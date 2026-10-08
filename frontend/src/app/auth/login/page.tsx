@@ -176,7 +176,7 @@ function LoginContent() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/logo.svg" alt="Flo" width={96} height={96} className="mx-auto mb-3" />
+          <img src="/dinzin-logo.png" alt="DinZin" className="h-16 w-auto mx-auto mb-3 object-contain" />
           <p className="text-muted-foreground mt-2">{t('signInTitle')}</p>
         </div>
         {dbError && (

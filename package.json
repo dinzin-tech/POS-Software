@@ -1,7 +1,7 @@
 {
-  "name": "flo-desktop",
+  "name": "dinzin-desktop",
   "version": "3.12.22",
-  "description": "Free, open-source, offline-first restaurant POS with KDS, SQLite, and thermal printer support.",
+  "description": "DinZin POS - Free, open-source, offline-first restaurant POS with KDS, SQLite, and thermal printer support.",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -326,8 +326,8 @@
     "ws": "^8.22.0"
   },
   "build": {
-    "appId": "com.flo.desktop",
-    "productName": "Flo Cafe",
+    "appId": "com.dinzin.desktop",
+    "productName": "DinZin",
     "icon": "assets/icon-512.png",
     "afterPack": "scripts/afterPack.js",
     "asar": true,
@@ -376,15 +376,15 @@
         }
       ],
       "icon": "assets/icon.ico",
-      "artifactName": "flocafe-${version}-win-${arch}.${ext}"
+      "artifactName": "dinzin-${version}-win-${arch}.${ext}"
     },
     "appx": {
-      "applicationId": "FloCafe",
+      "applicationId": "DinZin",
       "backgroundColor": "#1e1e2e",
       "publisherDisplayName": "Codify Apps Private Limited",
-      "identityName": "CodifyAppsPrivateLimited.FloCafe",
+      "identityName": "CodifyAppsPrivateLimited.DinZin",
       "publisher": "CN=34AFD24D-EC88-44B8-B309-08BB8A6BB5F7",
-      "displayName": "Flo Cafe",
+      "displayName": "DinZin",
       "languages": [
         "en-US"
       ]
@@ -414,9 +414,9 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "notarize": true,
-      "artifactName": "flocafe-${version}-mac-${arch}.${ext}",
+      "artifactName": "dinzin-${version}-mac-${arch}.${ext}",
       "extendInfo": {
-        "NSLocalNetworkUsageDescription": "Flo Cafe connects to thermal printers, KDS displays, and the Waiter & Table Terminal on your local network.",
+        "NSLocalNetworkUsageDescription": "DinZin connects to thermal printers, KDS displays, and the Waiter & Table Terminal on your local network.",
         "NSBonjourServices": [
           "_http._tcp"
         ]
@@ -434,7 +434,7 @@
       "type": "distribution",
       "extendInfo": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSLocalNetworkUsageDescription": "Flo Cafe connects to thermal printers, KDS displays, and the Waiter & Table Terminal on your local network.",
+        "NSLocalNetworkUsageDescription": "DinZin connects to thermal printers, KDS displays, and the Waiter & Table Terminal on your local network.",
         "NSBonjourServices": [
           "_http._tcp"
         ]
@@ -451,8 +451,8 @@
       "identity": "Apple Development: Codify Apps Private Limited (BKDY677XJA)"
     },
     "linux": {
-      "synopsis": "Self-hosted Point of Sale for cafes and restaurants",
-      "description": "Flo is a free, open-source point-of-sale system for cafes, restaurants, and small kitchens. Local-first, offline-capable, no cloud lock-in, no per-seat fees.",
+      "synopsis": "Offline-first Point of Sale for cafes and restaurants",
+      "description": "DinZin is an open-source point-of-sale system for cafes, restaurants, and small kitchens. Local-first, offline-capable, no cloud lock-in, no per-seat fees.",
       "target": [
         {
           "target": "AppImage",
@@ -485,8 +485,8 @@
       ],
       "icon": "assets",
       "category": "Office",
-      "executableName": "flocafe",
-      "artifactName": "flocafe-${version}-linux.${ext}",
+      "executableName": "dinzin",
+      "artifactName": "dinzin-${version}-linux.${ext}",
       "extraFiles": [
         {
           "from": "assets/com.flo.desktop.metainfo.xml",
@@ -499,16 +499,16 @@
       ],
       "desktop": {
         "entry": {
-          "Name": "Flo Cafe",
-          "Comment": "Free, open-source POS for cafes and restaurants",
+          "Name": "DinZin",
+          "Comment": "Offline-first POS for cafes and restaurants",
           "GenericName": "Point of Sale",
           "Keywords": "pos;point of sale;restaurant;cafe;billing;invoice;",
-          "StartupWMClass": "flo-desktop"
+          "StartupWMClass": "dinzin-desktop"
         }
       }
     },
     "appImage": {
-      "artifactName": "flocafe-${version}-linux.appimage"
+      "artifactName": "dinzin-${version}-linux.appimage"
     },
     "snapcraft": {
       "base": "core24",
