@@ -62,6 +62,8 @@ jobs:
 
       - name: Package Windows .exe
         run: npx electron-builder --win nsis
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
