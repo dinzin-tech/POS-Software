@@ -342,8 +342,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "FreeOpenSourcePOS",
-      "repo": "FloCafe",
+      "owner": "dinzin-tech",
+      "repo": "POS-Software",
       "releaseType": "release",
       "channel": "latest"
     },
