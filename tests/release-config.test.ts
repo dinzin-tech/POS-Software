@@ -199,8 +199,8 @@ function run() {
   assert.equal(build?.snapcraft?.core24?.environment?.TMPDIR, '$XDG_RUNTIME_DIR', 'snapcraft must use a writable runtime temp directory');
   assert.ok(typeof build?.linux?.synopsis === 'string' && build.linux.synopsis.length > 0 && build.linux.synopsis.length <= 78, 'linux synopsis must be present and short');
 
-  assert.equal(build?.linux?.artifactName, 'flocafe-${version}-linux.${ext}', 'Linux package artifact template must remain deterministic');
-  assert.equal(build?.appImage?.artifactName, 'flocafe-${version}-linux.appimage', 'AppImage artifact extension must be lowercase');
+  assert.equal(build?.linux?.artifactName, 'dinzin-${version}-linux.${ext}', 'Linux package artifact template must remain deterministic');
+  assert.equal(build?.appImage?.artifactName, 'dinzin-${version}-linux.appimage', 'AppImage artifact extension must be lowercase');
   assert.equal(builderUtil.getArtifactArchName(builderUtil.Arch.x64, 'AppImage'), 'x86_64', 'electron-builder AppImage x64 macro spelling must be documented');
   assert.equal(builderUtil.getArtifactArchName(builderUtil.Arch.arm64, 'AppImage'), 'arm64', 'electron-builder AppImage arm64 macro spelling must be documented');
   for (const artifact of [build?.linux?.artifactName, build?.appImage?.artifactName]) {
