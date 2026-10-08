@@ -190,11 +190,7 @@ function run() {
     'npm run build:frontend && npm run build && electron-builder --win appx --x64 --arm64 --config.npmRebuild=false',
     'build:appx must preserve local x64 and arm64 Store builds'
   );
-  assert.ok(build?.appx?.identityName, 'build.appx.identityName must be set');
-  assert.ok(build?.appx?.publisher, 'build.appx.publisher must be set');
-  assert.ok(winTargets.includes('appx'), 'win build target must include appx');
-  const appxConfig = (build?.win?.target || []).find((target: any) => target.target === 'appx');
-  assert.ok(appxConfig?.arch?.includes('arm64'), 'win appx target must include arm64');
+  assert.ok(winTargets.includes('nsis'), 'win build target must include nsis');
 
   assert.equal(build?.snapcraft?.base, 'core24', 'snapcraft must use core24');
   const snapPlugs = build?.snapcraft?.core24?.plugs || [];

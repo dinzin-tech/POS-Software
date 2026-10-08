@@ -63,7 +63,7 @@ test('real preload, renderer, and main boundaries reach an authenticated dashboa
   expect(runtime.titleBarDocumentNonce).toMatch(/^[0-9a-f-]{36}$/i);
   expect(runtime.focusedAttribute).toBe('true');
   expect(runtime.desktopAttribute).toBe('true');
-  expect(runtime.appInfo).toMatchObject({ name: 'flo-desktop', platform: process.platform });
+  expect(runtime.appInfo).toMatchObject({ name: 'dinzin-desktop', platform: process.platform });
   expect(runtime.updateStatus.status).toBeTruthy();
   expect(runtime.updateStatus.info.version).toBeTruthy();
   expect(runtime.readiness).toEqual({ success: true });
