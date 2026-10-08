@@ -175,7 +175,7 @@ function expectedManifestNames(channel) {
 }
 
 function assertManifestPlatformMapping(manifestName, version, files, selectedPath) {
-  const base = `flocafe-${version}`;
+  const base = `dinzin-${version}`;
   const urls = files.map((file) => file.url);
   let allowed;
   let required;
@@ -231,7 +231,7 @@ function assertManifestPlatformMapping(manifestName, version, files, selectedPat
 }
 
 function expectedArtifactNames(version) {
-  const base = `flocafe-${version}`;
+  const base = `dinzin-${version}`;
   return [
     'uninstall-macos.sh',
     'uninstall-windows.ps1',

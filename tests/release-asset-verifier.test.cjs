@@ -105,7 +105,7 @@ assert.throws(
 assert.throws(
   () => assertReleaseAssetInventory([
     ...assets,
-    { name: `flocafe-3.2.9-win-x64.exe`, size: 1 },
+    { name: `dinzin-3.2.9-win-x64.exe`, size: 1 },
   ], MANIFESTS, VERSION),
   /unexpected assets:.*3\.2\.9/,
 );
@@ -113,10 +113,10 @@ assert.throws(
 const parsedManifest = parseManifest(fixture.payloads.get('latest.yml').toString('utf8'), 'latest.yml');
 assert.deepEqual(parsedManifest, {
   version: VERSION,
-  path: `flocafe-${VERSION}-win-x64.exe`,
+  path: `dinzin-${VERSION}-win-x64.exe`,
   files: [{
-    url: `flocafe-${VERSION}-win-x64.exe`,
-    sha512: sha512(fixture.payloads.get(`flocafe-${VERSION}-win-x64.exe`)),
+    url: `dinzin-${VERSION}-win-x64.exe`,
+    sha512: sha512(fixture.payloads.get(`dinzin-${VERSION}-win-x64.exe`)),
   }],
 });
 assert.throws(
@@ -129,59 +129,59 @@ assert.throws(
 );
 
 assert.doesNotThrow(() => assertManifestPlatformMapping('latest.yml', VERSION, [
-  { url: `flocafe-${VERSION}-win-x64.exe` },
-], `flocafe-${VERSION}-win-x64.exe`));
+  { url: `dinzin-${VERSION}-win-x64.exe` },
+], `dinzin-${VERSION}-win-x64.exe`));
 assert.throws(
   () => assertManifestPlatformMapping('latest.yml', VERSION, [
-    { url: `flocafe-${VERSION}-win-x64.exe` },
+    { url: `dinzin-${VERSION}-win-x64.exe` },
   ]),
   /updater path must/,
 );
 assert.doesNotThrow(() => assertManifestPlatformMapping('latest-mac.yml', VERSION, [
-  { url: `flocafe-${VERSION}-mac-x64.zip` },
-  { url: `flocafe-${VERSION}-mac-arm64.zip` },
-  { url: `flocafe-${VERSION}-mac-x64.dmg` },
-  { url: `flocafe-${VERSION}-mac-arm64.dmg` },
-], `flocafe-${VERSION}-mac-x64.zip`));
+  { url: `dinzin-${VERSION}-mac-x64.zip` },
+  { url: `dinzin-${VERSION}-mac-arm64.zip` },
+  { url: `dinzin-${VERSION}-mac-x64.dmg` },
+  { url: `dinzin-${VERSION}-mac-arm64.dmg` },
+], `dinzin-${VERSION}-mac-x64.zip`));
 assert.throws(
   () => assertManifestPlatformMapping('latest-mac.yml', VERSION, [
-    { url: `flocafe-${VERSION}-mac-x64.zip` },
-    { url: `flocafe-${VERSION}-mac-arm64.zip` },
-  ], `flocafe-${VERSION}-mac-x64.dmg`),
+    { url: `dinzin-${VERSION}-mac-x64.zip` },
+    { url: `dinzin-${VERSION}-mac-arm64.zip` },
+  ], `dinzin-${VERSION}-mac-x64.dmg`),
   /updater path must/,
 );
 assert.doesNotThrow(() => assertManifestPlatformMapping('latest-linux.yml', VERSION, [
-  { url: `flocafe-${VERSION}-linux-x64.appimage` },
+  { url: `dinzin-${VERSION}-linux-x64.appimage` },
   // electron-builder lists every Linux target from the same invocation (#468).
-  { url: `flocafe-${VERSION}-linux-x64.deb` },
-  { url: `flocafe-${VERSION}-linux-x64.rpm` },
-], `flocafe-${VERSION}-linux-x64.appimage`));
+  { url: `dinzin-${VERSION}-linux-x64.deb` },
+  { url: `dinzin-${VERSION}-linux-x64.rpm` },
+], `dinzin-${VERSION}-linux-x64.appimage`));
 assert.doesNotThrow(() => assertManifestPlatformMapping('latest-linux-arm64.yml', VERSION, [
-  { url: `flocafe-${VERSION}-linux-arm64.appimage` },
-  { url: `flocafe-${VERSION}-linux-arm64.deb` },
-], `flocafe-${VERSION}-linux-arm64.appimage`));
+  { url: `dinzin-${VERSION}-linux-arm64.appimage` },
+  { url: `dinzin-${VERSION}-linux-arm64.deb` },
+], `dinzin-${VERSION}-linux-arm64.appimage`));
 assert.throws(
   () => assertManifestPlatformMapping('latest.yml', VERSION, [
-    { url: `flocafe-${VERSION}-mac-x64.zip` },
+    { url: `dinzin-${VERSION}-mac-x64.zip` },
   ]),
   /another platform or architecture/,
 );
 assert.throws(
   () => assertManifestPlatformMapping('latest-linux-arm64.yml', VERSION, [
-    { url: `flocafe-${VERSION}-linux-x64.appimage` },
-  ], `flocafe-${VERSION}-linux-x64.appimage`),
+    { url: `dinzin-${VERSION}-linux-x64.appimage` },
+  ], `dinzin-${VERSION}-linux-x64.appimage`),
   /another platform or architecture/,
 );
 assert.throws(
   () => assertManifestPlatformMapping('latest-linux.yml', VERSION, [
-    { url: `flocafe-${VERSION}-linux-x64.appimage` },
-    { url: `flocafe-${VERSION}-linux-x64.deb` },
-  ], `flocafe-${VERSION}-linux-x64.deb`),
+    { url: `dinzin-${VERSION}-linux-x64.appimage` },
+    { url: `dinzin-${VERSION}-linux-x64.deb` },
+  ], `dinzin-${VERSION}-linux-x64.deb`),
   /updater path must/,
 );
 assert.throws(
   () => assertManifestPlatformMapping('latest-mac.yml', VERSION, [
-    { url: `flocafe-${VERSION}-mac-x64.zip` },
+    { url: `dinzin-${VERSION}-mac-x64.zip` },
   ]),
   /missing required platform artifacts/,
 );
@@ -196,9 +196,9 @@ assert.throws(
     },
   });
   assert.ok(requestedAssets.includes('uninstall-macos.sh'), 'non-manifest assets must be availability-checked');
-  assert.ok(requestedAssets.includes(`flocafe-${VERSION}-win-x64.exe`), 'Windows representative must be downloaded and hashed');
-  assert.ok(requestedAssets.includes(`flocafe-${VERSION}-mac-x64.zip`), 'macOS representative must be downloaded and hashed');
-  assert.ok(requestedAssets.includes(`flocafe-${VERSION}-linux-x64.appimage`), 'Linux representative must be downloaded and hashed');
+  assert.ok(requestedAssets.includes(`dinzin-${VERSION}-win-x64.exe`), 'Windows representative must be downloaded and hashed');
+  assert.ok(requestedAssets.includes(`dinzin-${VERSION}-mac-x64.zip`), 'macOS representative must be downloaded and hashed');
+  assert.ok(requestedAssets.includes(`dinzin-${VERSION}-linux-x64.appimage`), 'Linux representative must be downloaded and hashed');
 
   const candidateManifest = await createCandidateManifest({
     release: fixture.release,
@@ -246,7 +246,7 @@ assert.throws(
   );
 
   const badUrl = makeFixture();
-  const badUrlName = `flocafe-${VERSION}-win-x64.exe`;
+  const badUrlName = `dinzin-${VERSION}-win-x64.exe`;
   badUrl.payloads.set('latest.yml', Buffer.from(manifestFor([{
     url: badUrlName,
     sha512: sha512(badUrl.payloads.get(badUrlName)),

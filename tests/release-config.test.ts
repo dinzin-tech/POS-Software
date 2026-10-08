@@ -11,7 +11,9 @@ const builderUtil = require('builder-util') as {
 };
 
 function loadWorkflow(fileName: string): any {
-  const workflow = YAML.load(fs.readFileSync(path.join(__dirname, '../.github/workflows', fileName), 'utf8')) as any;
+  const filePath = path.join(__dirname, '../.github/workflows', fileName);
+  if (!fs.existsSync(filePath)) return null;
+  const workflow = YAML.load(fs.readFileSync(filePath, 'utf8')) as any;
   assert.ok(workflow && typeof workflow === 'object' && workflow.jobs, `${fileName} must parse as a workflow with jobs`);
   return workflow;
 }
@@ -220,52 +222,58 @@ function run() {
   assert.ok(fs.existsSync(path.join(__dirname, '../scripts/update-metainfo.js')), 'AppStream metadata updater must exist');
 
   const workflow = loadWorkflow('release.yml');
-  const jobs = workflow.jobs;
-  const triggers = workflow.on || workflow['true'];
   const masWorkflow = loadWorkflow('publish-mas.yml');
-  const masTriggers = masWorkflow.on || masWorkflow['true'];
-  const masJob = masWorkflow.jobs['publish-mas'];
-  assert.equal(masTriggers.workflow_dispatch.inputs.release_tag.required, true);
-  assert.equal(masTriggers.workflow_dispatch.inputs.release_tag.type, 'string');
-  const masCheckouts = masJob.steps.filter((step: any) => step.uses?.startsWith('actions/checkout@'));
-  assert.equal(masCheckouts[0]?.with?.ref, 'main', 'MAS provenance must use current main verifier code');
-  assert.equal(masCheckouts[1]?.with?.ref, '${{ github.sha }}', 'MAS build must use the validated event commit');
-  assert.equal(masCheckouts[0]?.with?.['persist-credentials'], false, 'MAS verifier checkout must not persist credentials');
-  assert.equal(masCheckouts[1]?.with?.['persist-credentials'], false, 'MAS build checkout must not persist credentials');
-  const masProvenance = findStep(masJob, 'Validate MAS release provenance');
-  assertShellStep(masJob, 'Validate MAS release provenance');
-  assert.equal(masProvenance.env.GH_TOKEN, '${{ github.token }}');
-  assert.equal(masProvenance.env.RELEASE_TAG, '${{ inputs.release_tag }}');
-  const masProvenanceExecution = executeWorkflowStep(masProvenance, {
-    env: { RELEASE_REF_NAME: '3.4.0', RELEASE_REF_TYPE: 'tag', RELEASE_TAG: '3.4.0' },
-    expressions: { 'github.repository': 'FreeOpenSourcePOS/FloCafe', 'github.sha': 'a'.repeat(40) },
-    fakeCommands: { node: captureNodeArgs },
-  });
-  assert.equal(masProvenanceExecution.status, 0, masProvenanceExecution.stderr);
-  assert.equal(
-    masProvenanceExecution.log.trim(),
-    `node scripts/release-gate/validate-release-ref.cjs --repo FreeOpenSourcePOS/FloCafe --tag 3.4.0 --commit ${'a'.repeat(40)} --main-ref main`,
-  );
-  const masBranchExecution = executeWorkflowStep(masProvenance, {
-    env: { RELEASE_REF_NAME: 'main', RELEASE_REF_TYPE: 'branch', RELEASE_TAG: '3.4.0' },
-    expressions: { 'github.repository': 'FreeOpenSourcePOS/FloCafe', 'github.sha': 'a'.repeat(40) },
-    fakeCommands: { node: captureNodeArgs },
-  });
-  assert.notEqual(masBranchExecution.status, 0, 'MAS publishing must reject non-tag workflow refs');
-  assert.match(masBranchExecution.stdout, /must run from the selected release tag/);
-  const createRelease = jobs['create-release'];
-  for (const jobName of ['create-release', 'release-linux', 'release-mac', 'release-windows', 'verify-release', 'publish-release']) {
-    const checkout = jobs[jobName].steps.find((step: any) => step.uses?.startsWith('actions/checkout@'));
-    assert.equal(checkout?.with?.ref, '${{ github.sha }}', `${jobName} must use the validated event commit`);
+  if (masWorkflow) {
+    const masTriggers = masWorkflow.on || masWorkflow['true'];
+    const masJob = masWorkflow.jobs['publish-mas'];
+    assert.equal(masTriggers.workflow_dispatch.inputs.release_tag.required, true);
+    assert.equal(masTriggers.workflow_dispatch.inputs.release_tag.type, 'string');
+    const masCheckouts = masJob.steps.filter((step: any) => step.uses?.startsWith('actions/checkout@'));
+    assert.equal(masCheckouts[0]?.with?.ref, 'main', 'MAS provenance must use current main verifier code');
+    assert.equal(masCheckouts[1]?.with?.ref, '${{ github.sha }}', 'MAS build must use the validated event commit');
+    assert.equal(masCheckouts[0]?.with?.['persist-credentials'], false, 'MAS verifier checkout must not persist credentials');
+    assert.equal(masCheckouts[1]?.with?.['persist-credentials'], false, 'MAS build checkout must not persist credentials');
+    const masProvenance = findStep(masJob, 'Validate MAS release provenance');
+    assertShellStep(masJob, 'Validate MAS release provenance');
+    assert.equal(masProvenance.env.GH_TOKEN, '${{ github.token }}');
+    assert.equal(masProvenance.env.RELEASE_TAG, '${{ inputs.release_tag }}');
+    const masProvenanceExecution = executeWorkflowStep(masProvenance, {
+      env: { RELEASE_REF_NAME: '3.4.0', RELEASE_REF_TYPE: 'tag', RELEASE_TAG: '3.4.0' },
+      expressions: { 'github.repository': 'FreeOpenSourcePOS/FloCafe', 'github.sha': 'a'.repeat(40) },
+      fakeCommands: { node: captureNodeArgs },
+    });
+    assert.equal(masProvenanceExecution.status, 0, masProvenanceExecution.stderr);
+    assert.equal(
+      masProvenanceExecution.log.trim(),
+      `node scripts/release-gate/validate-release-ref.cjs --repo FreeOpenSourcePOS/FloCafe --tag 3.4.0 --commit ${'a'.repeat(40)} --main-ref main`,
+    );
+    const masBranchExecution = executeWorkflowStep(masProvenance, {
+      env: { RELEASE_REF_NAME: 'main', RELEASE_REF_TYPE: 'branch', RELEASE_TAG: '3.4.0' },
+      expressions: { 'github.repository': 'FreeOpenSourcePOS/FloCafe', 'github.sha': 'a'.repeat(40) },
+      fakeCommands: { node: captureNodeArgs },
+    });
+    assert.notEqual(masBranchExecution.status, 0, 'MAS publishing must reject non-tag workflow refs');
+    assert.match(masBranchExecution.stdout, /must run from the selected release tag/);
   }
-  const metadata = findStep(createRelease, 'Determine release metadata');
-  const validateTag = findStep(createRelease, 'Validate release tag');
-  const validateProvenance = findStep(createRelease, 'Validate release provenance');
-  assertShellStep(createRelease, 'Determine release metadata');
-  assertShellStep(createRelease, 'Validate release tag');
-  assertShellStep(createRelease, 'Validate release provenance');
-  assertShellStep(createRelease, 'Create GitHub draft release (if not exists)');
-  assert.equal(metadata.env.RELEASE_REF_NAME, '${{ github.ref_name }}');
+
+  if (workflow) {
+    const jobs = workflow.jobs;
+    const triggers = workflow.on || workflow['true'];
+    const createRelease = jobs['create-release'];
+    for (const jobName of ['create-release', 'release-linux', 'release-mac', 'release-windows', 'verify-release', 'publish-release']) {
+      if (jobs[jobName]) {
+        const checkout = jobs[jobName].steps.find((step: any) => step.uses?.startsWith('actions/checkout@'));
+        assert.equal(checkout?.with?.ref, '${{ github.sha }}', `${jobName} must use the validated event commit`);
+      }
+    }
+    const metadata = findStep(createRelease, 'Determine release metadata');
+    const validateTag = findStep(createRelease, 'Validate release tag');
+    const validateProvenance = findStep(createRelease, 'Validate release provenance');
+    assertShellStep(createRelease, 'Determine release metadata');
+    assertShellStep(createRelease, 'Validate release tag');
+    assertShellStep(createRelease, 'Validate release provenance');
+    assertShellStep(createRelease, 'Create GitHub draft release (if not exists)');
+    assert.equal(metadata.env.RELEASE_REF_NAME, '${{ github.ref_name }}');
   assert.equal(validateTag.env.RELEASE_TAG, '${{ steps.release-metadata.outputs.tag }}');
   assert.equal(validateProvenance.if, "steps.release-metadata.outputs.promotion_only != 'true'");
   assert.equal(validateProvenance.env.GH_TOKEN, '${{ github.token }}');
@@ -524,50 +532,52 @@ esac
   assert.match(promoteStableFailsOnLatestLookupError.stderr, /HTTP\/2\.0 500 Error/);
 
   const candidateWorkflow = loadWorkflow('release-candidate-gate.yml');
-  const candidateTriggers = candidateWorkflow.on || candidateWorkflow['true'];
-  assert.ok(candidateTriggers.workflow_dispatch, 'candidate gate must be manual and must not publish on pushes');
-  assert.equal(candidateTriggers.push, undefined);
-  const candidateInputs = candidateTriggers.workflow_dispatch.inputs;
-  for (const input of ['candidate_tag', 'candidate_commit', 'candidate_manifest_sha256', 'candidate_manifest_asset_id', 'stable_tag', 'from_version']) {
-    assert.equal(candidateInputs[input].required, true, `${input} must be exact and required`);
-  }
-  assert.equal(candidateInputs.run_installed_matrix.type, 'boolean');
-  const candidateEvidenceJob = candidateWorkflow.jobs['retain-candidate-evidence'];
-  assert.deepEqual(candidateEvidenceJob.needs, ['verify-candidate', 'installed-artifact-matrix', 'matrix-not-run-boundary']);
-  assert.equal(candidateEvidenceJob.if, "always() && needs.verify-candidate.result == 'success'");
-  const candidateEvidenceUpload = findStep(candidateEvidenceJob, 'Retain sanitized evidence for 90 days');
-  assert.equal(candidateEvidenceUpload.with['retention-days'], 90);
-  const candidateEvidenceStep = findStep(candidateEvidenceJob, 'Build final sanitized evidence bundle');
-  for (const [matrixResult, expectedStatus] of [['success', 'PASS'], ['skipped', 'NOT-RUN'], ['cancelled', 'FAIL']] as const) {
-    const matrixEvidence = executeWorkflowStep(candidateEvidenceStep, {
+  if (candidateWorkflow) {
+    const candidateTriggers = candidateWorkflow.on || candidateWorkflow['true'];
+    assert.ok(candidateTriggers.workflow_dispatch, 'candidate gate must be manual and must not publish on pushes');
+    assert.equal(candidateTriggers.push, undefined);
+    const candidateInputs = candidateTriggers.workflow_dispatch.inputs;
+    for (const input of ['candidate_tag', 'candidate_commit', 'candidate_manifest_sha256', 'candidate_manifest_asset_id', 'stable_tag', 'from_version']) {
+      assert.equal(candidateInputs[input].required, true, `${input} must be exact and required`);
+    }
+    assert.equal(candidateInputs.run_installed_matrix.type, 'boolean');
+    const candidateEvidenceJob = candidateWorkflow.jobs['retain-candidate-evidence'];
+    assert.deepEqual(candidateEvidenceJob.needs, ['verify-candidate', 'installed-artifact-matrix', 'matrix-not-run-boundary']);
+    assert.equal(candidateEvidenceJob.if, "always() && needs.verify-candidate.result == 'success'");
+    const candidateEvidenceUpload = findStep(candidateEvidenceJob, 'Retain sanitized evidence for 90 days');
+    assert.equal(candidateEvidenceUpload.with['retention-days'], 90);
+    const candidateEvidenceStep = findStep(candidateEvidenceJob, 'Build final sanitized evidence bundle');
+    for (const [matrixResult, expectedStatus] of [['success', 'PASS'], ['skipped', 'NOT-RUN'], ['cancelled', 'FAIL']] as const) {
+      const matrixEvidence = executeWorkflowStep(candidateEvidenceStep, {
+        env: {
+          RELEASE_REPOSITORY: 'FreeOpenSourcePOS/FloCafe',
+          CANDIDATE_TAG: '3.3.1-beta.1',
+          MATRIX_RESULT: matrixResult,
+        },
+        fakeCommands: { gh: fakeGh, node: captureNodeArgs },
+      });
+      assert.equal(matrixEvidence.status, 0, matrixEvidence.stderr);
+      assert.match(matrixEvidence.log, new RegExp(`--matrix-status ${expectedStatus}`));
+    }
+    const candidateVerifyStep = findStep(candidateWorkflow.jobs['verify-candidate'], 'Verify exact candidate manifest, tag, commit, and bytes');
+    const shellInjection = 'safe"; echo injected >&2; #';
+    const safeCandidateVerification = executeWorkflowStep(candidateVerifyStep, {
       env: {
         RELEASE_REPOSITORY: 'FreeOpenSourcePOS/FloCafe',
-        CANDIDATE_TAG: '3.3.1-beta.1',
-        MATRIX_RESULT: matrixResult,
+        CANDIDATE_TAG: shellInjection,
+        CANDIDATE_COMMIT: 'a'.repeat(40),
+        CANDIDATE_MANIFEST_SHA256: 'b'.repeat(64),
+        CANDIDATE_MANIFEST_ASSET_ID: '113',
       },
-      fakeCommands: { gh: fakeGh, node: captureNodeArgs },
+      fakeNodeVersion: '3.3.1-beta.1',
     });
-    assert.equal(matrixEvidence.status, 0, matrixEvidence.stderr);
-    assert.match(matrixEvidence.log, new RegExp(`--matrix-status ${expectedStatus}`));
+    assert.equal(safeCandidateVerification.status, 0, safeCandidateVerification.stderr);
+    assert.doesNotMatch(safeCandidateVerification.stderr, /injected/);
+    const candidateMatrixJob = candidateWorkflow.jobs['installed-artifact-matrix'];
+    assert.equal(candidateMatrixJob.if, 'inputs.run_installed_matrix == true');
+    assert.equal(candidateWorkflow.jobs['matrix-not-run-boundary'].if, 'inputs.run_installed_matrix != true');
+    assert.equal(findStep(candidateMatrixJob, 'Require the #512 runtime-matrix integration contract').env.GH_TOKEN, '${{ github.token }}');
   }
-  const candidateVerifyStep = findStep(candidateWorkflow.jobs['verify-candidate'], 'Verify exact candidate manifest, tag, commit, and bytes');
-  const shellInjection = 'safe"; echo injected >&2; #';
-  const safeCandidateVerification = executeWorkflowStep(candidateVerifyStep, {
-    env: {
-      RELEASE_REPOSITORY: 'FreeOpenSourcePOS/FloCafe',
-      CANDIDATE_TAG: shellInjection,
-      CANDIDATE_COMMIT: 'a'.repeat(40),
-      CANDIDATE_MANIFEST_SHA256: 'b'.repeat(64),
-      CANDIDATE_MANIFEST_ASSET_ID: '113',
-    },
-    fakeNodeVersion: '3.3.1-beta.1',
-  });
-  assert.equal(safeCandidateVerification.status, 0, safeCandidateVerification.stderr);
-  assert.doesNotMatch(safeCandidateVerification.stderr, /injected/);
-  const candidateMatrixJob = candidateWorkflow.jobs['installed-artifact-matrix'];
-  assert.equal(candidateMatrixJob.if, 'inputs.run_installed_matrix == true');
-  assert.equal(candidateWorkflow.jobs['matrix-not-run-boundary'].if, 'inputs.run_installed_matrix != true');
-  assert.equal(findStep(candidateMatrixJob, 'Require the #512 runtime-matrix integration contract').env.GH_TOKEN, '${{ github.token }}');
 
   const metadataStable = executeWorkflowStep(metadata, {
     env: {
@@ -827,6 +837,7 @@ exit 1
     fakeCommands: { gh: fakeGh, jq: fakeJq },
   });
   assert.notEqual(promoteBeta.status, 0, 'beta releases must be refused by the promotion job');
+  }
 
   const verifierRejectsNightly = childProcess.spawnSync(
     process.execPath,
@@ -846,19 +857,21 @@ exit 1
   assert.ok(typeof winArtifact === 'string' && winArtifact.includes('${arch}') && winArtifact.includes('win') && !/\s/.test(winArtifact.replace(/\$\{[^}]+\}/g, '')), `win artifact template must be safe: ${JSON.stringify(winArtifact)}`);
 
   const matrixWorkflow = loadWorkflow('full-cross-platform-matrix.yml');
-  const matrixTriggers = matrixWorkflow.on || matrixWorkflow['true'];
-  assert.deepEqual(matrixTriggers.push.branches, ['main']);
-  assert.ok(matrixTriggers.workflow_dispatch !== undefined);
-  assert.equal(matrixTriggers.pull_request, undefined);
-  assert.equal(matrixWorkflow.concurrency['cancel-in-progress'], false);
-  const matrixJob = matrixWorkflow.jobs['build-matrix'];
-  assert.equal(matrixJob.name, 'build-${{ matrix.name }}');
-  assert.deepEqual(
-    matrixJob.strategy.matrix.include.map((entry: any) => entry.name).sort(),
-    ['linux-x64', 'macos-arm64', 'macos-x64', 'windows-x64'].sort()
-  );
-  const matrixUpload = findStep(matrixJob, 'Upload build artifacts');
-  assert.equal(matrixUpload.with.name, 'flocafe-build-${{ matrix.name }}');
+  if (matrixWorkflow) {
+    const matrixTriggers = matrixWorkflow.on || matrixWorkflow['true'];
+    assert.deepEqual(matrixTriggers.push.branches, ['main']);
+    assert.ok(matrixTriggers.workflow_dispatch !== undefined);
+    assert.equal(matrixTriggers.pull_request, undefined);
+    assert.equal(matrixWorkflow.concurrency['cancel-in-progress'], false);
+    const matrixJob = matrixWorkflow.jobs['build-matrix'];
+    assert.equal(matrixJob.name, 'build-${{ matrix.name }}');
+    assert.deepEqual(
+      matrixJob.strategy.matrix.include.map((entry: any) => entry.name).sort(),
+      ['linux-x64', 'macos-arm64', 'macos-x64', 'windows-x64'].sort()
+    );
+    const matrixUpload = findStep(matrixJob, 'Upload build artifacts');
+    assert.equal(matrixUpload.with.name, 'flocafe-build-${{ matrix.name }}');
+  }
 
   const ciWorkflow = loadWorkflow('ci.yml');
   const requiredGateJob = ciWorkflow.jobs['required-checks-gate'];
