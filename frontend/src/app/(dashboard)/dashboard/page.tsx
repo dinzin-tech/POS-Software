@@ -371,6 +371,7 @@ export default function DashboardPage() {
           responseType: 'blob',
         });
         downloadBlob(res.data as Blob, `daily-sales-${selectedDate}-${part}.csv`);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     } catch {
       toast.error(tCommon('downloadFailed'));

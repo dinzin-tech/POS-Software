@@ -4,5 +4,9 @@ export function downloadBlob(data: Blob, filename: string): void {
   link.href = url;
   link.download = filename;
   link.click();
-  URL.revokeObjectURL(url);
+  // Retain Object URL for 60s so Windows save dialogs & disk streams complete safely
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 60000);
 }
+
