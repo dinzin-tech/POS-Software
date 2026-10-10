@@ -223,6 +223,75 @@ router.get('/', customerReadRateLimit, requirePermission('customers.view'), (req
   }
 });
 
+router.get('/export', customerReadRateLimit, requirePermission('customers.view'), (req: Request, res: Response) => {
+  try {
+    const db = getDatabase();
+    const rows = db.prepare(`
+      WITH order_stats AS (
+        SELECT customer_id,
+          COUNT(*) AS visits_count,
+          COALESCE(SUM(total), 0) AS total_spent,
+          MAX(created_at) AS last_visit_at
+        FROM orders
+        WHERE customer_id IS NOT NULL
+        GROUP BY customer_id
+      ),
+      ledger_credits AS (
+        SELECT customer_id, COALESCE(SUM(amount), 0) AS credits
+        FROM loyalty_ledger
+        WHERE type = 'credit'
+        GROUP BY customer_id
+      ),
+      ledger_debits AS (
+        SELECT customer_id, COALESCE(SUM(amount), 0) AS debits
+        FROM loyalty_ledger
+        WHERE type = 'debit'
+        GROUP BY customer_id
+      )
+      SELECT c.*,
+        COALESCE(os.visits_count, 0) as visits_count,
+        COALESCE(os.total_spent, 0) as total_spent,
+        MAX(0, COALESCE(lc.credits, 0) - COALESCE(ld.debits, 0)) as wallet_balance,
+        os.last_visit_at
+      FROM customers c
+      LEFT JOIN order_stats os ON os.customer_id = c.id
+      LEFT JOIN ledger_credits lc ON lc.customer_id = c.id
+      LEFT JOIN ledger_debits ld ON ld.customer_id = c.id
+      WHERE c.is_active = 1
+      ORDER BY c.name COLLATE NOCASE ASC
+    `).all() as any[];
+
+    const escapeCsv = (val: unknown) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const headers = ['Name', 'Phone', 'Email', 'Visits', 'Total Spent', 'Loyalty Balance', 'Last Visit', 'Address'];
+    const lines = rows.map((c) => {
+      const fullPhone = c.phone ? (c.country_code && !c.phone.startsWith(c.country_code) ? `${c.country_code}${c.phone}` : c.phone) : '';
+      return [
+        escapeCsv(c.name || ''),
+        escapeCsv(fullPhone),
+        escapeCsv(c.email || ''),
+        escapeCsv(c.visits_count ?? 0),
+        escapeCsv(Number(c.total_spent || 0).toFixed(2)),
+        escapeCsv(Number(c.wallet_balance || 0).toFixed(2)),
+        escapeCsv(c.last_visit_at || ''),
+        escapeCsv(c.address || ''),
+      ].join(',');
+    });
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...lines].join('\r\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="customers-${now().slice(0, 10)}.csv"`);
+    res.send(csvContent);
+  } catch (error: any) {
+    console.error("[API] Internal error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.get('/:id', customerReadRateLimit, requirePermission('customers.view'), (req: Request, res: Response) => {
   try {
     const db = getDatabase();

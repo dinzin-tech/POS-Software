@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 
 
 import toast from 'react-hot-toast';
-import { Plus, Search, X, Edit, Wallet, History, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { Plus, Search, X, Edit, Wallet, History, TrendingUp, TrendingDown, AlertCircle, Download } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
+import { downloadBlob } from '@/lib/download';
 import type { Customer } from '@/lib/types';
 import { countryName } from '@/lib/countries';
 import { dialCodeFor, normalizeOptionalPhone } from '@/lib/phone';
@@ -143,6 +144,57 @@ export default function CustomersPage() {
     }
   };
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  const exportCustomers = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      // Prefer server-side generated export
+      const res = await api.get('/customers/export', { responseType: 'blob' });
+      const filename = `customers-${new Date().toISOString().slice(0, 10)}.csv`;
+      downloadBlob(res.data as Blob, filename);
+      toast.success(tCommon('done'));
+    } catch {
+      // Client-side fallback if offline / standalone
+      try {
+        if (!customers.length) {
+          toast.error(tCommon('notAvailable'));
+          return;
+        }
+        const headers = ['Name', 'Phone', 'Email', 'Visits', 'Total Spent', 'Loyalty Balance', 'Last Visit', 'Address'];
+        const escapeCsv = (val: unknown) => {
+          if (val === null || val === undefined) return '""';
+          const str = String(val).replace(/"/g, '""');
+          return `"${str}"`;
+        };
+
+        const rows = customers.map((c) => {
+          const fullPhone = c.phone ? (c.country_code && !c.phone.startsWith(c.country_code) ? `${c.country_code}${c.phone}` : c.phone) : '';
+          return [
+            escapeCsv(c.name || ''),
+            escapeCsv(fullPhone),
+            escapeCsv(c.email || ''),
+            escapeCsv(c.visits_count ?? 0),
+            escapeCsv(Number(c.total_spent || 0).toFixed(2)),
+            escapeCsv(Number(c.wallet_balance || 0).toFixed(2)),
+            escapeCsv(c.last_visit_at ? formatDate(c.last_visit_at) : ''),
+            escapeCsv(c.address || ''),
+          ].join(',');
+        });
+
+        const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        downloadBlob(blob, `customers-${new Date().toISOString().slice(0, 10)}.csv`);
+        toast.success(tCommon('done'));
+      } catch {
+        toast.error(tCommon('downloadFailed'));
+      }
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -157,7 +209,20 @@ export default function CustomersPage() {
             </span>
           )}
         </div>
-        <Button onClick={openAdd}><Plus size={16} className="me-1" /> {tCustomer('add')}</Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={exportCustomers}
+            disabled={isExporting || customers.length === 0}
+            className="border-border bg-card hover:bg-muted text-foreground"
+          >
+            <Download size={16} className="me-1.5" />
+            {isExporting ? tCommon('loading') : 'Export CSV'}
+          </Button>
+          <Button onClick={openAdd}>
+            <Plus size={16} className="me-1" /> {tCustomer('add')}
+          </Button>
+        </div>
       </div>
 
       <div className="relative mb-4">
