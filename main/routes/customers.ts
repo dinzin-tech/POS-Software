@@ -60,7 +60,7 @@ router.delete('/admin/cleanup', customerWriteRateLimit, requirePermission('custo
     const db = getDatabase();
     const result = db.prepare("DELETE FROM customers WHERE id IS NULL").run();
     res.json({ message: `Deleted ${result.changes} customers with null IDs` });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[API] Internal error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
@@ -103,7 +103,7 @@ router.post('/admin/repair-phones', customerWriteRateLimit, requirePermission('c
       unparseableCount,
       conflictedCount,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[API] Internal error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
@@ -119,7 +119,7 @@ router.get('/alerts', customerReadRateLimit, requirePermission('customers.view')
     `).get() as { count: number };
     
     res.json({ invalidPhonesCount: result.count });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[API] Internal error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
@@ -226,6 +226,18 @@ router.get('/', customerReadRateLimit, requirePermission('customers.view'), (req
 router.get('/export', customerReadRateLimit, requirePermission('customers.view'), (req: Request, res: Response) => {
   try {
     const db = getDatabase();
+    interface CustomerExportRow {
+      name?: string | null;
+      phone?: string | null;
+      country_code?: string | null;
+      email?: string | null;
+      visits_count?: number;
+      total_spent?: number;
+      wallet_balance?: number;
+      last_visit_at?: string | null;
+      address?: string | null;
+    }
+
     const rows = db.prepare(`
       WITH order_stats AS (
         SELECT customer_id,
@@ -259,7 +271,7 @@ router.get('/export', customerReadRateLimit, requirePermission('customers.view')
       LEFT JOIN ledger_debits ld ON ld.customer_id = c.id
       WHERE c.is_active = 1
       ORDER BY c.name COLLATE NOCASE ASC
-    `).all() as any[];
+    `).all() as CustomerExportRow[];
 
     const escapeCsv = (val: unknown) => {
       if (val === null || val === undefined) return '""';
@@ -286,7 +298,7 @@ router.get('/export', customerReadRateLimit, requirePermission('customers.view')
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="customers-${now().slice(0, 10)}.csv"`);
     res.send(csvContent);
-  } catch (error: any) {
+  } catch (error) {
     console.error("[API] Internal error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
