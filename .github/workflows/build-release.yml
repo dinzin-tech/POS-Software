@@ -38,7 +38,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-appimage
-          path: release/*.appimage
+          path: |
+            release/*.appimage
+            release/latest-linux.yml
+            release/*.appimage.blockmap
 
   build-windows:
     name: Build Windows Executable
@@ -69,7 +72,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-exe
-          path: release/*.exe
+          path: |
+            release/*.exe
+            release/latest.yml
+            release/*.exe.blockmap
 
   publish-release:
     name: Publish GitHub Release
