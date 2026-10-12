@@ -268,9 +268,13 @@ export interface DocumentMetaBlock {
   readonly invoiceNumberLabel: SemanticLabel;
   /** Alternate bill-number label; layouts that head the receipt with "Bill #". */
   readonly billNumberLabel: SemanticLabel;
+  /** Order / token number label for layouts that render the order/token number. */
+  readonly orderNumberLabel?: SemanticLabel | null;
   /** Date label for layouts that print a labeled date line (e.g. compact). */
   readonly dateLabel: SemanticLabel;
   readonly invoiceNumber: DirectionalText;
+  /** Order / token number when known and present. */
+  readonly orderNumber?: DirectionalText | null;
   /** Canonical stored timestamp; presentation formatting is a renderer duty. */
   readonly timestamp: DirectionalText;
   /** Table reference with its (uninterpolated) label concept. */
@@ -604,11 +608,13 @@ export function buildBillDocument(printData: PrintData, printContext: PrintConte
     title: resolveSemanticLabel(labels, hasTax ? 'print.taxInvoiceTitle' : 'print.invoiceTitle'),
     invoiceNumberLabel: resolveSemanticLabel(labels, 'print.invoiceNumber'),
     billNumberLabel: resolveSemanticLabel(labels, 'receipt.billNumber'),
+    orderNumberLabel: order.orderNumber.length > 0 ? resolveSemanticLabel(labels, 'pos.orderNumber') : null,
     dateLabel: resolveSemanticLabel(labels, 'receipt.date'),
     invoiceNumber: directionalText(
       bill.billNumber.length > 0 ? bill.billNumber : order.orderNumber,
       base,
     ),
+    orderNumber: order.orderNumber.length > 0 ? directionalText(order.orderNumber, base) : null,
     timestamp: directionalText(order.createdAt, base),
     table: business.showTableNumber && order.tableName.length > 0
       ? Object.freeze({
@@ -1256,8 +1262,10 @@ function isPrintDocumentBlock(value: unknown): value is PrintDocumentBlock {
       return isSemanticLabel(value.title)
         && isSemanticLabel(value.invoiceNumberLabel)
         && isSemanticLabel(value.billNumberLabel)
+        && (value.orderNumberLabel === undefined || value.orderNumberLabel === null || isSemanticLabel(value.orderNumberLabel))
         && isSemanticLabel(value.dateLabel)
         && isDirectionalText(value.invoiceNumber)
+        && (value.orderNumber === undefined || value.orderNumber === null || isDirectionalText(value.orderNumber))
         && isDirectionalText(value.timestamp)
         && (value.table === null || (isRecord(value.table) && isSemanticLabel(value.table.label) && isDirectionalText(value.table.name)));
     case 'customer':

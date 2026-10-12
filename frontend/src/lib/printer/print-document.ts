@@ -82,9 +82,24 @@ function translatorFor(language: Language | string): ((key: string) => string) |
   const locale = LANGUAGES[lang]?.locale ?? 'en';
   const messages = getCachedMessages(lang) ?? getCachedMessages('en') ?? null;
   if (!messages) return null;
-  // `createTranslator` resolves dotted keys against the whole message tree;
-  // the cached messages are untyped, so the translator accepts any key here.
-  return createTranslator({ locale, messages }) as unknown as (key: string) => string;
+  // `createTranslator` resolves dotted keys against the whole message tree.
+  // Template labels (e.g. `pos.tableLabel` -> "Table: {name}") are retrieved via
+  // `t.raw` so ICU formatting doesn't fail when called without interpolation tokens.
+  const t = createTranslator({ locale, messages, onError: () => {} });
+  const tr = t as unknown as { (key: string): string; raw: (key: string) => unknown };
+  return (key: string): string => {
+    try {
+      const raw = tr.raw(key);
+      if (typeof raw === 'string') return raw;
+    } catch {
+      // Key not present in raw lookup; fall back to translator
+    }
+    try {
+      return tr(key);
+    } catch {
+      return key;
+    }
+  };
 }
 
 /** Pure label-catalog lookup for PrintContext backed by shared messages. */
@@ -92,10 +107,14 @@ export const printLabelResolver: LabelResolver = (conceptId: string, language: s
   const primary = translatorFor(language);
   if (primary) {
     const resolved = primary(conceptId);
-    if (resolved !== conceptId) return resolved;
+    if (resolved && resolved !== conceptId) return resolved;
   }
   const fallback = translatorFor('en');
-  return fallback ? fallback(conceptId) : conceptId;
+  if (fallback) {
+    const resolved = fallback(conceptId);
+    if (resolved && resolved !== conceptId) return resolved;
+  }
+  return conceptId;
 };
 
 /** Loads requested receipt language message bundles into memory before building documents. */

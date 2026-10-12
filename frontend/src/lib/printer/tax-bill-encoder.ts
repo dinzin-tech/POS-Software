@@ -216,8 +216,12 @@ export function buildTaxBillBytes(
   enc.newline();
 
   // ── Bill Details ─────────────────────────────────────────────────────────
-  enc.align('left');
-  safePrinterText(enc, `${labelFor('receipt.billNumber')}: ${bill.bill_number}`, warnings, false, arabicShaping, undefined, cols, language).newline();
+  if (order?.order_number && bill?.bill_number && String(order.order_number).trim() !== String(bill.bill_number).trim()) {
+    safePrinterText(enc, `${labelFor('pos.orderNumber').replace('{number}', order.order_number)}`, warnings, false, arabicShaping, undefined, cols, language).newline();
+    safePrinterText(enc, `${labelFor('print.invoiceNumber')}: ${bill.bill_number}`, warnings, false, arabicShaping, undefined, cols, language).newline();
+  } else {
+    safePrinterText(enc, `${labelFor('receipt.billNumber')}: ${bill.bill_number}`, warnings, false, arabicShaping, undefined, cols, language).newline();
+  }
   const billDate = rawEscPos
     ? formatRawTaxBillDate(bill.order?.created_at, locale, tenant.timezone, opts.capabilities)
     : formatDate(bill.order?.created_at, locale, tenant.timezone ? { timeZone: tenant.timezone } : undefined);

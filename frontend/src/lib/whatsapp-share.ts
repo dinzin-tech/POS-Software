@@ -185,7 +185,12 @@ export function getWhatsAppShareUrl(
   const lines: string[] = [];
 
   lines.push(`*${tenant.business_name}*`);
-  lines.push(`Bill #: ${bill.bill_number}`);
+  if (bill.order?.order_number && String(bill.order.order_number).trim() !== String(bill.bill_number).trim()) {
+    lines.push(`Order #: ${bill.order.order_number}`);
+    lines.push(`Invoice #: ${bill.bill_number}`);
+  } else {
+    lines.push(`Bill #: ${bill.bill_number}`);
+  }
   lines.push(`Date: ${formatDate(bill.order?.created_at, locale)}`);
   const itemLines = formatItemsList(bill.order, currency, locale);
   if (itemLines.length > 0) {
@@ -257,7 +262,12 @@ export function getWhatsAppMessage(
   const lines: string[] = [];
 
   lines.push(`${tenant.business_name}`);
-  lines.push(`Bill #: ${bill.bill_number}`);
+  if (bill.order?.order_number && String(bill.order.order_number).trim() !== String(bill.bill_number).trim()) {
+    lines.push(`Order #: ${bill.order.order_number}`);
+    lines.push(`Invoice #: ${bill.bill_number}`);
+  } else {
+    lines.push(`Bill #: ${bill.bill_number}`);
+  }
   lines.push(`Date: ${formatDate(bill.order?.created_at, locale)}`);
   const itemLines = formatItemsList(bill.order, currency, locale);
   if (itemLines.length > 0) {

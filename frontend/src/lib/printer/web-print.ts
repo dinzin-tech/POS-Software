@@ -282,6 +282,8 @@ export function generateBillHtml(
   const metaTableLabel = documentLabel(meta?.table?.label, 'pos.tableLabel', lang);
   const L = {
     billNumber: documentLabel(meta?.billNumberLabel, 'receipt.billNumber', lang),
+    invoiceNumber: documentLabel(meta?.invoiceNumberLabel, 'print.invoiceNumber', lang),
+    orderNumber: documentLabel(meta?.orderNumberLabel, 'pos.orderNumber', lang),
     date: documentLabel(meta?.dateLabel, 'receipt.date', lang),
     table: stripLabelPlaceholder(metaTableLabel),
     customer: documentLabel(customer?.nameLabel, 'pos.customer', lang),
@@ -299,7 +301,19 @@ export function generateBillHtml(
     printBill: printLabelResolver('receipt.printBill', lang),
   };
 
-  const invoiceNumberLabel = L.billNumber;
+  const hasDistinctOrderNumber = Boolean(
+    meta?.orderNumber?.text
+    && meta.orderNumber.text.trim().length > 0
+    && meta?.invoiceNumber?.text
+    && meta.orderNumber.text.trim() !== meta.invoiceNumber.text.trim()
+  );
+  const rawOrderLabel = documentLabel(meta?.orderNumberLabel, 'pos.orderNumber', lang);
+  const orderNumberLabel = stripLabelPlaceholder(rawOrderLabel) || 'Order #';
+  const rawInvoiceLabel = documentLabel(meta?.invoiceNumberLabel, 'print.invoiceNumber', lang);
+  const invoiceLabel = stripLabelPlaceholder(rawInvoiceLabel) || 'Invoice #';
+  const invoiceNumberLabel = hasDistinctOrderNumber
+    ? (lang === 'fa' ? L.billNumber : `${L.billNumber} / ${invoiceLabel}`)
+    : L.billNumber;
   const styles = getPaperStyles(paperSize);
 
   const items = itemsBlock?.rows ?? [];
@@ -317,7 +331,7 @@ export function generateBillHtml(
 <html lang="${localeTag}" dir="${dir}">
 <head>
   <meta charset="utf-8">
-  <title>${escapeHtml(invoiceNumberLabel)} ${escapeHtml(meta?.invoiceNumber.text ?? '')}</title>
+  <title>${escapeHtml(hasDistinctOrderNumber ? `${orderNumberLabel} ${meta?.orderNumber?.text ?? ''} · ` : '')}${escapeHtml(invoiceNumberLabel)} ${escapeHtml(meta?.invoiceNumber.text ?? '')}</title>
   <style>
     ${styles}
     @media print {
@@ -341,10 +355,19 @@ export function generateBillHtml(
     <!-- Bill Details -->
     <div class="bill-details">
       <table>
+        ${hasDistinctOrderNumber ? `
+        <tr>
+          <td><strong>${escapeHtml(orderNumberLabel)}:</strong> ${directionalValue(meta?.orderNumber ?? null, base)}</td>
+          <td class="text-end"><strong>${escapeHtml(L.date)}</strong> ${meta ? escapeHtml(formatReceiptDate(meta.timestamp.text, tenant, LANGUAGES[lang]?.locale ?? lang)) : ''}</td>
+        </tr>
+        <tr>
+          <td><strong>${escapeHtml(invoiceNumberLabel)}</strong> ${meta ? directionalValue(meta.invoiceNumber, base) : ''}</td>
+          <td class="text-end"></td>
+        </tr>` : `
         <tr>
           <td><strong>${escapeHtml(invoiceNumberLabel)}</strong> ${meta ? directionalValue(meta.invoiceNumber, base) : ''}</td>
           <td class="text-end"><strong>${escapeHtml(L.date)}</strong> ${meta ? escapeHtml(formatReceiptDate(meta.timestamp.text, tenant, LANGUAGES[lang]?.locale ?? lang)) : ''}</td>
-        </tr>
+        </tr>`}
         ${meta?.table ? `<tr><td><strong>${escapeHtml(L.table)}</strong> ${escapeHtml(meta.table.name.text)}</td><td></td></tr>` : ''}
         ${customer?.heading ? `<tr><td colspan="2"><strong>${escapeHtml(customer.heading.primary)}</strong></td></tr>` : ''}
         ${customer?.name ? `<tr><td><strong>${escapeHtml(L.customer)}</strong> ${escapeHtml(customer.name.text)}</td><td></td></tr>` : ''}
@@ -467,9 +490,9 @@ function surfaceLabel(
     : printLabelResolver(browserConceptId, lang);
 }
 
-/** Remove the semantic table label's interpolation token for a separate value cell. */
+/** Remove interpolation tokens for a separate value cell. */
 function stripLabelPlaceholder(label: string): string {
-  return label.replace('{name}', '').replace(/[:：]\s*$/, '').trim();
+  return label.replace(/\{name\}|\{number\}/g, '').replace(/[:：]\s*$/, '').trim();
 }
 
 /** Unknown payment methods keep their legacy capitalized literal rendering. */

@@ -195,6 +195,13 @@ export function renderBillDocumentToCompactLines(
   const metaStart = lines.length;
   const metaSourceLines: string[] = [];
   if (meta) {
+    if (meta.orderNumber && meta.orderNumber.text.trim().length > 0 && meta.orderNumber.text.trim() !== meta.invoiceNumber.text.trim()) {
+      const orderText = meta.orderNumberLabel
+        ? labelOf(meta.orderNumberLabel).replace('{number}', meta.orderNumber.text)
+        : `Order #: ${meta.orderNumber.text}`;
+      lines.push(normalize(orderText));
+      metaSourceLines.push(orderText);
+    }
     lines.push(normalize(labelOf(meta.billNumberLabel) + ': ' + meta.invoiceNumber.text));
     metaSourceLines.push(labelOf(meta.billNumberLabel) + ': ' + meta.invoiceNumber.text);
     const date = parseDbTimestamp(meta.timestamp.text);

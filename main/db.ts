@@ -6220,6 +6220,15 @@ function seedWhatsAppDefaults(): void {
   insertSettingIfMissing('whatsapp_disclosure_version', '1');
   // Group chat filtering is enabled by default to prevent sending receipts to groups.
   insertSettingIfMissing('whatsapp_filter_groups', 'true');
+  insertSettingIfMissing('whatsapp_provider', 'whatypie');
+  insertSettingIfMissing('whatypie_enabled', 'false');
+  insertSettingIfMissing('whatypie_api_url', 'https://api.whatypie.in');
+  insertSettingIfMissing('whatypie_api_key', '');
+  insertSettingIfMissing('whatypie_sender_phone', '');
+  insertSettingIfMissing('whatypie_send_on_bill', 'true');
+  insertSettingIfMissing('whatypie_send_on_order_status', 'true');
+  insertSettingIfMissing('whatypie_template_order_status', '');
+  insertSettingIfMissing('whatypie_template_bill', '');
 }
 
 function seedInstallDefaults(): void {

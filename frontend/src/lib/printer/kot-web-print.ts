@@ -38,7 +38,21 @@ export function resolveKotTicketLanguage(language?: Language): Language {
 function translatorFor(lang: Language): ((key: string) => string) {
   const locale = LANGUAGES[lang]?.locale ?? 'en';
   const messages = getCachedMessages(lang) ?? getCachedMessages('en') ?? {};
-  return createTranslator({ locale, messages }) as unknown as (key: string) => string;
+  const t = createTranslator({ locale, messages, onError: () => {} });
+  const tr = t as unknown as { (key: string): string; raw: (key: string) => unknown };
+  return (key: string): string => {
+    try {
+      const raw = tr.raw(key);
+      if (typeof raw === 'string') return raw;
+    } catch {
+      // Key not present in raw lookup; fall back to translator
+    }
+    try {
+      return tr(key);
+    } catch {
+      return key;
+    }
+  };
 }
 
 /** Render one kernel-annotated value with bidi-isolated LTR span inside RTL tickets. */

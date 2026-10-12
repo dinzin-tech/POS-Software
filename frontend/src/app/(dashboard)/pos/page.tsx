@@ -34,6 +34,7 @@ import { usePrinterStore } from '@/hooks/usePrinter';
 import { printerService } from '@/lib/printer/PrinterService';
 import { showPrintWarningsToast } from '@/lib/printer/warnings-toast';
 import { formatKotErrorToast, formatReceiptErrorToast } from '@/lib/printer/warnings';
+import { preferChildScopedBill } from '@/lib/printer/tax-components';
 import { AI_HELP_PROVIDERS, copyPrinterDiagnostic } from '@/lib/printer/ai-help';
 import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
 import { useTranslations } from 'use-intl';
@@ -449,7 +450,16 @@ export default function POSPage() {
     }
 
     try {
-      const printWarnings = await printBill(bill, currentTenant, undefined, reservedWindow);
+      let billToPrint = bill;
+      if (!billToPrint.order?.items || billToPrint.order.items.length === 0) {
+        try {
+          const latest = await fetchLatestBill(billToPrint.id);
+          if (latest?.order?.items && latest.order.items.length > 0) {
+            billToPrint = preferChildScopedBill(latest, billToPrint.order);
+          }
+        } catch { /* retain existing bill on fetch failure */ }
+      }
+      const printWarnings = await printBill(billToPrint, currentTenant, undefined, reservedWindow);
       showPrintWarningsToast(printWarnings);
     } catch (err) {
       // Non-fatal: print failure should not block the checkout flow.
@@ -712,6 +722,10 @@ export default function POSPage() {
 
   // Handle prepaid checkout - place order and pay in one step
   const handlePrepaidCheckout = async (payments: PrepaidPayment[], walletAmount: number, discount: PrepaidDiscount | null) => {
+    if (cart.items.length === 0) {
+      setShowPrepaidCheckout(false);
+      return;
+    }
     const isPrepaidCheckout = shouldTakePaymentNow;
     setShowPrepaidCheckout(false);
     setSubmitting(true);
@@ -879,7 +893,10 @@ export default function POSPage() {
         { payments: paymentLines, customer_id: billData.bill.customer_id ?? orderData.order.customer_id ?? null },
         { headers: { 'Idempotency-Key': attempt.paymentIdempotencyKey } },
       );
-      const paidBill: Bill = paymentResponse.data?.bill || billData.bill;
+      const paidBill: Bill = {
+        ...(paymentResponse.data?.bill || billData.bill),
+        order: paymentResponse.data?.bill?.order || billData.bill?.order || orderData.order,
+      };
       const pointsEarned = paymentResponse.data?.loyaltyPointsEarned > 0
         ? paymentResponse.data.loyaltyPointsEarned
         : 0;

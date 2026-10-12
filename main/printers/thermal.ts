@@ -1709,7 +1709,12 @@ function renderEscposLineTemplateV1(payload: any, profile: { columns: number; la
   lines.push(bar);
   lines.push(`{CENTER}${title}{/CENTER}`);
   lines.push(bar);
-  lines.push(normalize(printLabel(lang, 'print.invoiceNumber')) + ' ' + (bill.bill_number || order.order_number));
+  if (order?.order_number && bill?.bill_number && String(order.order_number).trim() !== String(bill.bill_number).trim()) {
+    lines.push(normalize(printLabel(lang, 'pos.orderNumber').replace('{number}', order.order_number)));
+    lines.push(normalize(printLabel(lang, 'print.invoiceNumber')) + ' ' + bill.bill_number);
+  } else {
+    lines.push(normalize(printLabel(lang, 'print.invoiceNumber')) + ' ' + (bill.bill_number || order.order_number));
+  }
   lines.push(normalize(printLabel(lang, 'receipt.date')) + ': ' + date.toLocaleDateString(locale + '-u-nu-latn', tzOptions));
   lines.push(normalize(printLabel(lang, 'print.time')) + ': ' + date.toLocaleTimeString(locale + '-u-nu-latn', tzOptions));
   if (biz.show_table_number !== false && order.table?.name) lines.push(truncateShapedLine(formatTableLabel(order.table.name, lang), cols, arabicShaping, lang, capabilities));

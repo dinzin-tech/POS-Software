@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { usePosSettingsStore, type BillTemplate } from '@/store/pos-settings';
@@ -27,7 +26,7 @@ import BetaChannelToggle from '@/components/settings/BetaChannelToggle';
 import { HealthCheckDialog } from '@/components/settings/HealthCheckDialog';
 import { InitializeDatabaseDialog } from '@/components/settings/InitializeDatabaseDialog';
 import { CurrencyResetDialog } from '@/components/settings/CurrencyResetDialog';
-import { WhatsAppEnableCard } from '@/components/settings/WhatsAppEnableCard';
+import { WhatyPieSettingsCard } from '@/components/settings/WhatyPieSettingsCard';
 import { TaxConfigurationPanel } from '@/components/settings/TaxConfigurationPanel';
 import { PaymentMethodsSettings } from '@/components/settings/PaymentMethodsSettings';
 import { GeneralSettingsTab, type BusinessForm, type InvoiceResetPeriod, type OrderNumberForm } from '@/components/settings/GeneralSettingsTab';
@@ -277,12 +276,10 @@ export default function SettingsPage() {
   const router = useRouter();
   const { currentTenant, user, updateCurrentTenant } = useAuthStore();
   const posSettings = usePosSettingsStore();
-  const whatsappEnabled = posSettings.whatsappEnabled;
   const { printMethod, setPrintMethod } = usePrinterStore();
   const t = useTranslations('settings');
   const tCommon = useTranslations('common');
   const tRestore = useTranslations('restore');
-  const tWhatsappSettings = useTranslations('whatsapp.settings');
   const { formatDate, formatTime, formatDateTime } = useFormatDate();
   const isAdmin = tenantCan(currentTenant, 'settings.manage');
   const isOwner = tenantCan(currentTenant, 'cloud.account.manage');
@@ -4199,22 +4196,10 @@ export default function SettingsPage() {
           />
         </TabsContent>
 
-        {/* Integrations tab — cloud + OrderFlow + More Apps */}
+        {/* WhatsApp & WhatyPie Integration Tab */}
         <TabsContent value="whatsapp">
-          <SettingsTabShell>
-            {!whatsappEnabled ? (
-              <WhatsAppEnableCard />
-            ) : (
-              <div className="bg-card rounded-xl border border-border p-6 flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-semibold text-foreground">{tWhatsappSettings('enabled')}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{tWhatsappSettings('enabledHint')}</p>
-                </div>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/whatsapp">{tWhatsappSettings('openConnection')}</Link>
-                </Button>
-              </div>
-            )}
+          <SettingsTabShell title={t('tabWhatsapp')}>
+            <WhatyPieSettingsCard />
           </SettingsTabShell>
         </TabsContent>
 

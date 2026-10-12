@@ -19,6 +19,20 @@ const nextConfig: NextConfig = {
     unoptimized: isDesktop,
   },
 
+  // In non-desktop mode (e.g. `next dev` browser testing), proxy API calls to Express backend
+  ...(!isDesktop
+    ? {
+        async rewrites() {
+          return [
+            {
+              source: '/api/:path*',
+              destination: `http://127.0.0.1:${process.env.API_PORT || '3001'}/api/:path*`,
+            },
+          ];
+        },
+      }
+    : {}),
+
   // Silence the "multiple lockfiles / inferred workspace root" warning.
   // Allow imports from /main (countries derivation shared with backend) via alias;
   // root must encompass both frontend/ and main/, so it points at the repo root.

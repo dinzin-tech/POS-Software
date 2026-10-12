@@ -666,6 +666,10 @@ function attachSocketHandlers(socket: BaileysSocket): void {
         state.lastErrorReason = 'logged_out';
         scheduleAuthWipe();
       } else if (!isWhatsAppTerminal() && state.enabled) {
+        if (getSettingValue('whatsapp_provider') === 'whatypie' && !state.connectedPhone) {
+          state.state = 'disconnected';
+          return;
+        }
         // Auto-reconnect on transient disconnections; cooldown only applies to explicit 429 errors.
         state.state = 'connecting';
         state.lastError = `Connection closed (${status ?? 'unknown'}), reconnecting in ${RECONNECT_DELAY_MS / 1000}s…`;
@@ -1325,12 +1329,14 @@ export function initFromDb(): void {
   }
   const v = getDatabase().prepare("SELECT value FROM settings WHERE key = 'whatsapp_enabled'").get() as { value: string | null } | undefined;
   state.enabled = v?.value === 'true';
+  const provider = getSettingValue('whatsapp_provider');
   logWhatsApp('info', 'startup_init', {
     enabled: state.enabled,
+    provider: provider || 'baileys',
     hasCredentials: fs.existsSync(credsPath),
     connectedPhone: maskPhone(state.connectedPhone),
   });
-  if (state.enabled) {
+  if (state.enabled && (provider !== 'whatypie' || state.connectedPhone)) {
     void startSocket().catch(() => {});
   }
 }

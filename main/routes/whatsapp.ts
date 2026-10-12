@@ -4,6 +4,7 @@ import { asyncHandler } from '../middleware/async-handler';
 import { getDatabase, getSettingValue, upsertSettings } from '../db';
 import { getHttpRequestSignal, trackHttpRequestWork } from '../shutdown';
 import * as whatsapp from '../services/whatsapp';
+import * as whatypie from '../services/whatypie';
 import * as QRCode from 'qrcode';
 import { parsePhoneE164 } from '../lib/phone';
 
@@ -18,16 +19,56 @@ function parsePaginationParam(value: unknown, fallback: number, max?: number): n
 
 router.get('/status', requirePermission('whatsapp.use'), (_req: Request, res: Response) => {
   const s = whatsapp.getStatus();
+  const wpConfig = whatypie.getWhatyPieConfig();
   // Don't expose the raw QR string via /status; the QR endpoint returns a rendered image.
   res.json({
     ...s,
     qr: undefined,
     pairingCode: undefined,
+    provider: wpConfig.provider,
+    whatypieEnabled: wpConfig.enabled,
     // Default ON when the row hasn't been seeded yet (existing installs that
     // were already at v29 before whatsapp_filter_groups was added).
     filterGroups: getSettingValue('whatsapp_filter_groups') !== 'false',
   });
 });
+
+router.get('/whatypie/config', requirePermission('whatsapp.manage'), (_req: Request, res: Response) => {
+  const config = whatypie.getWhatyPieConfig();
+  res.json({ config });
+});
+
+router.post('/whatypie/config', requirePermission('whatsapp.manage'), (req: Request, res: Response) => {
+  const patch = req.body ?? {};
+  const updated = whatypie.updateWhatyPieConfig(patch);
+  if (patch.provider === 'whatypie') {
+    whatsapp.disconnect();
+  }
+  res.json({ ok: true, config: updated });
+});
+
+router.post('/whatypie/test', requirePermission('whatsapp.manage'), asyncHandler(async (req: Request, res: Response) => {
+  const { apiUrl, apiKey } = req.body ?? {};
+  const currentConfig = whatypie.getWhatyPieConfig();
+  const testUrl = apiUrl || currentConfig.apiUrl;
+  const testKey = apiKey || currentConfig.apiKey;
+  const result = await whatypie.testWhatyPieConnection(testUrl, testKey);
+  res.json(result);
+}));
+
+router.get('/whatypie/phone-numbers', requirePermission('whatsapp.manage'), asyncHandler(async (req: Request, res: Response) => {
+  const apiUrl = typeof req.query.apiUrl === 'string' ? req.query.apiUrl : undefined;
+  const apiKey = typeof req.query.apiKey === 'string' ? req.query.apiKey : undefined;
+  const numbers = await whatypie.fetchWhatyPiePhoneNumbers(apiUrl, apiKey);
+  res.json({ success: true, numbers });
+}));
+
+router.get('/whatypie/templates', requirePermission('whatsapp.manage'), asyncHandler(async (req: Request, res: Response) => {
+  const apiUrl = typeof req.query.apiUrl === 'string' ? req.query.apiUrl : undefined;
+  const apiKey = typeof req.query.apiKey === 'string' ? req.query.apiKey : undefined;
+  const templates = await whatypie.fetchWhatyPieTemplates(apiUrl, apiKey);
+  res.json({ success: true, templates });
+}));
 
 router.post('/settings', requirePermission('whatsapp.manage'), (req: Request, res: Response) => {
   const next = (req.body as { filterGroups?: boolean } | undefined)?.filterGroups;
@@ -112,6 +153,24 @@ router.post('/send', requirePermission('whatsapp.use'), asyncHandler(async (req,
     return;
   }
   const userId = (req as any).user?.userId ?? null;
+
+  const wpConfig = whatypie.getWhatyPieConfig();
+  if (wpConfig.provider === 'whatypie' && wpConfig.enabled) {
+    const wpResult = await whatypie.sendWhatyPieMessage({
+      phone: parsedPhone.e164,
+      message: String(body),
+      billId: bill_id != null ? Number(bill_id) : null,
+      userId,
+      kind: (kind as any) || 'manual_reply',
+    });
+    if (!wpResult.ok) {
+      res.status(400).json({ error: wpResult.error, reason: 'whatypie_send_failed' });
+      return;
+    }
+    res.json({ ok: true, messageId: wpResult.messageId });
+    return;
+  }
+
   const result = await trackHttpRequestWork(req, whatsapp.sendMessage({
     phoneE164: parsedPhone.e164,
     body: String(body),

@@ -904,9 +904,15 @@ export function buildDetailedReceiptBytes(
   enc.align('left').rule({ style: 'single' });
 
   // Bill info
-  enc
-    .text(padRow(`Bill #: ${bill.bill_number}`, formatDate(bill.order?.created_at, locale, tenant.timezone ? { timeZone: tenant.timezone } : undefined), cols))
-    .newline();
+  const billDate = formatDate(bill.order?.created_at, locale, tenant.timezone ? { timeZone: tenant.timezone } : undefined);
+  if (order?.order_number && bill?.bill_number && String(order.order_number).trim() !== String(bill.bill_number).trim()) {
+    enc.text(padRow(`Order #: ${order.order_number}`, billDate, cols)).newline();
+    enc.text(`Invoice #: ${bill.bill_number}`).newline();
+  } else {
+    enc
+      .text(padRow(`Bill #: ${bill.bill_number}`, billDate, cols))
+      .newline();
+  }
 
   if (showCustomerName && order?.customer?.name) {
     safePrinterText(

@@ -16,6 +16,7 @@ import { calculateOrderTotals, recomputeOrderTotals } from '../services/orders';
 import { adjustProductStock, resolveInventoryDeduction } from '../services/inventory';
 import { applyRecipeSnapshot, buildRecipeSnapshot, parseRecipeSnapshot } from '../services/recipes';
 import { notifyKdsUpdate, notifyOrderUpdated } from '../services/kds';
+import { sendWhatyPieOrderStatus } from '../services/whatypie';
 import { cloudSync } from '../services/cloud-sync';
 import { validateOrderNotes, validateItemNotes, validateProductQuantity, validateDeliveryAddress } from './orders-validation';
 import { hasPermission, requirePermission } from '../services/authorization';
@@ -743,6 +744,9 @@ router.post('/', orderWriteRateLimit, requirePermission('orders.create'), (req: 
     if (!result.idempotentReplay) {
       notifyKdsUpdate();
       cloudSync.recordOrderChanged(result.order.id, 'order.created');
+      sendWhatyPieOrderStatus(Number(result.order.id), 'placed', undefined, String((req as any).user?.userId)).catch((err) => {
+        console.error('[WhatyPie] Order placed notification error:', err);
+      });
 
       if (result.order.customer_id) {
         try {
@@ -1186,6 +1190,9 @@ router.patch('/:id/status', orderWriteRateLimit, requirePermission('orders.statu
     if (changed) {
       cloudSync.recordOrderChanged(req.params.id as string, `order.${status}`);
       notifyKdsUpdate();
+      sendWhatyPieOrderStatus(Number(req.params.id), status, undefined, String((req as any).user?.userId)).catch((err) => {
+        console.error('[WhatyPie] Order status notification error:', err);
+      });
     }
 
     res.json({ order: Object.assign({}, updatedOrder, { items: orderItems, table }) });

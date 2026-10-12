@@ -9,7 +9,7 @@ import type { Order } from '@/lib/types';
 const ACTIVE_STATUSES = new Set<Order['status']>(['pending', 'preparing', 'ready']);
 
 function getCustomerOrderNumber(order: Order): string {
-  return order.bill?.bill_number || order.order_number;
+  return order.order_number;
 }
 
 export default function CustomerDisplayPage() {

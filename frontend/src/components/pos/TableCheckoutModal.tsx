@@ -90,7 +90,7 @@ export default function TableCheckoutModal({
         return;
       }
       const { data } = await api.post('/bills/generate', { order_id: order.id });
-      handlePayment(data.bill);
+      handlePayment({ ...data.bill, order: data.bill?.order || order });
     } catch {
       toast.error(t('generateBillFailed'));
     } finally {
@@ -204,7 +204,12 @@ export default function TableCheckoutModal({
                 {order.bill?.payment_status === 'paid' ? t('paid') : t('unpaid')}
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">{t('orderNumber', { number: order.order_number })}</p>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{t('orderNumber', { number: order.order_number })}</span>
+              {order.bill?.bill_number && (
+                <span>• {t('billNumber', { number: order.bill.bill_number })}</span>
+              )}
+            </div>
           </div>
           <button onClick={onClose} className="touch-target rounded-full text-muted-foreground hover:text-foreground active:bg-muted" aria-label={t('close')}>
             <X size={20} />

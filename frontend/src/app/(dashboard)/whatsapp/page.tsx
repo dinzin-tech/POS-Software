@@ -29,6 +29,8 @@ interface WhatsAppStatus {
   lastError: string | null;
   lastErrorReason: string | null;
   cooldownUntil: string | null;
+  provider?: 'whatypie' | 'baileys';
+  whatypieEnabled?: boolean;
 }
 
 type WhatsAppApiErrorKey = keyof AppConfig['Messages']['whatsapp']['apiError'];
@@ -450,8 +452,8 @@ export default function WhatsAppPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{tNav('whatsapp')}</h1>
         {status && (
-          <Badge variant={status.state === 'connected' ? 'default' : status.state === 'cooldown' ? 'destructive' : 'secondary'}>
-            {stateLabel(status.state)}
+          <Badge variant={status.provider === 'whatypie' && status.whatypieEnabled ? 'default' : status.state === 'connected' ? 'default' : status.state === 'cooldown' ? 'destructive' : 'secondary'}>
+            {status.provider === 'whatypie' && status.whatypieEnabled ? 'WhatyPie Active' : stateLabel(status.state)}
             {status.connectedPhone ? <> · <Ltr>{status.connectedPhone}</Ltr></> : null}
           </Badge>
         )}
@@ -467,7 +469,31 @@ export default function WhatsAppPage() {
         </TabsList>
 
         <TabsContent value="connection" className="space-y-4">
-          {!status?.enabled && (
+          {status?.provider === 'whatypie' && (
+            <Card className="border-emerald-500/30 bg-emerald-500/5">
+              <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-5">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="size-4 text-emerald-500" />
+                    <span className="font-semibold text-sm text-foreground">
+                      Active Provider: WhatyPie (Official Meta API)
+                    </span>
+                    <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                      Cloud Active
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Receipts and order updates are delivered via WhatyPie official WhatsApp Cloud API without requiring an active phone session.
+                  </p>
+                </div>
+                <Button asChild variant="outline" size="sm" className="shrink-0">
+                  <Link href="/settings?tab=whatsapp">Configure WhatyPie Settings</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {!status?.enabled && status?.provider !== 'whatypie' && (
             <Card>
               <CardContent className="text-sm text-muted-foreground flex items-center justify-between gap-4 py-4">
                 <span>

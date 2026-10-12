@@ -28,6 +28,7 @@ import {
 import { applyPayableRounding } from '../services/tax-engine';
 import { calculateOrderTotals, recomputeOrderTotals } from '../services/orders';
 import { sendEvent } from '../services/telemetry';
+import { sendWhatyPieBillReceipt } from '../services/whatypie';
 import {
   getCurrencyFractionDigits,
   getCurrencyMinorUnitFactor,
@@ -2121,8 +2122,13 @@ function applyPaymentBatch(
       }
     }
   }
+  const rawBill = parseRowJson(db.prepare('SELECT * FROM bills WHERE id = ?').get(billId)) as (BillLoyaltyRow & { order_id: number; customer_id?: number | null }) | null;
+  const billWithLoyalty = rawBill ? addBillLoyaltyFields(db, rawBill) : null;
+  const orderWithItems = billWithLoyalty ? getOrderWithItems(db, Number(billWithLoyalty.order_id), Number(billWithLoyalty.id)) : null;
+  const customer = billWithLoyalty?.customer_id ? db.prepare('SELECT * FROM customers WHERE id = ?').get(billWithLoyalty.customer_id) : null;
+  const finalBill = billWithLoyalty ? { ...billWithLoyalty, order: orderWithItems, customer } : null;
   const result = {
-    bill: parseRowJson(db.prepare('SELECT * FROM bills WHERE id = ?').get(billId)),
+    bill: finalBill,
     walletDebited,
     loyaltyPointsEarned,
     ...(kitchenStatus.overridden ? { kitchenDeliveryOverridden: true } : {}),
@@ -2150,8 +2156,14 @@ router.post('/:id/payment', requirePermission('payments.take'), (req: Request, r
     ));
 
     const billStatus = (result.bill as any)?.payment_status;
-    if (billStatus === 'paid') notifyKdsUpdate();
-    else notifyOrderUpdated();
+    if (billStatus === 'paid') {
+      notifyKdsUpdate();
+      sendWhatyPieBillReceipt(Number(result.bill.id), undefined, String((req as any).user?.userId)).catch((err) => {
+        console.error('[WhatyPie] Bill receipt notification error:', err);
+      });
+    } else {
+      notifyOrderUpdated();
+    }
 
     res.json(result);
   } catch (error: any) {
@@ -2185,8 +2197,14 @@ router.post('/:id/payments', requirePermission('payments.take'), (req: Request, 
     ));
 
     const billStatus = (result.bill as any)?.payment_status;
-    if (billStatus === 'paid') notifyKdsUpdate();
-    else notifyOrderUpdated();
+    if (billStatus === 'paid') {
+      notifyKdsUpdate();
+      sendWhatyPieBillReceipt(Number(result.bill.id), undefined, String((req as any).user?.userId)).catch((err) => {
+        console.error('[WhatyPie] Bill receipt notification error:', err);
+      });
+    } else {
+      notifyOrderUpdated();
+    }
 
     res.json(result);
   } catch (error: any) {

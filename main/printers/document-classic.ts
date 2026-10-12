@@ -430,6 +430,14 @@ export function renderBillDocumentToClassicLines(
           segment.sourceLines.main.push(labelOf(block.title));
           segment.sourceControlLines.main.push(segment.main.at(-1) ?? '');
         }
+        if (block.orderNumber && block.orderNumber.text.trim().length > 0 && block.orderNumber.text.trim() !== block.invoiceNumber.text.trim()) {
+          const orderText = block.orderNumberLabel
+            ? labelOf(block.orderNumberLabel).replace('{number}', block.orderNumber.text)
+            : `Order #: ${block.orderNumber.text}`;
+          segment.main.push('{CENTER}' + normalize(orderText) + '{/CENTER}');
+          segment.sourceLines.main.push(orderText);
+          segment.sourceControlLines.main.push(segment.main.at(-1) ?? '');
+        }
         segment.main.push('{CENTER}' + normalize(labelOf(block.invoiceNumberLabel) + ' ' + block.invoiceNumber.text) + '{/CENTER}');
         segment.sourceLines.main.push(labelOf(block.invoiceNumberLabel) + ' ' + block.invoiceNumber.text);
         segment.sourceControlLines.main.push(segment.main.at(-1) ?? '');

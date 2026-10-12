@@ -272,6 +272,11 @@ export function OrderCard({
             <span className="font-bold text-base text-foreground tracking-tight">
               #<Ltr>{order.order_number}</Ltr>
             </span>
+            {bill?.bill_number && bill.bill_number !== order.order_number && (
+              <span className="text-xs text-muted-foreground font-mono bg-muted px-2 py-0.5 rounded">
+                <Ltr>{bill.bill_number}</Ltr>
+              </span>
+            )}
             {statusBadgeInfo && (
               <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadgeInfo.bg} ${statusBadgeInfo.text}`}>
                 {tOrders(statusBadgeInfo.labelKey)}

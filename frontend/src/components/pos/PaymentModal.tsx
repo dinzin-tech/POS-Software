@@ -21,6 +21,7 @@ import { useWhatsAppReady } from '@/hooks/useWhatsAppReady';
 import { sendBillViaFlo, shareBillViaWhatsApp } from '@/lib/whatsapp-share';
 import { useAuthStore } from '@/store/auth';
 import { CurrencyTouchNumberPad } from '@/components/pos/TouchNumberPad';
+import { Ltr } from '@/components/layout/Ltr';
 import {
   defaultDiscountTypeForMode,
   isDiscountTypeAllowed,
@@ -98,6 +99,17 @@ export default function PaymentModal({ bill, initialOverridePin, onClose, onPaid
   useEffect(() => {
     idempotencyKeyRef.current = null;
   }, [bill.id]);
+  useEffect(() => {
+    if (!bill.order && bill.order_id) {
+      api.get(`/orders/${bill.order_id}`)
+        .then((res) => {
+          if (res.data?.order && onBillUpdate) {
+            onBillUpdate({ ...bill, order: res.data.order });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [bill, onBillUpdate]);
   const [justPaid, setJustPaid] = useState(false);
   const [sendingWa, setSendingWa] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(0);
@@ -481,7 +493,23 @@ export default function PaymentModal({ bill, initialOverridePin, onClose, onPaid
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-border">
           <div>
             <h2 className="text-lg font-bold text-foreground">{t('payment')}</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{t('billNumber', { number: bill.bill_number })}</p>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+              {bill.order?.order_number ? (
+                <>
+                  <span className="font-semibold text-foreground">
+                    <Ltr>{t('orderNumber', { number: bill.order.order_number })}</Ltr>
+                  </span>
+                  <span>•</span>
+                  <span>
+                    <Ltr>{t('billNumber', { number: bill.bill_number })}</Ltr>
+                  </span>
+                </>
+              ) : (
+                <span>
+                  <Ltr>{t('billNumber', { number: bill.bill_number })}</Ltr>
+                </span>
+              )}
+            </div>
           </div>
           <button
             onClick={onClose}
