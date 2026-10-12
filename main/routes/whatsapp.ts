@@ -10,6 +10,13 @@ import { parsePhoneE164 } from '../lib/phone';
 
 const router = Router();
 
+type AuthReq = Request & { user?: { userId?: string } };
+type SendKind = 'bill_receipt' | 'manual_reply' | 'auto_followup' | 'z_report';
+
+function parseSendKind(k: unknown): SendKind {
+  return k === 'bill_receipt' || k === 'auto_followup' || k === 'z_report' ? k : 'manual_reply';
+}
+
 function parsePaginationParam(value: unknown, fallback: number, max?: number): number | null {
   if (value === undefined) return fallback;
   const parsed = Number(value);
@@ -100,7 +107,7 @@ router.get('/pairing-code', requirePermission('whatsapp.manage'), (_req: Request
 });
 
 router.post('/enable', requirePermission('whatsapp.manage'), asyncHandler(async (req, res) => {
-  const userId = (req as any).user?.userId ?? null;
+  const userId = (req as AuthReq).user?.userId ?? null;
   const result = await whatsapp.enable(userId ?? 'unknown');
   res.json(result);
 }));
@@ -152,7 +159,7 @@ router.post('/send', requirePermission('whatsapp.use'), asyncHandler(async (req,
     res.status(400).json({ error: 'body required', reason: 'body_required' });
     return;
   }
-  const userId = (req as any).user?.userId ?? null;
+  const userId = (req as AuthReq).user?.userId ?? null;
 
   const wpConfig = whatypie.getWhatyPieConfig();
   if (wpConfig.provider === 'whatypie' && wpConfig.enabled) {
@@ -161,7 +168,7 @@ router.post('/send', requirePermission('whatsapp.use'), asyncHandler(async (req,
       message: String(body),
       billId: bill_id != null ? Number(bill_id) : null,
       userId,
-      kind: (kind as any) || 'manual_reply',
+      kind: parseSendKind(kind),
     });
     if (!wpResult.ok) {
       res.status(400).json({ error: wpResult.error, reason: 'whatypie_send_failed' });
@@ -176,7 +183,7 @@ router.post('/send', requirePermission('whatsapp.use'), asyncHandler(async (req,
     body: String(body),
     billId: bill_id != null ? Number(bill_id) : null,
     customerId: null,
-    kind: (kind as any) || 'manual_reply',
+    kind: parseSendKind(kind),
     userId,
     signal: getHttpRequestSignal(req),
   }));
@@ -236,7 +243,7 @@ router.post('/inbox/:messageId/reply', requirePermission('whatsapp.manage'), asy
     res.status(404).json({ error: 'inbound message not found', reason: 'inbound_not_found' });
     return;
   }
-  const userId = (req as any).user?.userId ?? null;
+  const userId = (req as AuthReq).user?.userId ?? null;
   const result = await trackHttpRequestWork(req, whatsapp.sendMessage({
     phoneE164: msg.phone_e164,
     body: String(body),
@@ -266,7 +273,7 @@ router.post('/blocklist', requirePermission('whatsapp.manage'), (req: Request, r
     res.status(400).json({ error: 'Valid phone_e164 required', reason: 'invalid_phone' });
     return;
   }
-  const userId = (req as any).user?.userId ?? null;
+  const userId = (req as AuthReq).user?.userId ?? null;
   whatsapp.addToBlocklist(parsed.e164, String(reason ?? ''), userId ?? 'unknown');
   res.json({ ok: true });
 });

@@ -216,6 +216,7 @@ export function buildTaxBillBytes(
   enc.newline();
 
   // ── Bill Details ─────────────────────────────────────────────────────────
+  enc.align('left');
   if (order?.order_number && bill?.bill_number && String(order.order_number).trim() !== String(bill.bill_number).trim()) {
     safePrinterText(enc, `${labelFor('pos.orderNumber').replace('{number}', order.order_number)}`, warnings, false, arabicShaping, undefined, cols, language).newline();
     safePrinterText(enc, `${labelFor('print.invoiceNumber')}: ${bill.bill_number}`, warnings, false, arabicShaping, undefined, cols, language).newline();

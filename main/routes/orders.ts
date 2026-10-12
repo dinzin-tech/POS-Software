@@ -744,7 +744,7 @@ router.post('/', orderWriteRateLimit, requirePermission('orders.create'), (req: 
     if (!result.idempotentReplay) {
       notifyKdsUpdate();
       cloudSync.recordOrderChanged(result.order.id, 'order.created');
-      sendWhatyPieOrderStatus(Number(result.order.id), 'placed', undefined, String((req as any).user?.userId)).catch((err) => {
+      sendWhatyPieOrderStatus(Number(result.order.id), 'placed', undefined, String((req as Request & { user?: { userId?: string } }).user?.userId || '')).catch((err) => {
         console.error('[WhatyPie] Order placed notification error:', err);
       });
 
@@ -1190,7 +1190,7 @@ router.patch('/:id/status', orderWriteRateLimit, requirePermission('orders.statu
     if (changed) {
       cloudSync.recordOrderChanged(req.params.id as string, `order.${status}`);
       notifyKdsUpdate();
-      sendWhatyPieOrderStatus(Number(req.params.id), status, undefined, String((req as any).user?.userId)).catch((err) => {
+      sendWhatyPieOrderStatus(Number(req.params.id), status, undefined, String((req as Request & { user?: { userId?: string } }).user?.userId || '')).catch((err) => {
         console.error('[WhatyPie] Order status notification error:', err);
       });
     }

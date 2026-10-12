@@ -2158,7 +2158,7 @@ router.post('/:id/payment', requirePermission('payments.take'), (req: Request, r
     const billStatus = (result.bill as any)?.payment_status;
     if (billStatus === 'paid') {
       notifyKdsUpdate();
-      sendWhatyPieBillReceipt(Number(result.bill.id), undefined, String((req as any).user?.userId)).catch((err) => {
+      sendWhatyPieBillReceipt(Number(result.bill.id), undefined, String((req as Request & { user?: { userId?: string } }).user?.userId || '')).catch((err) => {
         console.error('[WhatyPie] Bill receipt notification error:', err);
       });
     } else {
@@ -2199,7 +2199,7 @@ router.post('/:id/payments', requirePermission('payments.take'), (req: Request, 
     const billStatus = (result.bill as any)?.payment_status;
     if (billStatus === 'paid') {
       notifyKdsUpdate();
-      sendWhatyPieBillReceipt(Number(result.bill.id), undefined, String((req as any).user?.userId)).catch((err) => {
+      sendWhatyPieBillReceipt(Number(result.bill.id), undefined, String((req as Request & { user?: { userId?: string } }).user?.userId || '')).catch((err) => {
         console.error('[WhatyPie] Bill receipt notification error:', err);
       });
     } else {
