@@ -14,6 +14,7 @@ import { setupKdsWebSocket } from './services/kds';
 import expressRateLimit from 'express-rate-limit';
 import { staticRouteRateLimit, corsOptions, getUserAuthStatus, isAllowedPrivateIp, isTokenRevoked, isTokenStale } from './middleware/security';
 import { initFromDb as initWhatsAppFromDb } from './services/whatsapp';
+import { initLiveSync, stopLiveSync } from './services/live-sync';
 import { cloudSync } from './services/cloud-sync';
 import { API_JSON_BODY_LIMIT } from './http-limits';
 import { buildCspHeader } from './csp';
@@ -346,6 +347,12 @@ export function startServer(): Promise<void> {
           console.error('[Server] WhatsApp startup initialization failed:', error);
         }
 
+        try {
+          initLiveSync();
+        } catch (error) {
+          console.error('[Server] Live sync startup initialization failed:', error);
+        }
+
         resolve();
       };
 
@@ -390,6 +397,11 @@ export function stopServer(): Promise<void> {
   // promise while the captured resources finish draining.
   server = null;
   wss = null;
+  try {
+    stopLiveSync();
+  } catch (error) {
+    console.error('[Server] Live sync stop failed:', error);
+  }
 
   stopPromise = closeServerResources(serverToClose, wssToClose, 'Main server')
     .then(() => {

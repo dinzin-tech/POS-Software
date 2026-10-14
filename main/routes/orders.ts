@@ -1015,7 +1015,7 @@ router.patch('/:id/status', orderWriteRateLimit, requirePermission('orders.statu
       return res.status(400).json({ error: 'Status is required' });
     }
 
-    const validStatuses = ['preparing', 'ready', 'served', 'completed', 'cancelled'];
+    const validStatuses = ['preparing', 'ready', 'out_for_delivery', 'served', 'completed', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: `Invalid status. Use: ${validStatuses.join(', ')}` });
     }
@@ -1042,7 +1042,8 @@ router.patch('/:id/status', orderWriteRateLimit, requirePermission('orders.statu
         throw Object.assign(new Error('Insufficient permissions'), { statusCode: 403 });
       }
 
-      if (currentOrder.status === status) {
+      const targetStatus = status === 'delivered' ? 'completed' : status;
+      if (currentOrder.status === targetStatus) {
         // Idempotent same-state request for order
         const items = attachEffectiveAddons(db, db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(req.params.id).map(parseItemJson) as any[]);
         const tableRow = currentOrder.table_id ? db.prepare('SELECT * FROM tables WHERE id = ?').get(currentOrder.table_id) as any : null;
@@ -1051,11 +1052,13 @@ router.patch('/:id/status', orderWriteRateLimit, requirePermission('orders.statu
       }
 
       const VALID_TRANSITIONS: Record<string, string[]> = {
-        pending: ['preparing', 'ready', 'served', 'completed', 'cancelled'],
-        preparing: ['ready', 'served', 'completed', 'cancelled'],
-        ready: ['served', 'completed', 'cancelled'],
-        served: ['completed', 'cancelled'],
-        completed: [],
+        pending: ['preparing', 'ready', 'out_for_delivery', 'served', 'completed', 'delivered', 'cancelled'],
+        preparing: ['ready', 'out_for_delivery', 'served', 'completed', 'delivered', 'cancelled'],
+        ready: ['out_for_delivery', 'served', 'completed', 'delivered', 'cancelled'],
+        out_for_delivery: ['completed', 'delivered', 'cancelled'],
+        served: ['out_for_delivery', 'completed', 'delivered', 'cancelled'],
+        completed: ['out_for_delivery', 'delivered'],
+        delivered: [],
         cancelled: [],
       };
 
@@ -1071,7 +1074,7 @@ router.patch('/:id/status', orderWriteRateLimit, requirePermission('orders.statu
         WHERE order_id = ? AND status IN ('preparing', 'ready', 'served', 'completed')
         LIMIT 1
       `).get(req.params.id) !== undefined;
-      const statusOrder = ['pending', 'preparing', 'ready', 'served', 'completed'];
+      const statusOrder = ['pending', 'preparing', 'ready', 'out_for_delivery', 'served', 'completed'];
       const currentStatusIndex = statusOrder.indexOf(currentOrder.status);
       const requiresOverride = (currentStatusIndex > 0 || hasItemsInProgress) && status === 'cancelled';
 
@@ -1108,14 +1111,24 @@ router.patch('/:id/status', orderWriteRateLimit, requirePermission('orders.statu
             .run(status, nowStr, nowStr, req.params.id);
           break;
 
+        case 'out_for_delivery':
+          db.prepare('UPDATE orders SET status = ?, completed_at = NULL, updated_at = ? WHERE id = ?')
+            .run(status, nowStr, req.params.id);
+          db.prepare(`
+            UPDATE order_items SET status = 'ready', updated_at = ?
+            WHERE order_id = ? AND status IN ('pending', 'preparing')
+          `).run(nowStr, req.params.id);
+          break;
+
         case 'served':
           db.prepare('UPDATE orders SET status = ?, served_at = ?, updated_at = ? WHERE id = ?')
             .run(status, nowStr, nowStr, req.params.id);
           break;
 
+        case 'delivered':
         case 'completed':
           db.prepare('UPDATE orders SET status = ?, completed_at = ?, updated_at = ? WHERE id = ?')
-            .run(status, nowStr, nowStr, req.params.id);
+            .run('completed', nowStr, nowStr, req.params.id);
           db.prepare(`
             UPDATE order_items SET status = 'served', updated_at = ?
             WHERE order_id = ? AND status IN ('pending', 'preparing', 'ready')

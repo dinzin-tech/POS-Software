@@ -12,6 +12,7 @@ import { parsePhone, dialCodeFor } from '@/lib/phone';
 import type { Customer } from '@/lib/types';
 import EditCustomerModal from './EditCustomerModal';
 import { Ltr } from '@/components/layout/Ltr';
+import TouchKeyboard from './TouchKeyboard';
 
 import { useTranslations } from 'use-intl';
 
@@ -70,9 +71,11 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
   const [creating, setCreating] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(false);
   const [loyaltyPoints, setLoyaltyPoints] = useState<number | null>(null);
+  const [activeInput, setActiveInput] = useState<'phone' | 'name' | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const requestAbortRef = useRef<AbortController | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
   const autoAdvancedRef = useRef(false);
 
   const customer = cart.customer;
@@ -143,6 +146,10 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
+    applyPhoneValue(val);
+  };
+
+  const applyPhoneValue = (val: string) => {
     setPhone(val);
     if (matched !== null) setMatched(null);
     if (name !== '') setName('');
@@ -152,6 +159,8 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
 
     if (enforcePhoneLength && !autoAdvancedRef.current && parsePhone(val, country)) {
       autoAdvancedRef.current = true;
+      // Switch to name keyboard on touch; focus name field on hardware keyboard
+      setActiveInput('name');
       requestAnimationFrame(() => nameRef.current?.focus());
     }
   };
@@ -194,7 +203,10 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
   // shouldn't have to click Add/Select if they've already moved on.
   const handleWidgetBlur = (e: React.FocusEvent<HTMLDivElement>) => {
     if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    // Keyboard keys use onPointerDown+preventDefault so focus stays in the
+    // input — but this guard still fires for clicks outside the whole widget.
     if (creating) return;
+    setActiveInput(null);
     if (matched) { handleSelectMatched(); return; }
     if (isNew && name.trim() && phone.trim()) { handleCreate(); }
   };
@@ -280,10 +292,12 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
         <div className="h-10 flex items-center gap-2 min-w-0" onBlur={handleWidgetBlur}>
 
           <input
+            ref={phoneRef}
             type="tel"
             inputMode="tel"
             value={phone}
             onChange={handlePhoneChange}
+            onFocus={() => setActiveInput('phone')}
             onKeyDown={handlePhoneKeyDown}
             placeholder={dialCode ? `${dialCode} ${t('phone')}` : t('phone')}
             className="h-10 w-48 min-w-0 px-3 text-sm border border-amber-400 bg-amber-50 placeholder:text-amber-600/70 dark:border-amber-600 dark:bg-amber-950/40 dark:placeholder:text-amber-400/70 rounded-lg focus:ring-2 focus:ring-amber-200 focus:border-amber-500 dark:focus:ring-amber-800 dark:focus:border-amber-600 outline-none"
@@ -294,6 +308,7 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
             type="text"
             value={name}
             onChange={matched ? undefined : (e) => setName(e.target.value)}
+            onFocus={() => !matched && setActiveInput('name')}
             onKeyDown={(e) => {
               if (e.key !== 'Enter') return;
               if (matched) handleSelectMatched();
@@ -327,7 +342,25 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
           )}
         </div>
 
-        {searched && (
+        {/* On-screen keyboard (topbar: floats below the widget) */}
+        {activeInput && (
+          <div className="absolute start-0 top-full mt-1 z-30 w-max">
+            <TouchKeyboard
+              mode={activeInput === 'phone' ? 'numpad' : 'alpha'}
+              value={activeInput === 'phone' ? phone : name}
+              onChange={(v) => {
+                if (activeInput === 'phone') {
+                  applyPhoneValue(v);
+                } else {
+                  if (!matched) setName(v);
+                }
+              }}
+              onClose={() => setActiveInput(null)}
+            />
+          </div>
+        )}
+
+        {searched && !activeInput && (
           <div className="absolute start-0 top-full mt-1 z-20 rounded-md border border-border bg-card px-2 py-1 shadow-sm">
             {matched ? (
               <span className="text-xs text-green-600 dark:text-green-400 font-medium">{t('customerFound')}</span>
@@ -347,10 +380,12 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
         <div className="flex items-stretch gap-2">
 
           <input
+            ref={phoneRef}
             type="tel"
             inputMode="numeric"
             value={phone}
             onChange={handlePhoneChange}
+            onFocus={() => setActiveInput('phone')}
             onKeyDown={handlePhoneKeyDown}
             placeholder={dialCode ? `${dialCode} ${t('phone')}` : t('phone')}
             className={`${baseInput} flex-1 py-2`}
@@ -362,6 +397,7 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
           type="text"
           value={name}
           onChange={matched ? undefined : (e) => setName(e.target.value)}
+          onFocus={() => !matched && setActiveInput('name')}
           onKeyDown={(e) => {
             if (e.key !== 'Enter') return;
             if (matched) handleSelectMatched();
@@ -373,6 +409,23 @@ export default function CustomerSearch({ onSelected, variant = 'default' }: Prop
           onClick={matched ? handleSelectMatched : undefined}
         />
       </div>
+
+      {/* On-screen keyboard (default/modal: shown inline, below inputs) */}
+      {activeInput && (
+        <TouchKeyboard
+          mode={activeInput === 'phone' ? 'numpad' : 'alpha'}
+          value={activeInput === 'phone' ? phone : name}
+          onChange={(v) => {
+            if (activeInput === 'phone') {
+              applyPhoneValue(v);
+            } else {
+              if (!matched) setName(v);
+            }
+          }}
+          onClose={() => setActiveInput(null)}
+          className="w-full"
+        />
+      )}
 
       {searched && (
         <div className="space-y-1.5">

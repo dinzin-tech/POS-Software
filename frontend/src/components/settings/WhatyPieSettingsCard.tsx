@@ -543,6 +543,16 @@ export function WhatyPieSettingsCard() {
                       </button>
                     )}
                   </div>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await fetchAvailableTemplates();
+                        toast.success('Templates refreshed');
+                      }}
+                      className="ml-2 text-[10px] text-emerald-600 hover:underline cursor-pointer"
+                    >
+                      Refresh
+                    </button>
                   {availableTemplates.length > 0 ? (
                     <select
                       value={templateBill}

@@ -2104,10 +2104,12 @@ function applyPaymentBatch(
     const orderFullyPaid = !unpaidSibling;
     if (orderFullyPaid) {
       // Payment must not resurrect terminal orders (VALID_TRANSITIONS.cancelled = []).
-      const order = db.prepare('SELECT status, table_id FROM orders WHERE id = ?').get(bill.order_id) as any;
+      const order = db.prepare('SELECT status, type, table_id FROM orders WHERE id = ?').get(bill.order_id) as any;
       const canComplete = order && !['cancelled', 'completed'].includes(order.status);
       if (canComplete) {
-        db.prepare("UPDATE orders SET status = 'completed', completed_at = ?, updated_at = ? WHERE id = ?").run(changedAt, changedAt, bill.order_id);
+        if (order.type !== 'delivery') {
+          db.prepare("UPDATE orders SET status = 'completed', completed_at = ?, updated_at = ? WHERE id = ?").run(changedAt, changedAt, bill.order_id);
+        }
         if (order.table_id) db.prepare("UPDATE tables SET status = 'available', updated_at = ? WHERE id = ?").run(changedAt, order.table_id);
       }
     }

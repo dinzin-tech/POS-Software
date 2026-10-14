@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {۱ مورد باطل شده · برای مشاهده لمس کنید} other {# مورد باطل شده · برای مشاهده لمس کنید}}",
     "voidingItem": "در حال باطل کردن",
     "walkInCustomer": "مشتری حضوری",
-    "whatsappFailed": "باز کردن واتساپ انجام نشد"
+    "whatsappFailed": "باز کردن واتساپ انجام نشد",
+    "outForDelivery": "در حال تحویل",
+    "delivered": "تحویل داده شده",
+    "markOutForDelivery": "علامت‌گذاری به عنوان در حال تحویل",
+    "markDelivered": "علامত‌گذاری به عنوان تحویل داده شده",
+    "markPreparing": "علامت‌گذاری به عنوان در حال آماده‌سازی",
+    "markReady": "علامت‌گذاری به عنوان آماده",
+    "markServed": "علامت‌گذاری به عنوان سرو شده",
+    "markCompleted": "علامت‌گذاری به عنوان تکمیل شده"
   },
   "pos": {
     "addCustomer": "افزودن مشتری",

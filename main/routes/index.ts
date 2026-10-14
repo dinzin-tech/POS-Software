@@ -37,6 +37,7 @@ import { whatsappRoutes } from './whatsapp';
 import { supportTicketRoutes } from './support-ticket';
 import { diagnosticsRoutes } from './diagnostics';
 import { authorizationRoutes } from './authorization';
+import { liveSyncRoutes } from './live-sync';
 import { getDatabase, getSettingValue, getCachedPairingCode, setCachedPairingCode } from '../db';
 
 import { getActiveCountryPack } from '../services/tax';
@@ -103,6 +104,7 @@ export function registerRoutes(app: Express): void {
   app.use('/api/held-orders', heldOrderRoutes);
   app.use('/api/print-templates', printTemplateRoutes);
   app.use('/api/whatsapp', whatsappRoutes);
+  app.use('/api/live-sync', liveSyncRoutes);
   app.use('/api/support-ticket', supportTicketRoutes);
   app.use('/api/diagnostics', diagnosticsRoutes);
   app.use('/api/authorization', authorizationRoutes);

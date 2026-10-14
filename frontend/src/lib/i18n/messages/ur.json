@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 منسوخ آئٹم · دیکھنے کے لیے ٹیپ کریں} other {# منسوخ آئٹمز · دیکھنے کے لیے ٹیپ کریں}}",
     "voidingItem": "منسوخ کیا جا رہا ہے...",
     "walkInCustomer": "بغیر بکنگ گاہک",
-    "whatsappFailed": "WhatsApp نہیں کھل سکا"
+    "whatsappFailed": "WhatsApp نہیں کھل سکا",
+    "outForDelivery": "ڈیلیوری کے لیے روانہ",
+    "delivered": "ڈیلیور ہو گیا",
+    "markOutForDelivery": "ڈیلیوری کے لیے روانہ نشان زد کریں",
+    "markDelivered": "ڈیلیور ہو گیا نشان زد کریں",
+    "markPreparing": "تیار ہو رہا ہے نشان زد کریں",
+    "markReady": "تیار ہے نشان زد کریں",
+    "markServed": "پیش کیا گیا نشان زد کریں",
+    "markCompleted": "مکمل نشان زد کریں"
   },
   "pos": {
     "addCustomer": "گاہک شامل کریں",

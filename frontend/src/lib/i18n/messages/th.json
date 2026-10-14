@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {มีสินค้าที่ยกเลิก 1 รายการ · แตะเพื่อดู} other {มีสินค้าที่ยกเลิก # รายการ · แตะเพื่อดู}}",
     "voidingItem": "กำลังยกเลิกสินค้า...",
     "walkInCustomer": "ลูกค้าไม่นัด",
-    "whatsappFailed": "เปิด WhatsApp ไม่สำเร็จ"
+    "whatsappFailed": "เปิด WhatsApp ไม่สำเร็จ",
+    "outForDelivery": "กำลังจัดส่ง",
+    "delivered": "จัดส่งแล้ว",
+    "markOutForDelivery": "ทำเครื่องหมายว่ากำลังจัดส่ง",
+    "markDelivered": "ทำเครื่องหมายว่าจัดส่งแล้ว",
+    "markPreparing": "ทำเครื่องหมายว่ากำลังเตรียม",
+    "markReady": "ทำเครื่องหมายว่าพร้อมแล้ว",
+    "markServed": "ทำเครื่องหมายว่าเสิร์ฟแล้ว",
+    "markCompleted": "ทำเครื่องหมายว่าเสร็จสิ้น"
   },
   "pos": {
     "addCustomer": "เพิ่มลูกค้า",

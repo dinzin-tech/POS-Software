@@ -138,6 +138,7 @@ export default function OrdersPage() {
   const [cancelModal, setCancelModal] = useState<CancelModal | null>(null);
   const [cancellingOrderId, setCancellingOrderId] = useState<number | null>(null);
   const [convertingOrderId, setConvertingOrderId] = useState<number | null>(null);
+  const [updatingStatusOrderId, setUpdatingStatusOrderId] = useState<number | null>(null);
 
   // Void (in-progress item) modal state
   const [voidItemModal, setVoidItemModal] = useState<VoidItemModal | null>(null);
@@ -475,6 +476,9 @@ export default function OrdersPage() {
     }
     // Filter by status
     if (filters.status === 'active' && !isOrderActive(order)) {
+      return false;
+    }
+    if (filters.status === 'out_for_delivery' && order.status !== 'out_for_delivery') {
       return false;
     }
     if (filters.status === 'completed' && order.status !== 'completed') {
@@ -896,6 +900,26 @@ export default function OrdersPage() {
     }
   };
 
+  const handleUpdateStatus = async (orderId: number, status: string) => {
+    setUpdatingStatusOrderId(orderId);
+    try {
+      await api.patch(`/orders/${orderId}/status`, { status });
+      toast.success(
+        status === 'out_for_delivery'
+          ? tOrders('outForDelivery')
+          : status === 'delivered'
+          ? tOrders('delivered')
+          : tCommon('done')
+      );
+      fetchOrders();
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { error?: string; message?: string } } };
+      toast.error(axiosErr?.response?.data?.error || axiosErr?.response?.data?.message || tCommon('failedToSave'));
+    } finally {
+      setUpdatingStatusOrderId(null);
+    }
+  };
+
   // Helper to update cancel modal state
   const updateCancelModal = (updates: Partial<Omit<CancelModal, 'order'>>) => {
     if (cancelModal) {
@@ -981,6 +1005,7 @@ export default function OrdersPage() {
         >
           <option value="">{tOrders('allStatuses')}</option>
           <option value="active">{tOrders('active')}</option>
+          <option value="out_for_delivery">{tOrders('outForDelivery')}</option>
           <option value="completed">{tOrders('completed')}</option>
           <option value="cancelled">{tOrders('cancelled')}</option>
         </select>
@@ -1082,6 +1107,8 @@ export default function OrdersPage() {
               sendingWaOrderId={sendingWaOrderId}
               cancellingOrderId={cancellingOrderId}
               convertingOrderId={convertingOrderId}
+              onUpdateStatus={handleUpdateStatus}
+              updatingStatusOrderId={updatingStatusOrderId}
               isLinkingCustomer={linkCustomerOrderId === order.id}
               linkCustomerSearch={linkCustomerSearch}
               linkCustomerResults={linkCustomerResults}

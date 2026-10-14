@@ -27,6 +27,7 @@ import { HealthCheckDialog } from '@/components/settings/HealthCheckDialog';
 import { InitializeDatabaseDialog } from '@/components/settings/InitializeDatabaseDialog';
 import { CurrencyResetDialog } from '@/components/settings/CurrencyResetDialog';
 import { WhatyPieSettingsCard } from '@/components/settings/WhatyPieSettingsCard';
+import { LiveSyncSettingsCard } from '@/components/settings/LiveSyncSettingsCard';
 import { TaxConfigurationPanel } from '@/components/settings/TaxConfigurationPanel';
 import { PaymentMethodsSettings } from '@/components/settings/PaymentMethodsSettings';
 import { GeneralSettingsTab, type BusinessForm, type InvoiceResetPeriod, type OrderNumberForm } from '@/components/settings/GeneralSettingsTab';
@@ -4434,6 +4435,8 @@ export default function SettingsPage() {
                 </div>
               )}
             </div>
+
+            <LiveSyncSettingsCard />
           </SettingsTabShell>
           ) : (
             <div className="flex flex-col items-center justify-center py-24 text-center">

@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, other {# 件已作廢商品 · 點按檢視}}",
     "voidingItem": "作廢中…",
     "walkInCustomer": "散客",
-    "whatsappFailed": "開啟 WhatsApp 失敗"
+    "whatsappFailed": "開啟 WhatsApp 失敗",
+    "outForDelivery": "外送中",
+    "delivered": "已送達",
+    "markOutForDelivery": "標記為外送中",
+    "markDelivered": "標記為已送達",
+    "markPreparing": "標記為製作中",
+    "markReady": "標記為已備好",
+    "markServed": "標記為已上菜",
+    "markCompleted": "標記為已完成"
   },
   "pos": {
     "addCustomer": "新增顧客",

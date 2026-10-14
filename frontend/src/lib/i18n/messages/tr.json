@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 iptal edilen ürün · Görüntülemek için dokunun} other {# iptal edilen ürün · Görüntülemek için dokunun}}",
     "voidingItem": "İptal ediliyor...",
     "walkInCustomer": "Giriş Müşterisi",
-    "whatsappFailed": "WhatsApp gönderimi başarısız"
+    "whatsappFailed": "WhatsApp gönderimi başarısız",
+    "outForDelivery": "Dağıtımda",
+    "delivered": "Teslim edildi",
+    "markOutForDelivery": "Dağıtımda olarak işaretle",
+    "markDelivered": "Teslim edildi olarak işaretle",
+    "markPreparing": "Hazırlanıyor olarak işaretle",
+    "markReady": "Hazır olarak işaretle",
+    "markServed": "Servis edildi olarak işaretle",
+    "markCompleted": "Tamamlandı olarak işaretle"
   },
   "pos": {
     "addCustomer": "Müşteri Ekle",

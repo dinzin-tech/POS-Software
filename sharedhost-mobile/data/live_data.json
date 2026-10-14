@@ -1,0 +1,815 @@
+{
+  "status": "active",
+  "synced_at": "2026-10-14T07:54:50.237Z",
+  "store": {
+    "name": "Five  Star",
+    "currency": "INR",
+    "currency_symbol": "₹",
+    "timezone": "Asia/Kolkata",
+    "address": "",
+    "phone": ""
+  },
+  "today": {
+    "date": "2026-10-14",
+    "net_sales": 375,
+    "gross_sales": 375,
+    "refunds": 0,
+    "discounts": 0,
+    "taxes": 0,
+    "bill_count": 2,
+    "avg_bill": 187.5,
+    "items_sold_count": 5,
+    "active_orders_count": 0,
+    "occupied_tables_count": 0,
+    "total_tables_count": 0
+  },
+  "comparison": {
+    "yesterday": {
+      "gross_sales": 1500,
+      "refunds": 0,
+      "net_sales": 1500,
+      "discounts": 0,
+      "taxes": 0,
+      "bill_count": 7,
+      "avg_bill": 214.29,
+      "discount_bills_count": 0
+    },
+    "this_week": {
+      "gross_sales": 4925,
+      "refunds": 0,
+      "net_sales": 4925,
+      "discounts": 0,
+      "taxes": 68.54,
+      "bill_count": 29,
+      "avg_bill": 169.83,
+      "discount_bills_count": 0
+    },
+    "this_month": {
+      "gross_sales": 5100,
+      "refunds": 0,
+      "net_sales": 5100,
+      "discounts": 0,
+      "taxes": 68.54,
+      "bill_count": 30,
+      "avg_bill": 170,
+      "discount_bills_count": 0
+    },
+    "diff_vs_yesterday": -1125,
+    "growth_pct": -75
+  },
+  "operations": {
+    "cancelled_items_count": 0,
+    "cancelled_items_total": 0,
+    "discount_bills_count": 0,
+    "peak_hour": {
+      "hour": 6,
+      "label": "06:00 - 07:00",
+      "sales": 225,
+      "bills": 1
+    }
+  },
+  "categories": [
+    {
+      "name": "Food",
+      "quantity": 2,
+      "total": 300,
+      "pct": 80
+    },
+    {
+      "name": "Beverages",
+      "quantity": 3,
+      "total": 75,
+      "pct": 20
+    }
+  ],
+  "staff_sales": [
+    {
+      "name": "Charan",
+      "role": "owner",
+      "bills": 2,
+      "total": 375
+    }
+  ],
+  "active_orders": [],
+  "payment_methods": [
+    {
+      "name": "UPI",
+      "method": "upi",
+      "count": 1,
+      "total": 225
+    },
+    {
+      "name": "Cash",
+      "method": "cash",
+      "count": 1,
+      "total": 150
+    }
+  ],
+  "order_types": [
+    {
+      "type": "dine_in",
+      "count": 2,
+      "total": 375
+    }
+  ],
+  "top_items": [
+    {
+      "name": "Tea",
+      "quantity": 3,
+      "total": 75
+    },
+    {
+      "name": "Meal",
+      "quantity": 2,
+      "total": 300
+    }
+  ],
+  "recent_bills": [
+    {
+      "id": 33,
+      "bill_number": "INVOICE-0026",
+      "paid_amount": 225,
+      "subtotal": 225,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-14 01:12:20",
+      "customer_name": "Sanjeev Kumar",
+      "customer_phone": "+917019409891",
+      "items_summary": "1x Meal, 3x Tea",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 3,
+          "price": 25,
+          "total": 75
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "bill_number": "INVOICE-0025",
+      "paid_amount": 150,
+      "subtotal": 150,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "Cash",
+      "paid_at": "2026-10-13 19:14:15",
+      "customer_name": "Walk-in Customer",
+      "customer_phone": "",
+      "items_summary": "1x Meal",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "bill_number": "INVOICE-0024",
+      "paid_amount": 150,
+      "subtotal": 150,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "Card",
+      "paid_at": "2026-10-13 15:49:31",
+      "customer_name": "Walk-in Customer",
+      "customer_phone": "",
+      "items_summary": "1x Meal",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "bill_number": "INVOICE-0023",
+      "paid_amount": 280,
+      "subtotal": 280,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-13 15:16:53",
+      "customer_name": "Kumar",
+      "customer_phone": "+919535046200",
+      "items_summary": "1x Meal, 2x Tea, 1x Snack",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 2,
+          "price": 25,
+          "total": 50
+        },
+        {
+          "name": "Snack",
+          "quantity": 1,
+          "price": 80,
+          "total": 80
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "bill_number": "INVOICE-0022",
+      "paid_amount": 215,
+      "subtotal": 215,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-13 15:15:08",
+      "customer_name": "Sanjeev Kumar",
+      "customer_phone": "+917019409891",
+      "items_summary": "1x Meal, 1x Tea, 1x Coffee",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 1,
+          "price": 25,
+          "total": 25
+        },
+        {
+          "name": "Coffee",
+          "quantity": 1,
+          "price": 40,
+          "total": 40
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "bill_number": "INVOICE-0021",
+      "paid_amount": 200,
+      "subtotal": 200,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-13 15:13:58",
+      "customer_name": "MALLIKARJUN",
+      "customer_phone": "+918867466035",
+      "items_summary": "1x Meal, 2x Tea",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 2,
+          "price": 25,
+          "total": 50
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "bill_number": "INVOICE-0020",
+      "paid_amount": 255,
+      "subtotal": 255,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-13 12:29:22",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Meal, 1x Tea, 2x Coffee",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 1,
+          "price": 25,
+          "total": 25
+        },
+        {
+          "name": "Coffee",
+          "quantity": 2,
+          "price": 40,
+          "total": 80
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "bill_number": "INVOICE-0019",
+      "paid_amount": 200,
+      "subtotal": 200,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-13 12:01:01",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Meal, 2x Tea",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 2,
+          "price": 25,
+          "total": 50
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "bill_number": "INVOICE-0018",
+      "paid_amount": 200,
+      "subtotal": 200,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-13 11:57:30",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Meal, 2x Tea",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 2,
+          "price": 25,
+          "total": 50
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "bill_number": "INVOICE-0017",
+      "paid_amount": 400,
+      "subtotal": 400,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-12 15:25:58",
+      "customer_name": "Sanjeev Kumar",
+      "customer_phone": "+917019409891",
+      "items_summary": "1x Meal, 2x Tea, 3x Coffee, 1x Snack",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 2,
+          "price": 25,
+          "total": 50
+        },
+        {
+          "name": "Coffee",
+          "quantity": 3,
+          "price": 40,
+          "total": 120
+        },
+        {
+          "name": "Snack",
+          "quantity": 1,
+          "price": 80,
+          "total": 80
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "bill_number": "INVOICE-0013",
+      "paid_amount": 200,
+      "subtotal": 200,
+      "tax_amount": 0,
+      "discount_amount": 0,
+      "payment_method": "Card",
+      "paid_at": "2026-10-12 14:33:07",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Meal, 2x Tea",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 2,
+          "price": 25,
+          "total": 50
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "bill_number": "INVOICE-0011",
+      "paid_amount": 200,
+      "subtotal": 200,
+      "tax_amount": 9.52,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-12 13:33:20",
+      "customer_name": "Sanjeev Kumar",
+      "customer_phone": "+917019409891",
+      "items_summary": "1x Meal, 2x Tea",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        },
+        {
+          "name": "Tea",
+          "quantity": 2,
+          "price": 25,
+          "total": 50
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "bill_number": "INVOICE-0010",
+      "paid_amount": 170,
+      "subtotal": 170,
+      "tax_amount": 8.079999999999998,
+      "discount_amount": 0,
+      "payment_method": "UPI",
+      "paid_at": "2026-10-12 13:30:36",
+      "customer_name": "Sanjeev Kumar",
+      "customer_phone": "+917019409891",
+      "items_summary": "1x Snack, 1x Coffee, 2x Tea",
+      "items": [
+        {
+          "name": "Snack",
+          "quantity": 1,
+          "price": 80,
+          "total": 80
+        },
+        {
+          "name": "Coffee",
+          "quantity": 1,
+          "price": 40,
+          "total": 40
+        },
+        {
+          "name": "Tea",
+          "quantity": 2,
+          "price": 25,
+          "total": 50
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "bill_number": "INVOICE-0009",
+      "paid_amount": 150,
+      "subtotal": 150,
+      "tax_amount": 7.14,
+      "discount_amount": 0,
+      "payment_method": "Zomato",
+      "paid_at": "2026-10-12 08:55:37",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Meal",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "bill_number": "INVOICE-0008",
+      "paid_amount": 65,
+      "subtotal": 65,
+      "tax_amount": 3.0999999999999996,
+      "discount_amount": 0,
+      "payment_method": "Cash",
+      "paid_at": "2026-10-12 08:26:33",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Tea, 1x Coffee",
+      "items": [
+        {
+          "name": "Tea",
+          "quantity": 1,
+          "price": 25,
+          "total": 25
+        },
+        {
+          "name": "Coffee",
+          "quantity": 1,
+          "price": 40,
+          "total": 40
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "bill_number": "INVOICE-0007",
+      "paid_amount": 150,
+      "subtotal": 150,
+      "tax_amount": 7.14,
+      "discount_amount": 0,
+      "payment_method": "Cash",
+      "paid_at": "2026-10-12 06:26:13",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Meal",
+      "items": [
+        {
+          "name": "Meal",
+          "quantity": 1,
+          "price": 150,
+          "total": 150
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "bill_number": "INVOICE-0006",
+      "paid_amount": 80,
+      "subtotal": 80,
+      "tax_amount": 3.8,
+      "discount_amount": 0,
+      "payment_method": "Cash",
+      "paid_at": "2026-10-12 05:33:52",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Snack",
+      "items": [
+        {
+          "name": "Snack",
+          "quantity": 1,
+          "price": 80,
+          "total": 80
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "bill_number": "INVOICE-0005",
+      "paid_amount": 240,
+      "subtotal": 240,
+      "tax_amount": 11.42,
+      "discount_amount": 0,
+      "payment_method": "Zomato",
+      "paid_at": "2026-10-12 05:27:45",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "2x Snack, 2x Coffee",
+      "items": [
+        {
+          "name": "Snack",
+          "quantity": 2,
+          "price": 80,
+          "total": 160
+        },
+        {
+          "name": "Coffee",
+          "quantity": 2,
+          "price": 40,
+          "total": 80
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "bill_number": "INVOICE-0004",
+      "paid_amount": 65,
+      "subtotal": 65,
+      "tax_amount": 3.0999999999999996,
+      "discount_amount": 0,
+      "payment_method": "Cash",
+      "paid_at": "2026-10-12 04:52:29",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Tea, 1x Coffee",
+      "items": [
+        {
+          "name": "Tea",
+          "quantity": 1,
+          "price": 25,
+          "total": 25
+        },
+        {
+          "name": "Coffee",
+          "quantity": 1,
+          "price": 40,
+          "total": 40
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "bill_number": "INVOICE-0003",
+      "paid_amount": 80,
+      "subtotal": 80,
+      "tax_amount": 3.8,
+      "discount_amount": 0,
+      "payment_method": "Card",
+      "paid_at": "2026-10-11 19:25:37",
+      "customer_name": "Charan",
+      "customer_phone": "+919353333945",
+      "items_summary": "1x Snack",
+      "items": [
+        {
+          "name": "Snack",
+          "quantity": 1,
+          "price": 80,
+          "total": 80
+        }
+      ]
+    }
+  ],
+  "hourly_sales": [
+    {
+      "hour": 0,
+      "label": "00:00",
+      "total": 150,
+      "count": 1
+    },
+    {
+      "hour": 1,
+      "label": "01:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 2,
+      "label": "02:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 3,
+      "label": "03:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 4,
+      "label": "04:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 5,
+      "label": "05:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 6,
+      "label": "06:00",
+      "total": 225,
+      "count": 1
+    },
+    {
+      "hour": 7,
+      "label": "07:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 8,
+      "label": "08:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 9,
+      "label": "09:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 10,
+      "label": "10:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 11,
+      "label": "11:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 12,
+      "label": "12:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 13,
+      "label": "13:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 14,
+      "label": "14:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 15,
+      "label": "15:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 16,
+      "label": "16:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 17,
+      "label": "17:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 18,
+      "label": "18:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 19,
+      "label": "19:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 20,
+      "label": "20:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 21,
+      "label": "21:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 22,
+      "label": "22:00",
+      "total": 0,
+      "count": 0
+    },
+    {
+      "hour": 23,
+      "label": "23:00",
+      "total": 0,
+      "count": 0
+    }
+  ]
+}

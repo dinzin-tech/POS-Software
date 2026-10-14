@@ -23,6 +23,7 @@ export const ORDER_STATUS_LABEL_KEYS = {
   pending: 'pending',
   preparing: 'preparing',
   ready: 'ready',
+  out_for_delivery: 'outForDelivery',
   served: 'served',
   completed: 'completed',
   cancelled: 'cancelled',

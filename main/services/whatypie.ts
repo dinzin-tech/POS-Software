@@ -12,6 +12,17 @@ export interface WhatyPieConfig {
   templateBill: string;
 }
 
+export interface TemplateVariableContext {
+  businessName?: string;
+  orderNumber?: string;
+  billNumber?: string;
+  totalAmount?: string;
+  currency?: string;
+  currencySymbol?: string;
+  customerName?: string;
+  stageLabel?: string;
+}
+
 export interface SendWhatyPieParams {
   phone: string;
   message: string;
@@ -19,6 +30,7 @@ export interface SendWhatyPieParams {
   templateName?: string;
   languageCode?: string;
   templateVariables?: unknown[];
+  templateContext?: TemplateVariableContext;
   mediaUrl?: string;
   billId?: number | null;
   customerId?: string | number | null;
@@ -147,7 +159,7 @@ export interface WhatyPieTemplateInfo {
 
 let cachedTemplates: { fetchedAt: number; templates: WhatyPieTemplateInfo[] } | null = null;
 
-/** Fetch list of approved WhatsApp templates from WhatyPie. */
+/** Fetch list of approved WhatsApp templates from WhatyPie across connected accounts. */
 export async function fetchWhatyPieTemplates(
   apiUrl?: string,
   apiKey?: string,
@@ -168,38 +180,127 @@ export async function fetchWhatyPieTemplates(
       signal: AbortSignal.timeout(8000),
     });
     if (!connsRes.ok) return cachedTemplates?.templates || [];
-    const connsJson = (await connsRes.json()) as { data?: Array<{ id: string; whatsapp_business_account_id?: string }> };
-    const waba = connsJson.data?.find((c) => Boolean(c.whatsapp_business_account_id)) || connsJson.data?.[0];
-    if (!waba) return cachedTemplates?.templates || [];
+    const connsJson = (await connsRes.json()) as {
+      data?: Array<{ id: string; whatsapp_business_account_id?: string }>;
+    };
+    const wabas = connsJson.data?.filter((c) => Boolean(c.whatsapp_business_account_id)) || [];
+    const targets = wabas.length > 0 ? wabas : (connsJson.data || []);
+    if (targets.length === 0) return cachedTemplates?.templates || [];
 
-    const tmplRes = await fetch(`${cleanUrl}/api/template?waba_id=${waba.id}`, {
-      method: 'GET',
-      headers: { 'x-api-key': cleanKey, Accept: 'application/json' },
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!tmplRes.ok) return cachedTemplates?.templates || [];
-    const tmplJson = (await tmplRes.json()) as { data?: { templates?: Record<string, unknown>[] } | Record<string, unknown>[] };
-    const rawList = Array.isArray(tmplJson.data)
-      ? tmplJson.data
-      : Array.isArray(tmplJson.data?.templates)
-        ? tmplJson.data.templates
-        : [];
+    const fetchedTemplates: WhatyPieTemplateInfo[] = [];
+    const seenNames = new Set<string>();
 
-    const templates: WhatyPieTemplateInfo[] = rawList.map((t: Record<string, unknown>) => ({
-      name: String(t.template_name || ''),
-      language: String(t.language || 'en'),
-      category: String(t.category || ''),
-      status: String(t.status || ''),
-      bodyVariables: Array.isArray(t.body_variables) ? (t.body_variables as Array<{ key: string; example?: string }>) : [],
-      body: String(t.message_body || ''),
-    }));
+    for (const waba of targets) {
+      try {
+        const tmplRes = await fetch(`${cleanUrl}/api/template?waba_id=${waba.id}`, {
+          method: 'GET',
+          headers: { 'x-api-key': cleanKey, Accept: 'application/json' },
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!tmplRes.ok) continue;
+        const tmplJson = (await tmplRes.json()) as {
+          data?: { templates?: Record<string, unknown>[] } | Record<string, unknown>[];
+        };
+        const rawList = Array.isArray(tmplJson.data)
+          ? tmplJson.data
+          : Array.isArray(tmplJson.data?.templates)
+            ? tmplJson.data.templates
+            : [];
 
-    cachedTemplates = { fetchedAt: Date.now(), templates };
-    return templates;
+        for (const t of rawList) {
+          const name = String(t.template_name || '');
+          if (!name || seenNames.has(name)) continue;
+          seenNames.add(name);
+          fetchedTemplates.push({
+            name,
+            language: String(t.language || 'en'),
+            category: String(t.category || ''),
+            status: String(t.status || ''),
+            bodyVariables: Array.isArray(t.body_variables)
+              ? (t.body_variables as Array<{ key: string; example?: string }>)
+              : [],
+            body: String(t.message_body || ''),
+          });
+        }
+      } catch {
+        // continue to next waba
+      }
+    }
+
+    if (fetchedTemplates.length > 0) {
+      cachedTemplates = { fetchedAt: Date.now(), templates: fetchedTemplates };
+      return fetchedTemplates;
+    }
   } catch (err) {
     console.warn('[WhatyPie] Failed to fetch templates:', err);
   }
   return cachedTemplates?.templates || [];
+}
+
+/** Resolves and pads template variables according to approved template body structure. */
+export function resolveTemplateVariables(
+  template: WhatyPieTemplateInfo,
+  ctx: TemplateVariableContext,
+  providedVariables?: unknown[],
+): string[] {
+  const expectedCount = template.bodyVariables.length;
+  if (expectedCount === 0) return [];
+
+  const body = template.body || '';
+  const parts = body.split(/\{\{(?:\d+|[a-zA-Z0-9_]+)\}\}/);
+  const result: string[] = [];
+
+  const businessName = ctx.businessName || 'Five Star';
+  const billOrOrder = ctx.billNumber || ctx.orderNumber || '-';
+  const totalAmount = ctx.totalAmount || '0.00';
+  const currency = ctx.currency || ctx.currencySymbol || 'INR';
+  const customerName = ctx.customerName || 'Valued Customer';
+  const stageLabel = ctx.stageLabel || 'Confirmed';
+
+  for (let i = 0; i < expectedCount; i++) {
+    const explicitVal =
+      providedVariables &&
+      providedVariables[i] !== undefined &&
+      providedVariables[i] !== null &&
+      String(providedVariables[i]).trim() !== ''
+        ? String(providedVariables[i]).trim()
+        : null;
+
+    if (parts.length > 1) {
+      const prefix = (parts[i] || '').toLowerCase();
+      const suffix = (parts[i + 1] || '').toLowerCase();
+
+      if (/receipt\s*-|restaurant|cafe|brand|\bfrom\b|store|shop/.test(prefix)) {
+        result.push(businessName);
+      } else if (/bill\s*#|bill\s*no|order\s*#|order\s*no|ticket|token/.test(prefix)) {
+        result.push(billOrOrder);
+      } else if (/total\s*paid|total|amount|sum|price/.test(prefix)) {
+        result.push(totalAmount);
+      } else if (
+        i > 0 &&
+        (/total\s*paid|total|amount/.test((parts[i - 1] || '').toLowerCase()) ||
+          /currency|inr|usd|eur|\$/.test(prefix))
+      ) {
+        result.push(currency);
+      } else if (/hi|hello|dear|customer|name/.test(prefix) || /hi|hello/.test(suffix)) {
+        result.push(customerName);
+      } else if (/status|stage|update|ready|kitchen|\snow\b|\sis\b/.test(prefix)) {
+        result.push(stageLabel);
+      } else if (explicitVal) {
+        result.push(explicitVal);
+      } else {
+        const fallbackList = [businessName, billOrOrder, totalAmount, currency, stageLabel, customerName];
+        result.push(fallbackList[i] || businessName);
+      }
+    } else if (explicitVal) {
+      result.push(explicitVal);
+    } else {
+      const fallbackList = [businessName, billOrOrder, totalAmount, currency, stageLabel, customerName];
+      result.push(fallbackList[i] || businessName);
+    }
+  }
+
+  return result.slice(0, expectedCount).map((v) => String(v || '').trim() || '-');
 }
 
 /** Probe WhatyPie endpoint and verify API key. */
@@ -323,7 +424,9 @@ export async function sendWhatyPieMessage(params: SendWhatyPieParams): Promise<S
 
   // 3. Resolve template details (language code and variable counts)
   let resolvedLanguage = params.languageCode;
-  let resolvedVariables = params.templateVariables;
+  let resolvedVariables: unknown[] | undefined = params.templateVariables
+    ? [...params.templateVariables]
+    : undefined;
 
   if (params.templateName) {
     try {
@@ -333,13 +436,21 @@ export async function sendWhatyPieMessage(params: SendWhatyPieParams): Promise<S
         if (!resolvedLanguage) {
           resolvedLanguage = matched.language;
         }
-        // Match expected body variables count to prevent Meta #132000 errors
         const expectedCount = matched.bodyVariables.length;
         if (expectedCount === 0) {
           resolvedVariables = undefined;
-        } else if (Array.isArray(resolvedVariables)) {
-          resolvedVariables = resolvedVariables.slice(0, expectedCount);
+        } else {
+          const ctx = params.templateContext || {};
+          resolvedVariables = resolveTemplateVariables(matched, ctx, resolvedVariables);
         }
+      } else if (params.templateName === 'five_start_bill_receipt') {
+        if (!resolvedLanguage) resolvedLanguage = 'en_US';
+        const ctx = params.templateContext || {};
+        const bName = ctx.businessName || 'Five Star';
+        const num = ctx.billNumber || ctx.orderNumber || (resolvedVariables?.[0] as string) || 'TOK-0001';
+        const tot = ctx.totalAmount || (resolvedVariables?.[2] as string) || '0.00';
+        const cur = ctx.currency || 'INR';
+        resolvedVariables = [bName, num, tot, cur];
       }
     } catch (tmplErr) {
       console.warn('[WhatyPie] Template auto-resolution warning:', tmplErr);
@@ -508,6 +619,7 @@ export async function sendWhatyPieBillReceipt(
   const businessName = getSettingValue('business_name') || 'DinZin Restaurant';
   const currency = getSettingValue('currency') || 'INR';
   const currencySymbol = getSettingValue('currency_symbol') || '₹';
+  const totalAmount = Number(bill.total || 0).toFixed(2);
 
   const itemLines = items.map(
     (item) => `• ${item.quantity}x ${item.product_name} - ${currencySymbol}${Number(item.total).toFixed(2)}`,
@@ -519,17 +631,36 @@ export async function sendWhatyPieBillReceipt(
     `*Date:* ${bill.created_at.replace('T', ' ').slice(0, 16)}`,
     ...(itemLines.length > 0 ? ['', '*Ordered Items:*', ...itemLines] : []),
     '',
-    `*Total Paid:* ${currencySymbol}${Number(bill.total).toFixed(2)} ${currency}`,
+    `*Total Paid:* ${currencySymbol}${totalAmount} ${currency}`,
     '',
     'Thank you for your visit! 🙏',
   ].join('\n');
+
+  const templateContext: TemplateVariableContext = {
+    businessName,
+    billNumber: bill.bill_number,
+    orderNumber: bill.bill_number,
+    totalAmount,
+    currency,
+    currencySymbol,
+    customerName: bill.customer_name || 'Valued Customer',
+    stageLabel: 'Completed',
+  };
+
+  const isReceiptTemplate =
+    config.templateBill.toLowerCase().includes('receipt') ||
+    config.templateBill.toLowerCase().includes('bill');
+  const candidateVariables = isReceiptTemplate
+    ? [businessName, bill.bill_number, totalAmount, currency]
+    : [bill.bill_number, `${currencySymbol}${totalAmount}`, businessName, currency];
 
   return sendWhatyPieMessage({
     phone: recipientPhone,
     message: formattedMessage,
     messageType: config.templateBill ? 'template' : 'text',
     templateName: config.templateBill || undefined,
-    templateVariables: config.templateBill ? [bill.bill_number, `${currencySymbol}${Number(bill.total).toFixed(2)}`, businessName] : undefined,
+    templateVariables: config.templateBill ? candidateVariables : undefined,
+    templateContext,
     billId: bill.id,
     customerId: bill.customer_id,
     userId,
@@ -551,7 +682,7 @@ export async function sendWhatyPieOrderStatus(
 
   const db = getDatabase();
   const order = db.prepare(`
-    SELECT o.id, o.order_number, o.status, o.customer_id,
+    SELECT o.id, o.order_number, o.status, o.type, o.total, o.customer_id,
            c.name AS customer_name, c.phone AS customer_phone
     FROM orders o
     LEFT JOIN customers c ON c.id = o.customer_id
@@ -560,6 +691,8 @@ export async function sendWhatyPieOrderStatus(
     id: number;
     order_number: string;
     status: string;
+    type: string;
+    total: number;
     customer_id: number | null;
     customer_name: string | null;
     customer_phone: string | null;
@@ -575,6 +708,9 @@ export async function sendWhatyPieOrderStatus(
   }
 
   const businessName = getSettingValue('business_name') || 'DinZin Restaurant';
+  const currency = getSettingValue('currency') || 'INR';
+  const currencySymbol = getSettingValue('currency_symbol') || '₹';
+  const totalAmount = Number(order.total || 0).toFixed(2);
 
   let stageLabel = stage;
   let statusText = '';
@@ -584,9 +720,12 @@ export async function sendWhatyPieOrderStatus(
   } else if (stage === 'ready') {
     stageLabel = 'Ready for Pickup';
     statusText = `🥡 *Order Ready!* from *${businessName}*\nYour Order *#${order.order_number}* is freshly prepared and ready for pickup/delivery!`;
+  } else if (stage === 'out_for_delivery') {
+    stageLabel = 'Out for Delivery';
+    statusText = `🚚 *Out for Delivery!* from *${businessName}*\nYour Order *#${order.order_number}* is out for delivery and will arrive soon!`;
   } else if (stage === 'completed' || stage === 'delivered') {
-    stageLabel = 'Completed';
-    statusText = `✅ *Order Completed* from *${businessName}*\nYour Order *#${order.order_number}* is completed. Thank you for choosing us! 🙏`;
+    stageLabel = order.type === 'delivery' || stage === 'delivered' ? 'Delivered' : 'Completed';
+    statusText = `✅ *Order ${stageLabel}* from *${businessName}*\nYour Order *#${order.order_number}* has been ${stageLabel === 'Delivered' ? 'delivered' : 'completed'}. Thank you for choosing us! 🙏`;
   } else if (stage === 'confirmed' || stage === 'placed') {
     stageLabel = 'Confirmed';
     statusText = `🛎️ *Order Confirmed* from *${businessName}*\nWe have received your Order *#${order.order_number}*. We're on it!`;
@@ -596,12 +735,31 @@ export async function sendWhatyPieOrderStatus(
     statusText = `📢 *Order Update* from *${businessName}*\nYour Order *#${order.order_number}* status is now: *${stage.toUpperCase()}*.`;
   }
 
+  const templateContext: TemplateVariableContext = {
+    businessName,
+    orderNumber: order.order_number,
+    billNumber: order.order_number,
+    totalAmount,
+    currency,
+    currencySymbol,
+    customerName: order.customer_name || 'Valued Customer',
+    stageLabel,
+  };
+
+  const isReceiptTemplate =
+    config.templateOrderStatus.toLowerCase().includes('receipt') ||
+    config.templateOrderStatus.toLowerCase().includes('bill');
+  const candidateVariables = isReceiptTemplate
+    ? [businessName, order.order_number, totalAmount, currency]
+    : [order.order_number, stageLabel, businessName, totalAmount];
+
   return sendWhatyPieMessage({
     phone: recipientPhone,
     message: statusText,
     messageType: config.templateOrderStatus ? 'template' : 'text',
     templateName: config.templateOrderStatus || undefined,
-    templateVariables: config.templateOrderStatus ? [order.order_number, stageLabel, businessName] : undefined,
+    templateVariables: config.templateOrderStatus ? candidateVariables : undefined,
+    templateContext,
     customerId: order.customer_id,
     userId,
     kind: 'auto_followup',

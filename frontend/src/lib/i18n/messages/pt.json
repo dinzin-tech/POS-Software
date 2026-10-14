@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 item cancelado · Toque para ver} other {# itens cancelados · Toque para ver}}",
     "voidingItem": "Anulando...",
     "walkInCustomer": "Cliente sem reserva",
-    "whatsappFailed": "Falha ao abrir o WhatsApp"
+    "whatsappFailed": "Falha ao abrir o WhatsApp",
+    "outForDelivery": "Saiu para entrega",
+    "delivered": "Entregue",
+    "markOutForDelivery": "Marcar como saiu para entrega",
+    "markDelivered": "Marcar como entregue",
+    "markPreparing": "Marcar em preparo",
+    "markReady": "Marcar como pronto",
+    "markServed": "Marcar como servido",
+    "markCompleted": "Marcar como concluído"
   },
   "pos": {
     "addCustomer": "Adicionar Cliente",

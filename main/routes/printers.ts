@@ -265,10 +265,6 @@ router.delete('/:id', requirePermission('printers.manage'), (req: Request, res: 
     if (!printer) return res.status(404).json({ error: 'Printer not found' });
 
     db.transaction(() => {
-      const count = (db.prepare('SELECT COUNT(*) as count FROM printers').get() as any).count;
-      if (printer.is_default && count === 1) {
-        throw Object.assign(new Error('Cannot delete the only default printer'), { statusCode: 409 });
-      }
       db.prepare('DELETE FROM printers WHERE id = ?').run(req.params.id);
       if (printer.is_default) {
         const replacement = db.prepare('SELECT id FROM printers ORDER BY created_at, name LIMIT 1').get() as any;

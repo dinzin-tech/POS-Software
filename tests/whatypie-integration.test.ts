@@ -22,6 +22,7 @@ const {
   getWhatyPieConfig,
   updateWhatyPieConfig,
   testWhatyPieConnection,
+  resolveTemplateVariables,
 } = require('../main/services/whatypie');
 
 async function main() {
@@ -96,6 +97,53 @@ async function main() {
     // Direct service probe test with empty key
     const directTestRes = await testWhatyPieConnection('https://api.whatypie.in', '');
     assertEqual(directTestRes.ok, false, 'direct testWhatyPieConnection rejects empty key');
+
+    // 5. Template variables resolution and count matching (Meta #132000 prevention)
+    const mockFiveStarTemplate = {
+      name: 'five_start_bill_receipt',
+      language: 'en_US',
+      category: 'UTILITY',
+      status: 'approved',
+      bodyVariables: [{ key: '1' }, { key: '2' }, { key: '3' }, { key: '4' }],
+      body: '🧾 *BILL RECEIPT - {{1}}* *Bill #:* {{2}} *Total Paid:* {{3}} {{4}} Thanks for dining with us! Hope you enjoyed your meal. Visit us again soon for more delicious food! 🍽️🙏',
+    };
+
+    const resolved = resolveTemplateVariables(
+      mockFiveStarTemplate,
+      {
+        businessName: 'Five Star',
+        orderNumber: 'TOK-0001',
+        billNumber: 'TOK-0001',
+        totalAmount: '225.00',
+        currency: 'INR',
+        currencySymbol: '₹',
+        customerName: 'Charan',
+        stageLabel: 'Confirmed',
+      },
+      ['TOK-0001', 'Confirmed', 'Five Star'],
+    );
+
+    assertEqual(resolved.length, 4, 'five_start_bill_receipt always resolves exactly 4 variables');
+    assertEqual(resolved[0], 'Five Star', 'variable 1 maps to business name');
+    assertEqual(resolved[1], 'TOK-0001', 'variable 2 maps to bill or order number');
+    assertEqual(resolved[2], '225.00', 'variable 3 maps to total amount');
+    assertEqual(resolved[3], 'INR', 'variable 4 maps to currency');
+
+    // Test padding when template expects more variables than provided
+    const padded = resolveTemplateVariables(
+      {
+        name: 'custom_status',
+        language: 'en',
+        category: 'UTILITY',
+        status: 'approved',
+        bodyVariables: [{ key: '1' }, { key: '2' }, { key: '3' }],
+        body: 'Update: {{1}} {{2}} {{3}}',
+      },
+      { businessName: 'Five Star', orderNumber: 'TOK-0001' },
+      ['TOK-0001'],
+    );
+    assertEqual(padded.length, 3, 'under-specified parameters are padded to expected count to prevent #132000');
+    assertOrThrow(padded.every((v: string) => Boolean(v && v.trim())), 'all resolved variables are non-empty strings');
   } finally {
     server.close();
     closeDatabase();

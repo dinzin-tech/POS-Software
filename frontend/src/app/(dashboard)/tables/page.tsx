@@ -533,6 +533,7 @@ export default function TablesPage() {
                             order.status === 'preparing' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' :
                             order.status === 'ready' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' :
                             order.status === 'served' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' :
+                            order.status === 'out_for_delivery' ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' :
                             'bg-muted text-muted-foreground'
                           }`}>
                             {tOrders(ORDER_STATUS_LABEL_KEYS[order.status])}

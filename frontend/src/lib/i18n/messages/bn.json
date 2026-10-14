@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1টি বাতিল করা আইটেম · দেখতে ট্যাপ করুন} other {#টি অকার্যকর আইটেম · দেখতে আলতো চাপুন}}",
     "voidingItem": "ভয়ডিং...",
     "walkInCustomer": "ওয়াক-ইন গ্রাহক",
-    "whatsappFailed": "WhatsApp খুলতে ব্যর্থ হয়েছে।"
+    "whatsappFailed": "WhatsApp খুলতে ব্যর্থ হয়েছে।",
+    "outForDelivery": "ডেলিভারির জন্য পাঠানো হয়েছে",
+    "delivered": "ডেলিভারি সম্পন্ন",
+    "markOutForDelivery": "ডেলিভারির জন্য পাঠানো হয়েছে চিহ্নিত করুন",
+    "markDelivered": "ডেলিভারি সম্পন্ন চিহ্নিত করুন",
+    "markPreparing": "প্রস্তুত হচ্ছে চিহ্নিত করুন",
+    "markReady": "প্রস্তুত চিহ্নিত করুন",
+    "markServed": "পরিবেশন করা হয়েছে চিহ্নিত করুন",
+    "markCompleted": "সম্পন্ন চিহ্নিত করুন"
   },
   "pos": {
     "addCustomer": "গ্রাহক যোগ করুন",

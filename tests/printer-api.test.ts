@@ -192,15 +192,25 @@ async function runTests() {
     assert(res.status === 200, `deleting the default with others returns 200 (got ${res.status})`);
     assert(defaultCount() === 1, 'a replacement default is chosen after deletion');
 
-    // Reduce to a single printer and confirm it cannot be deleted.
+    // Reduce to a single printer and confirm it can also be deleted.
     const all = db.prepare('SELECT id FROM printers').all() as { id: string }[];
     for (const printer of all.slice(1)) {
       await request(app).delete(`/api/printers/${printer.id}`);
     }
     const onlyDefault = defaultId();
     assert(onlyDefault !== undefined, 'one printer remains and is default');
-    const refused = await request(app).delete(`/api/printers/${onlyDefault}`);
-    assert(refused.status === 409, `deleting the only default printer is refused (got ${refused.status})`);
+    const deleteLast = await request(app).delete(`/api/printers/${onlyDefault}`);
+    assert(deleteLast.status === 200, `deleting the only default printer succeeds (got ${deleteLast.status})`);
+    assert(defaultCount() === 0, 'zero printers remain after deleting the only default printer');
+
+    // Re-create a printer for subsequent tests
+    const recreated = await request(app).post('/api/printers').send({
+      name: 'Kitchen Station Printer',
+      connection_type: 'network',
+      ip_address: '192.168.1.100',
+      port: 9100,
+    });
+    assert(recreated.status === 201, 'recreating a printer succeeds');
   }
 
   // ── Test 7: kitchen stations validate printer identifiers ───────────────

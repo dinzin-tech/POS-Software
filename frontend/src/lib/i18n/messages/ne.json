@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {१ रद्द वस्तु · हेर्न ट्याप गर्नुहोस्} other {# रद्द वस्तुहरू · हेर्न ट्याप गर्नुहोस्}}",
     "voidingItem": "रद्द गरिँदै...",
     "walkInCustomer": "वाक-इन ग्राहक",
-    "whatsappFailed": "WhatsApp खोल्न असफल भयो"
+    "whatsappFailed": "WhatsApp खोल्न असफल भयो",
+    "outForDelivery": "डेलिभरीका लागि बाहिर",
+    "delivered": "डेलिभर भयो",
+    "markOutForDelivery": "डेलिभरीका लागि बाहिर चिन्ह लगाउनुहोस्",
+    "markDelivered": "डेलिभर भयो चिन्ह लगाउनुहोस्",
+    "markPreparing": "तयार हुँदैछ चिन्ह लगाउनुहोस्",
+    "markReady": "तयार छ चिन्ह लगाउनुहोस्",
+    "markServed": "पस्कियो चिन्ह लगाउनुहोस्",
+    "markCompleted": "सम्पन्न चिन्ह लगाउनुहोस्"
   },
   "pos": {
     "addCustomer": "ग्राहक थप्नुहोस्",

@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, zero {لا توجد عناصر ملغاة} one {عنصر واحد ملغى · اضغط للعرض} two {عنصران ملغيان · اضغط للعرض} few {# عناصر ملغاة · اضغط للعرض} many {# عنصرًا ملغى · اضغط للعرض} other {# عنصر ملغى · اضغط للعرض}}",
     "voidingItem": "إلغاء...",
     "walkInCustomer": "العميل العابر",
-    "whatsappFailed": "فشل فتح تطبيق WhatsApp"
+    "whatsappFailed": "فشل فتح تطبيق WhatsApp",
+    "outForDelivery": "خارج للتوصيل",
+    "delivered": "تم التوصيل",
+    "markOutForDelivery": "تحديد كخارج للتوصيل",
+    "markDelivered": "تحديد كمكتمل التوصيل",
+    "markPreparing": "تحديد قيد التحضير",
+    "markReady": "تحديد كجاهز",
+    "markServed": "تحديد كتم التقديم",
+    "markCompleted": "تحديد كمكتمل"
   },
   "pos": {
     "addCustomer": "إضافة عميل",

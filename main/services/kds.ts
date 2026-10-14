@@ -6,6 +6,7 @@ import { parseCategoryIds } from '../routes/auth';
 import { getUserAuthStatus, isTokenRevoked, isTokenStale } from '../middleware/security';
 import { ROLE_ACCESS, hasRole } from '../../shared/role-permissions';
 import { hasPermission } from './authorization';
+import { triggerLiveSyncDebounced } from './live-sync';
 
 interface KdsClient {
   ws: WebSocket;
@@ -666,6 +667,11 @@ export function notifyKdsUpdate(): void {
   queueMicrotask(() => {
     broadcastQueued = false;
     broadcastOrderUpdate();
+    try {
+      triggerLiveSyncDebounced();
+    } catch {
+      // ignore
+    }
   });
 }
 

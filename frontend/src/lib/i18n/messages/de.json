@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 stornierter Artikel · Zum Anzeigen tippen} other {# stornierte Artikel · Zum Anzeigen tippen}}",
     "voidingItem": "Wird storniert…",
     "walkInCustomer": "Laufkunde",
-    "whatsappFailed": "WhatsApp konnte nicht geöffnet werden"
+    "whatsappFailed": "WhatsApp konnte nicht geöffnet werden",
+    "outForDelivery": "In Zustellung",
+    "delivered": "Zugestellt",
+    "markOutForDelivery": "Als in Zustellung markieren",
+    "markDelivered": "Als zugestellt markieren",
+    "markPreparing": "Als in Zubereitung markieren",
+    "markReady": "Als fertig markieren",
+    "markServed": "Als serviert markieren",
+    "markCompleted": "Als abgeschlossen markieren"
   },
   "pos": {
     "addCustomer": "Kunde hinzufügen",

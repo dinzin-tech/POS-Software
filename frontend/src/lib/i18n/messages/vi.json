@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 món đã hủy · Chạm để xem} other {# món đã hủy · Chạm để xem}}",
     "voidingItem": "Đang hủy món...",
     "walkInCustomer": "Khách vãng lai",
-    "whatsappFailed": "Không thể mở WhatsApp"
+    "whatsappFailed": "Không thể mở WhatsApp",
+    "outForDelivery": "Đang giao hàng",
+    "delivered": "Đã giao hàng",
+    "markOutForDelivery": "Đánh dấu đang giao hàng",
+    "markDelivered": "Đánh dấu đã giao hàng",
+    "markPreparing": "Đánh dấu đang chuẩn bị",
+    "markReady": "Đánh dấu đã sẵn sàng",
+    "markServed": "Đánh dấu đã phục vụ",
+    "markCompleted": "Đánh dấu đã hoàn thành"
   },
   "pos": {
     "addCustomer": "Thêm khách hàng",

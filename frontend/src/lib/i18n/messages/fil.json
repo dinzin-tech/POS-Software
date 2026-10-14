@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 kinanselang aytem · I-tap para makita} other {# kinanselang aytem · I-tap para makita}}",
     "voidingItem": "Vino-void...",
     "walkInCustomer": "Walk-in na Kustomer",
-    "whatsappFailed": "Nabigong open WhatsApp"
+    "whatsappFailed": "Nabigong open WhatsApp",
+    "outForDelivery": "Ipapadala na",
+    "delivered": "Naihatid na",
+    "markOutForDelivery": "Markahan bilang ipapadala na",
+    "markDelivered": "Markahan bilang naihatid na",
+    "markPreparing": "Markahan bilang inihahanda",
+    "markReady": "Markahan bilang handa na",
+    "markServed": "Markahan bilang naihain na",
+    "markCompleted": "Markahan bilang tapos na"
   },
   "pos": {
     "addCustomer": "Magdagdag ng Customer",

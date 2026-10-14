@@ -174,7 +174,7 @@ export interface Order {
   /** Address confirmed for this delivery; printed in full on the courier slip. */
   delivery_address?: string | null;
   type: 'dine_in' | 'takeaway' | 'delivery' | 'online';
-  status: 'pending' | 'preparing' | 'ready' | 'served' | 'completed' | 'cancelled';
+  status: 'pending' | 'preparing' | 'ready' | 'out_for_delivery' | 'served' | 'completed' | 'cancelled';
   subtotal: number;
   tax_amount: number;
   discount_amount: number;

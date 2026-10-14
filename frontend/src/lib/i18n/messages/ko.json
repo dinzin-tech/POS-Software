@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, other {취소된 메뉴 #건 · 탭하여 보기}}",
     "voidingItem": "취소 중...",
     "walkInCustomer": "방문 고객",
-    "whatsappFailed": "WhatsApp을 열지 못했습니다"
+    "whatsappFailed": "WhatsApp을 열지 못했습니다",
+    "outForDelivery": "배달 중",
+    "delivered": "배달 완료",
+    "markOutForDelivery": "배달 중으로 표시",
+    "markDelivered": "배달 완료로 표시",
+    "markPreparing": "조리 중으로 표시",
+    "markReady": "준비 완료로 표시",
+    "markServed": "서빙 완료로 표시",
+    "markCompleted": "완료로 표시"
   },
   "pos": {
     "addCustomer": "고객 추가",

@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 artikull i anuluar - prekni për ta parë} other {# artikuj të anuluar - prekni për t’i parë}}",
     "voidingItem": "Duke anuluar artikullin...",
     "walkInCustomer": "Klient pa rezervim",
-    "whatsappFailed": "Hapja e WhatsApp dështoi"
+    "whatsappFailed": "Hapja e WhatsApp dështoi",
+    "outForDelivery": "Në dorëzim",
+    "delivered": "Dorëzuar",
+    "markOutForDelivery": "Shëno në dorëzim",
+    "markDelivered": "Shëno si dorëzuar",
+    "markPreparing": "Shëno në përgatitje",
+    "markReady": "Shëno si gati",
+    "markServed": "Shëno si shërbyer",
+    "markCompleted": "Shëno si përfunduar"
   },
   "pos": {
     "addCustomer": "Shto klient",

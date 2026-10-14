@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {無効化した商品1点 · タップして表示} other {無効化した商品#点 · タップして表示}}",
     "voidingItem": "無効化中…",
     "walkInCustomer": "ウォークイン顧客",
-    "whatsappFailed": "WhatsAppを開けませんでした"
+    "whatsappFailed": "WhatsAppを開けませんでした",
+    "outForDelivery": "配達中",
+    "delivered": "配達完了",
+    "markOutForDelivery": "配達中に設定",
+    "markDelivered": "配達完了に設定",
+    "markPreparing": "調理中に設定",
+    "markReady": "準備完了に設定",
+    "markServed": "提供済みに設定",
+    "markCompleted": "完了に設定"
   },
   "pos": {
     "addCustomer": "顧客を追加",

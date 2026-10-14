@@ -5,6 +5,7 @@ import { requirePermission } from '../services/authorization';
 import { checkPinRateLimit } from './orders';
 import { createRefund, getTenantCurrency, RefundRequest } from '../services/refund';
 import { getCurrencyFractionDigits, getCurrencyMinorUnitFactor } from '../countries';
+import { triggerLiveSyncDebounced } from '../services/live-sync';
 
 const router = Router();
 const MAX_IDEMPOTENCY_KEY_LENGTH = 128;
@@ -110,6 +111,11 @@ router.post('/', requirePermission('refunds.initiate'), (req: Request, res: Resp
     };
 
     const result = withTxn(() => createRefund(db, refundRequest));
+    try {
+      triggerLiveSyncDebounced();
+    } catch {
+      // ignore
+    }
     res.status(201).json(result);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message || 'Unable to process refund' });

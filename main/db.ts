@@ -5490,6 +5490,81 @@ export const MIGRATIONS: { version: number; name: string; up: () => void }[] = [
       `);
     },
   },
+  {
+    version: 99,
+    name: 'allow_reusable_daily_order_numbers',
+    up: () => {
+      db.exec(`
+        PRAGMA foreign_keys=OFF;
+        CREATE TABLE IF NOT EXISTS orders_v99 (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          order_number TEXT NOT NULL,
+          table_id TEXT,
+          customer_id TEXT,
+          user_id TEXT,
+          type TEXT DEFAULT 'takeaway',
+          delivery_address TEXT DEFAULT NULL,
+          guest_count INTEGER,
+          special_instructions TEXT,
+          packaging_charge REAL DEFAULT 0,
+          delivery_charge REAL DEFAULT 0,
+          service_charge REAL DEFAULT 0,
+          status TEXT DEFAULT 'pending',
+          subtotal REAL DEFAULT 0,
+          tax_amount REAL DEFAULT 0,
+          tax_breakdown TEXT,
+          tax_snapshot TEXT DEFAULT NULL,
+          packaging_tax_category_id TEXT DEFAULT NULL,
+          delivery_tax_category_id TEXT DEFAULT NULL,
+          service_charge_tax_category_id TEXT DEFAULT NULL,
+          discount_amount REAL DEFAULT 0,
+          discount_type TEXT,
+          discount_value REAL,
+          discount_reason TEXT,
+          round_off REAL DEFAULT 0,
+          total REAL DEFAULT 0,
+          cooking_started_at TEXT,
+          ready_at TEXT,
+          served_at TEXT,
+          completed_at TEXT,
+          cancelled_at TEXT,
+          cancellation_reason TEXT,
+          online_platform TEXT DEFAULT NULL,
+          external_order_id TEXT DEFAULT NULL,
+          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+        INSERT INTO orders_v99 (
+          id, order_number, table_id, customer_id, user_id, type, delivery_address,
+          guest_count, special_instructions, packaging_charge, delivery_charge,
+          service_charge, status, subtotal, tax_amount, tax_breakdown, tax_snapshot,
+          packaging_tax_category_id, delivery_tax_category_id, service_charge_tax_category_id,
+          discount_amount, discount_type, discount_value, discount_reason, round_off,
+          total, cooking_started_at, ready_at, served_at, completed_at, cancelled_at,
+          cancellation_reason, online_platform, external_order_id, created_at, updated_at
+        )
+        SELECT
+          id, order_number, table_id, customer_id, user_id, type, delivery_address,
+          guest_count, special_instructions, packaging_charge, delivery_charge,
+          service_charge, status, subtotal, tax_amount, tax_breakdown, tax_snapshot,
+          packaging_tax_category_id, delivery_tax_category_id, service_charge_tax_category_id,
+          discount_amount, discount_type, discount_value, discount_reason, round_off,
+          total, cooking_started_at, ready_at, served_at, completed_at, cancelled_at,
+          cancellation_reason, online_platform, external_order_id, created_at, updated_at
+        FROM orders;
+        DROP TABLE orders;
+        ALTER TABLE orders_v99 RENAME TO orders;
+        CREATE INDEX IF NOT EXISTS idx_orders_type        ON orders(type);
+        CREATE INDEX IF NOT EXISTS idx_orders_table_id    ON orders(table_id);
+        CREATE INDEX IF NOT EXISTS idx_orders_customer    ON orders(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_orders_user        ON orders(user_id);
+        CREATE INDEX IF NOT EXISTS idx_orders_created     ON orders(created_at);
+        CREATE INDEX IF NOT EXISTS idx_orders_status      ON orders(status);
+        PRAGMA foreign_keys=ON;
+      `);
+    },
+  },
 ];
 
 function syncBackupBeforeMigration(fromVersion: number, toVersion: number): void {
@@ -5777,7 +5852,7 @@ function createSchema(): void {
 
     CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_number TEXT UNIQUE NOT NULL,
+      order_number TEXT NOT NULL,
       table_id TEXT,
       customer_id TEXT,
       user_id TEXT,

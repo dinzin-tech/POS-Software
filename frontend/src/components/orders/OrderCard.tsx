@@ -35,6 +35,7 @@ import {
   XCircle,
   Download,
   Loader2,
+  CheckCircle,
 } from 'lucide-react';
 import type { Order, OrderItem, Bill, Customer } from '@/lib/types';
 import { Ltr } from '@/components/layout/Ltr';
@@ -51,6 +52,7 @@ const orderStatusBadge: Record<Order['status'], { bg: string; text: string; labe
   preparing: { bg: 'bg-blue-100 dark:bg-blue-950/40', text: 'text-blue-700 dark:text-blue-300', labelKey: 'preparing' },
   ready: { bg: 'bg-green-100 dark:bg-green-950/40', text: 'text-green-700 dark:text-green-300', labelKey: 'ready' },
   served: { bg: 'bg-purple-100 dark:bg-purple-950/40', text: 'text-purple-700 dark:text-purple-300', labelKey: 'served' },
+  out_for_delivery: { bg: 'bg-indigo-100 dark:bg-indigo-950/40', text: 'text-indigo-700 dark:text-indigo-300', labelKey: 'outForDelivery' },
   completed: { bg: 'bg-muted', text: 'text-muted-foreground', labelKey: 'completed' },
   cancelled: { bg: 'bg-red-100 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-300', labelKey: 'cancelled' },
 };
@@ -123,6 +125,8 @@ interface OrderCardProps {
   onDeleteItem?: (orderId: number, itemId: number) => void;
   onVoidItem?: (orderId: number, itemId: number, productName: string) => void;
   onRestoreItem?: (orderId: number, itemId: number) => void;
+  onUpdateStatus?: (orderId: number, status: string) => void;
+  updatingStatusOrderId?: number | null;
 }
 
 export function OrderCard({
@@ -162,6 +166,8 @@ export function OrderCard({
   onDeleteItem,
   onVoidItem,
   onRestoreItem,
+  onUpdateStatus,
+  updatingStatusOrderId,
 }: OrderCardProps) {
   const tOrders = useTranslations('orders');
   const tCommon = useTranslations('common');
@@ -343,6 +349,66 @@ export function OrderCard({
                     <Download size={14} className="me-2" />
                     {tOrders('downloadPrintPreview')}
                   </DropdownMenuItem>
+                )}
+
+                {order.status !== 'cancelled' && onUpdateStatus && (
+                  <>
+                    <DropdownMenuSeparator />
+                    {order.status !== 'out_for_delivery' && (
+                      <DropdownMenuItem
+                        onClick={() => onUpdateStatus(order.id, 'out_for_delivery')}
+                        disabled={updatingStatusOrderId === order.id}
+                      >
+                        <Truck size={14} className="me-2 text-indigo-600" />
+                        {tOrders('markOutForDelivery')}
+                      </DropdownMenuItem>
+                    )}
+                    {order.status !== 'completed' && (
+                      <DropdownMenuItem
+                        onClick={() => onUpdateStatus(order.id, 'delivered')}
+                        disabled={updatingStatusOrderId === order.id}
+                      >
+                        <CheckCircle size={14} className="me-2 text-emerald-600" />
+                        {tOrders('markDelivered')}
+                      </DropdownMenuItem>
+                    )}
+                    {order.status === 'pending' && (
+                      <DropdownMenuItem
+                        onClick={() => onUpdateStatus(order.id, 'preparing')}
+                        disabled={updatingStatusOrderId === order.id}
+                      >
+                        <Clock size={14} className="me-2" />
+                        {tOrders('markPreparing')}
+                      </DropdownMenuItem>
+                    )}
+                    {['pending', 'preparing'].includes(order.status) && (
+                      <DropdownMenuItem
+                        onClick={() => onUpdateStatus(order.id, 'ready')}
+                        disabled={updatingStatusOrderId === order.id}
+                      >
+                        <CheckCircle size={14} className="me-2" />
+                        {tOrders('markReady')}
+                      </DropdownMenuItem>
+                    )}
+                    {order.type === 'dine_in' && !['served', 'completed'].includes(order.status) && (
+                      <DropdownMenuItem
+                        onClick={() => onUpdateStatus(order.id, 'served')}
+                        disabled={updatingStatusOrderId === order.id}
+                      >
+                        <Utensils size={14} className="me-2" />
+                        {tOrders('markServed')}
+                      </DropdownMenuItem>
+                    )}
+                    {order.status !== 'completed' && (
+                      <DropdownMenuItem
+                        onClick={() => onUpdateStatus(order.id, 'completed')}
+                        disabled={updatingStatusOrderId === order.id}
+                      >
+                        <CheckCircle size={14} className="me-2" />
+                        {tOrders('markCompleted')}
+                      </DropdownMenuItem>
+                    )}
+                  </>
                 )}
 
                 {!['completed', 'cancelled'].includes(order.status) && (
@@ -895,6 +961,38 @@ export function OrderCard({
               <Bike size={15} className="me-1.5 text-muted-foreground" />
             )}
             {tOrders('printDeliverySlip')}
+          </Button>
+        )}
+
+        {onUpdateStatus && order.status === 'out_for_delivery' && (
+          <Button
+            variant="outline"
+            onClick={() => onUpdateStatus(order.id, 'delivered')}
+            disabled={updatingStatusOrderId === order.id}
+            className="mt-2 w-full h-10 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 active:scale-95 touch-manipulation font-semibold text-xs"
+          >
+            {updatingStatusOrderId === order.id ? (
+              <Loader2 size={15} className="animate-spin me-1.5" />
+            ) : (
+              <CheckCircle size={15} className="me-1.5" />
+            )}
+            {tOrders('markDelivered')}
+          </Button>
+        )}
+
+        {onUpdateStatus && order.type === 'delivery' && order.status !== 'out_for_delivery' && order.status !== 'cancelled' && (
+          <Button
+            variant="outline"
+            onClick={() => onUpdateStatus(order.id, 'out_for_delivery')}
+            disabled={updatingStatusOrderId === order.id}
+            className="mt-2 w-full h-10 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 touch-manipulation font-semibold text-xs"
+          >
+            {updatingStatusOrderId === order.id ? (
+              <Loader2 size={15} className="animate-spin me-1.5" />
+            ) : (
+              <Truck size={15} className="me-1.5" />
+            )}
+            {tOrders('markOutForDelivery')}
           </Button>
         )}
       </div>

@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 geannuleerd artikel - tik om te bekijken} other {# geannuleerde artikelen - tik om te bekijken}}",
     "voidingItem": "Annuleren...",
     "walkInCustomer": "Passerende klant",
-    "whatsappFailed": "Kan WhatsApp niet openen"
+    "whatsappFailed": "Kan WhatsApp niet openen",
+    "outForDelivery": "Onderweg voor bezorging",
+    "delivered": "Bezorgd",
+    "markOutForDelivery": "Markeren als onderweg",
+    "markDelivered": "Markeren als bezorgd",
+    "markPreparing": "Markeren als in bereiding",
+    "markReady": "Markeren als gereed",
+    "markServed": "Markeren als geserveerd",
+    "markCompleted": "Markeren als voltooid"
   },
   "pos": {
     "addCustomer": "Klant toevoegen",

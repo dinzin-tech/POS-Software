@@ -1,0 +1,11 @@
+# Prevent direct public HTTP access to live_data.json
+<Files "live_data.json">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<IfModule mod_authz_core.c>
+    <Files "live_data.json">
+        Require all denied
+    </Files>
+</IfModule>

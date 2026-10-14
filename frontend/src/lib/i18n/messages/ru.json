@@ -636,7 +636,15 @@
     "voidedItemsCount": "{count, plural, one {1 аннулированный элемент · Нажмите для просмотра} few {# аннулированных элемента · Нажмите для просмотра} many {# аннулированных элементов · Нажмите для просмотра} other {# аннулированного элемента · Нажмите для просмотра}}",
     "voidingItem": "Отмена позиции…",
     "walkInCustomer": "Клиент без стола",
-    "whatsappFailed": "Не удалось открыть WhatsApp."
+    "whatsappFailed": "Не удалось открыть WhatsApp.",
+    "outForDelivery": "В пути",
+    "delivered": "Доставлен",
+    "markOutForDelivery": "Отметить в пути",
+    "markDelivered": "Отметить как доставлен",
+    "markPreparing": "Отметить готовится",
+    "markReady": "Отметить готово",
+    "markServed": "Отметить подано",
+    "markCompleted": "Отметить выполнено"
   },
   "pos": {
     "addCustomer": "Добавить клиента",
