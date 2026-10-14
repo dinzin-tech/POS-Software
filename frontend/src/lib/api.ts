@@ -35,6 +35,7 @@ api.interceptors.response.use(
       if (!window.location.pathname.includes('/auth/login') && !authRedirectInProgress) {
         authRedirectInProgress = true;
         localStorage.removeItem('tenant');
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = '/auth/login';
       }
     }
