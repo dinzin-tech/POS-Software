@@ -100,7 +100,7 @@ function resolveStoreCurrencySymbol(): string {
 }
 
 /** Build full live snapshot payload to push to shared hosting */
-export function buildLiveSyncPayload(): any {
+export function buildLiveSyncPayload(): Record<string, unknown> {
   const db = getDatabase();
   const timezone = resolveStoreTimezone();
   const startTime = tenantBusinessDayStartTime();
@@ -132,7 +132,10 @@ export function buildLiveSyncPayload(): any {
         COALESCE((SELECT SUM(tax_amount) FROM bills WHERE paid_at >= ? AND paid_at < ?), 0) AS taxes,
         (SELECT COUNT(*) FROM bills WHERE paid_at >= ? AND paid_at < ?) AS bill_count,
         (SELECT COUNT(*) FROM bills WHERE discount_amount > 0 AND paid_at >= ? AND paid_at < ?) AS discount_bills_count
-    `).get(start, end, minorFactor, start, end, start, end, start, end, start, end, start, end) as any;
+    `).get(start, end, minorFactor, start, end, start, end, start, end, start, end, start, end) as {
+      gross_sales: number; refunds: number; discounts: number; taxes: number;
+      bill_count: number; discount_bills_count: number;
+    };
 
     const gross = Number(row?.gross_sales || 0);
     const refunds = Number(row?.refunds || 0);
@@ -208,14 +211,18 @@ export function buildLiveSyncPayload(): any {
       AND (o.created_at >= ? OR (o.type = 'delivery' AND o.created_at >= datetime('now', '-24 hours')))
     ORDER BY o.created_at DESC
     LIMIT 40
-  `).all(dayStart) as any[];
+  `).all(dayStart) as {
+    id: number; order_number: string; status: string; type: string; total: number;
+    created_at: string; customer_name: string | null; customer_phone: string | null;
+    customer_address: string | null; table_name: string | null;
+  }[];
 
   const activeOrders = activeOrdersRows.map((o) => {
     const items = db.prepare(`
       SELECT product_name as name, quantity, unit_price as price
       FROM order_items
       WHERE order_id = ? AND status != 'cancelled'
-    `).all(o.id) as any[];
+    `).all(o.id) as { name: string; quantity: number; price: number }[];
 
     return {
       id: o.id,
@@ -233,7 +240,9 @@ export function buildLiveSyncPayload(): any {
   });
 
   // Payment Methods Breakdown
-  const paymentMethods = paymentMethodBreakdown(db, { startDate: today }) as any[];
+  const paymentMethods = paymentMethodBreakdown(db, { startDate: today }) as {
+    name?: string; method?: string; payment_method?: string; count: number; total: number;
+  }[];
 
   // Order Channels Breakdown
   const orderChannelsRows = db.prepare(`
@@ -241,7 +250,7 @@ export function buildLiveSyncPayload(): any {
     FROM orders
     WHERE created_at >= ? AND created_at < ? AND status != 'cancelled'
     GROUP BY type
-  `).all(dayStart, dayEnd) as any[];
+  `).all(dayStart, dayEnd) as { type: string; count: number; total: number }[];
 
   // Top Items Sold Today
   const topItemsRows = db.prepare(`
@@ -255,7 +264,7 @@ export function buildLiveSyncPayload(): any {
     GROUP BY oi.product_name
     ORDER BY quantity DESC
     LIMIT 12
-  `).all(dayStart, dayEnd) as any[];
+  `).all(dayStart, dayEnd) as { name: string; quantity: number; total: number }[];
 
   // Categories Breakdown Today
   const categoriesRows = db.prepare(`
@@ -271,7 +280,7 @@ export function buildLiveSyncPayload(): any {
     GROUP BY c.id, c.name
     ORDER BY total DESC
     LIMIT 10
-  `).all(dayStart, dayEnd) as any[];
+  `).all(dayStart, dayEnd) as { name: string; quantity: number; total: number }[];
 
   const totalCatSales = categoriesRows.reduce((sum, c) => sum + Number(c.total || 0), 0) || 1;
 
@@ -289,7 +298,7 @@ export function buildLiveSyncPayload(): any {
     GROUP BY u.id, u.name, u.role
     ORDER BY total DESC
     LIMIT 8
-  `).all(dayStart, dayEnd) as any[];
+  `).all(dayStart, dayEnd) as { name: string; role: string; bill_count: number; total: number }[];
 
   // Recent Settled Bills (Last 20) with itemized items
   const recentBillsRows = db.prepare(`
@@ -311,7 +320,12 @@ export function buildLiveSyncPayload(): any {
     WHERE b.payment_status = 'paid'
     ORDER BY b.paid_at DESC
     LIMIT 20
-  `).all() as any[];
+  `).all() as {
+    id: number; bill_number: string; order_id: number | null; subtotal: number;
+    tax_amount: number; discount_amount: number; paid_amount: number;
+    payment_details: string | null; paid_at: string; created_at: string;
+    customer_name: string | null; customer_phone: string | null;
+  }[];
 
   const getBillItemsStmt = db.prepare(`
     SELECT product_name as name, quantity, unit_price as price, total
@@ -325,7 +339,7 @@ export function buildLiveSyncPayload(): any {
       const details = JSON.parse(b.payment_details || '[]');
       if (Array.isArray(details) && details.length > 0) {
         const methods = details
-          .map((d: any) => {
+          .map((d: { method?: string; payment_method?: string }) => {
             const raw = (d.method || d.payment_method || 'Cash').trim();
             const lower = raw.toLowerCase();
             if (lower === 'upi') return 'UPI';
@@ -343,8 +357,8 @@ export function buildLiveSyncPayload(): any {
     } catch {
       // ignore
     }
-    const items = b.order_id ? getBillItemsStmt.all(b.order_id) as any[] : [];
-    const itemsSummary = items.map((it: any) => `${it.quantity}x ${it.name}`).join(', ');
+    const items = b.order_id ? getBillItemsStmt.all(b.order_id) as { name: string; quantity: number; price: number; total: number }[] : [];
+    const itemsSummary = items.map((it) => `${it.quantity}x ${it.name}`).join(', ');
 
     return {
       id: b.id,
@@ -546,7 +560,7 @@ export async function pushLiveSync(options?: {
     if (!res.ok) {
       let errMsg = `Server returned HTTP ${res.status}`;
       try {
-        const errJson = (await res.json()) as any;
+        const errJson = (await res.json()) as { error?: string };
         if (errJson?.error) errMsg = String(errJson.error);
       } catch {
         // ignore
@@ -566,8 +580,9 @@ export async function pushLiveSync(options?: {
     });
 
     return { ok: true, message: 'Sync completed successfully' };
-  } catch (error: any) {
-    const msg = error.name === 'AbortError' ? 'Sync timed out (server took > 12s)' : String(error.message || 'Connection failed');
+  } catch (error: unknown) {
+    const err = error as { name?: string; message?: string };
+    const msg = err.name === 'AbortError' ? 'Sync timed out (server took > 12s)' : String(err.message || 'Connection failed');
     upsertSettings({
       live_sync_last_status: 'error',
       live_sync_last_error: msg,
@@ -606,17 +621,18 @@ export async function testLiveSyncConnection(url: string, key: string): Promise<
       return { ok: false, message: `Server error: HTTP ${res.status}` };
     }
 
-    const data = (await res.json().catch(() => ({}))) as any;
+    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; message?: string };
     if (data?.ok) {
       return { ok: true, message: data.message || 'Connection successful!' };
     }
 
     return { ok: true, message: 'Endpoint reached successfully' };
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
+  } catch (error: unknown) {
+    const err = error as { name?: string; message?: string };
+    if (err.name === 'AbortError') {
       return { ok: false, message: 'Connection timed out (> 8 seconds)' };
     }
-    return { ok: false, message: error.message || 'Could not reach server' };
+    return { ok: false, message: err.message || 'Could not reach server' };
   }
 }
 
