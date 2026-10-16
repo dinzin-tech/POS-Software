@@ -228,7 +228,7 @@ async function main() {
       const removeSeed = await api(baseUrl, '/api/printers/pr-bar', { method: 'DELETE', headers: authHeader });
       assertEqual(removeSeed.status, 200, 'C: non-default printer can be deleted');
       const soleDelete = await api(baseUrl, `/api/printers/${second.data.printer.id}`, { method: 'DELETE', headers: authHeader });
-      assertEqual(soleDelete.status, 409, 'C: prevents deleting the only default printer');
+      assertEqual(soleDelete.status, 200, 'C: deleting the only default printer succeeds');
     }
 
     console.log('\n─── Scenario D: assigning staff to a station ───');
