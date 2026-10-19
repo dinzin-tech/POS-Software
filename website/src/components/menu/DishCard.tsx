@@ -62,7 +62,7 @@ export default function DishCard({ item }: DishCardProps) {
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
-      className="group relative rounded-2xl bg-[#121110] border border-white/5 hover:border-[#C9A24B]/40 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-[0_12px_30px_rgba(0,0,0,0.8)]"
+      className="group relative rounded-2xl bg-[#121110] border border-white/5 hover:border-[#ebdd0b]/40 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-[0_12px_30px_rgba(0,0,0,0.8)]"
     >
       {/* Dish Image Container with Zoom */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#1A1816]">
@@ -91,7 +91,7 @@ export default function DishCard({ item }: DishCardProps) {
 
             {/* Bestseller Badge */}
             {item.isBestseller && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r from-[#D32314] to-[#C9A24B] text-white shadow-md">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#ebdd0b] text-[#0A0A0A] font-extrabold shadow-md">
                 <Sparkles className="w-2.5 h-2.5" /> Bestseller
               </span>
             )}
@@ -104,7 +104,7 @@ export default function DishCard({ item }: DishCardProps) {
         {/* Portion / Serves Tag */}
         {item.serves && (
           <div className="absolute bottom-2 left-3 z-10">
-            <span className="text-[10px] font-semibold text-[#E8C979] bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded border border-[#C9A24B]/30">
+            <span className="text-[10px] font-semibold text-[#ebdd0b] bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded border border-[#ebdd0b]/30">
               {item.serves}
             </span>
           </div>
@@ -115,10 +115,10 @@ export default function DishCard({ item }: DishCardProps) {
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-baseline justify-between gap-2 mb-1.5">
-            <h3 className="font-serif-lux text-base sm:text-lg font-bold text-[#F7F3EE] group-hover:text-[#E8C979] transition-colors line-clamp-1">
+            <h3 className="font-serif-lux text-base sm:text-lg font-bold text-[#F7F3EE] group-hover:text-[#ebdd0b] transition-colors line-clamp-1">
               {item.name}
             </h3>
-            <span className="text-base sm:text-lg font-extrabold text-[#E8C979] font-serif-lux shrink-0">
+            <span className="text-base sm:text-lg font-extrabold text-[#ebdd0b] font-serif-lux shrink-0">
               ₹{item.price}
             </span>
           </div>
@@ -158,7 +158,7 @@ export default function DishCard({ item }: DishCardProps) {
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all duration-200 ${
               isAdded
                 ? 'bg-emerald-600 text-white'
-                : 'bg-gold-gradient hover:bg-gold-gradient-hover text-[#0A0A0A] shadow-[0_0_15px_rgba(201,162,75,0.2)]'
+                : 'bg-gold-gradient hover:bg-gold-gradient-hover text-[#0A0A0A] shadow-[0_0_15px_rgba(235,221,11,0.2)]'
             }`}
           >
             {isAdded ? (

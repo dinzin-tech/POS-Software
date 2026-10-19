@@ -27,15 +27,15 @@ export default function ReserveWhatsApp() {
   return (
     <section className="py-16 bg-[#080808] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl p-8 sm:p-12 bg-gradient-to-r from-[#171412] via-[#1E1916] to-[#171412] border border-[#C9A24B]/40 shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden">
+        <div className="relative rounded-3xl p-8 sm:p-12 bg-gradient-to-r from-[#171412] via-[#1E1916] to-[#171412] border border-[#ebdd0b]/40 shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden">
           {/* Subtle Decorative Background Ring */}
-          <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-[#C9A24B]/10 blur-3xl pointer-events-none" />
+          <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-[#ebdd0b]/10 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Content */}
             <div className="lg:col-span-5 space-y-3">
-              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#E8C979]">
-                <Sparkles className="w-4 h-4 text-[#C9A24B]" />
+              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#ebdd0b]">
+                <Sparkles className="w-4 h-4 text-[#ebdd0b]" />
                 <span>Dine-In & Celebrations</span>
               </div>
               <h2 className="font-serif-lux text-2xl sm:text-4xl font-extrabold text-[#F7F3EE]">
@@ -70,7 +70,7 @@ export default function ReserveWhatsApp() {
                 {/* Party Size */}
                 <div className="p-2 border-t sm:border-t-0 sm:border-l border-white/10">
                   <label className="block text-[10px] uppercase font-bold text-[#A69F96] mb-1 flex items-center gap-1">
-                    <Users className="w-3 h-3 text-[#C9A24B]" /> Guests
+                    <Users className="w-3 h-3 text-[#ebdd0b]" /> Guests
                   </label>
                   <select
                     value={guests}
@@ -88,7 +88,7 @@ export default function ReserveWhatsApp() {
                 {/* Date */}
                 <div className="p-2 border-t sm:border-t-0 sm:border-l border-white/10">
                   <label className="block text-[10px] uppercase font-bold text-[#A69F96] mb-1 flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-[#C9A24B]" /> Date
+                    <Calendar className="w-3 h-3 text-[#ebdd0b]" /> Date
                   </label>
                   <input
                     type="date"

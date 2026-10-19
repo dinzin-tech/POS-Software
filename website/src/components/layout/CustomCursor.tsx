@@ -55,13 +55,13 @@ export default function CustomCursor() {
     <>
       {/* Trailing Outer Ring */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full border border-[#C9A24B]/50"
+        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full border border-[#ebdd0b]/50"
         animate={{
           x: mousePosition.x - (isHovered ? 24 : 14),
           y: mousePosition.y - (isHovered ? 24 : 14),
           width: isHovered ? 48 : 28,
           height: isHovered ? 48 : 28,
-          backgroundColor: isHovered ? 'rgba(201, 162, 75, 0.12)' : 'rgba(201, 162, 75, 0)',
+          backgroundColor: isHovered ? 'rgba(235, 221, 11, 0.16)' : 'rgba(235, 221, 11, 0)',
         }}
         transition={{
           type: 'spring',
@@ -72,7 +72,7 @@ export default function CustomCursor() {
       />
       {/* Precision Inner Dot */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-[#E8C979]"
+        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-[#ebdd0b]"
         animate={{
           x: mousePosition.x - 3,
           y: mousePosition.y - 3,

@@ -79,7 +79,7 @@ export default function CartDrawer() {
         particleCount: 80,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#D32314', '#C9A24B', '#E8C979', '#ffffff'],
+        colors: ['#dd2023', '#ebdd0b', '#f6ee52', '#ffffff'],
       });
     } catch {
       // ignore
@@ -156,12 +156,12 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="absolute inset-y-0 right-0 w-full max-w-md bg-[#0F0E0D] border-l border-[#C9A24B]/20 shadow-2xl flex flex-col justify-between"
+            className="absolute inset-y-0 right-0 w-full max-w-md bg-[#0F0E0D] border-l border-[#ebdd0b]/20 shadow-2xl flex flex-col justify-between"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#161412]">
               <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-md bg-[#C9A24B]/10 text-[#E8C979]">
+                <div className="p-1.5 rounded-md bg-[#ebdd0b]/10 text-[#ebdd0b]">
                   <ShoppingBag className="w-5 h-5" />
                 </div>
                 <div>
@@ -238,7 +238,7 @@ export default function CartDrawer() {
               <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
                 {/* Order Type Toggle (Delivery / Pickup / Dine-in) */}
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#C9A24B] mb-2">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#ebdd0b] mb-2">
                     Select Order Fulfillment
                   </label>
                   <div className="grid grid-cols-3 gap-2 p-1 bg-[#1A1816] rounded-xl border border-white/10">
@@ -290,7 +290,7 @@ export default function CartDrawer() {
                     {items.map((cartItem) => (
                       <div
                         key={cartItem.item.id}
-                        className="flex items-center gap-3 p-2.5 rounded-xl bg-[#161412] border border-white/5 hover:border-[#C9A24B]/30 transition-colors"
+                        className="flex items-center gap-3 p-2.5 rounded-xl bg-[#161412] border border-white/5 hover:border-[#ebdd0b]/30 transition-colors"
                       >
                         <div className="relative w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-white/10">
                           <Image
@@ -304,7 +304,7 @@ export default function CartDrawer() {
                           <h5 className="text-xs font-semibold text-[#F7F3EE] truncate">
                             {cartItem.item.name}
                           </h5>
-                          <p className="text-xs font-bold text-[#E8C979] mt-0.5">
+                          <p className="text-xs font-bold text-[#ebdd0b] mt-0.5">
                             ₹{cartItem.item.price * cartItem.quantity}
                           </p>
                         </div>
@@ -350,13 +350,13 @@ export default function CartDrawer() {
                     value={specialInstructions}
                     onChange={(e) => setSpecialInstructions(e.target.value)}
                     placeholder="e.g. Extra spicy peri peri, less ice in drink"
-                    className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#C9A24B] focus:outline-none"
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#ebdd0b] focus:outline-none"
                   />
                 </div>
 
                 {/* Customer Checkout Form */}
                 <form id="checkout-form" onSubmit={handlePlaceOrder} className="space-y-3 pt-2 border-t border-white/10">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-[#C9A24B]">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-[#ebdd0b]">
                     Contact & Delivery Information
                   </h4>
 
@@ -375,7 +375,7 @@ export default function CartDrawer() {
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#C9A24B] focus:outline-none"
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#ebdd0b] focus:outline-none"
                       />
                     </div>
                     <div>
@@ -386,7 +386,7 @@ export default function CartDrawer() {
                         value={customerPhone}
                         onChange={(e) => setCustomerPhone(e.target.value)}
                         placeholder="10-digit Mobile"
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#C9A24B] focus:outline-none"
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#ebdd0b] focus:outline-none"
                       />
                     </div>
                   </div>
@@ -402,7 +402,7 @@ export default function CartDrawer() {
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
                         placeholder="House / Flat No, Street, Landmark, Nelamangala"
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#C9A24B] focus:outline-none resize-none"
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#ebdd0b] focus:outline-none resize-none"
                       />
                     </div>
                   )}
@@ -416,7 +416,7 @@ export default function CartDrawer() {
                         value={tableNumber}
                         onChange={(e) => setTableNumber(e.target.value)}
                         placeholder="e.g. Table 4"
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#C9A24B] focus:outline-none"
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-[#161412] border border-white/10 text-[#F7F3EE] focus:border-[#ebdd0b] focus:outline-none"
                       />
                     </div>
                   )}
@@ -446,7 +446,7 @@ export default function CartDrawer() {
                   )}
                   <div className="flex justify-between pt-2 border-t border-white/10 text-sm font-bold text-[#F7F3EE]">
                     <span>Total Amount</span>
-                    <span className="text-[#E8C979] font-serif-lux text-base">₹{total}</span>
+                    <span className="text-[#ebdd0b] font-serif-lux text-base">₹{total}</span>
                   </div>
                 </div>
               </div>
@@ -458,7 +458,7 @@ export default function CartDrawer() {
                 <button
                   type="submit"
                   form="checkout-form"
-                  className="w-full py-3.5 px-4 rounded-xl text-sm font-bold tracking-wider uppercase text-white bg-fire-gradient hover:bg-fire-gradient-hover shadow-[0_0_20px_rgba(211,35,20,0.4)] flex items-center justify-center gap-2 transition-all transform active:scale-98"
+                  className="w-full py-3.5 px-4 rounded-xl text-sm font-bold tracking-wider uppercase text-white bg-fire-gradient hover:bg-fire-gradient-hover shadow-[0_0_20px_rgba(221,32,35,0.4)] flex items-center justify-center gap-2 transition-all transform active:scale-98"
                 >
                   <span>Send Order via WhatsApp</span>
                   <ArrowRight className="w-4 h-4" />

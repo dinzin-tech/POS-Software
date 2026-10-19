@@ -29,13 +29,13 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#050505] border-t border-[#C9A24B]/20 text-[#A69F96] pt-16 pb-12 relative overflow-hidden">
+    <footer className="bg-[#050505] border-t border-[#ebdd0b]/20 text-[#A69F96] pt-16 pb-12 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-white/10">
           {/* Brand Info */}
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#C9A24B]/40 shadow-lg">
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#ebdd0b]/40 shadow-lg">
                 <Image
                   src="/images/logo/five-star-emblem.png"
                   alt="Five Star Chicken"
@@ -47,7 +47,7 @@ export default function Footer() {
                 <h3 className="font-serif-lux text-xl font-bold text-white uppercase tracking-wider">
                   Five Star Chicken
                 </h3>
-                <p className="text-xs text-[#E8C979] font-medium">{siteConfig.branch}</p>
+                <p className="text-xs text-[#ebdd0b] font-medium">{siteConfig.branch}</p>
               </div>
             </div>
 
@@ -55,8 +55,8 @@ export default function Footer() {
               {siteConfig.description}
             </p>
 
-            <div className="flex items-center gap-2 pt-2 text-xs text-[#E8C979]">
-              <ShieldCheck className="w-4 h-4 text-[#C9A24B]" />
+            <div className="flex items-center gap-2 pt-2 text-xs text-[#ebdd0b]">
+              <ShieldCheck className="w-4 h-4 text-[#ebdd0b]" />
               <span>100% Halal Certified • Fresh Farm Poultry Daily</span>
             </div>
           </div>
@@ -68,32 +68,32 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <a href="#menu" className="hover:text-[#E8C979] transition-colors">
+                <a href="#menu" className="hover:text-[#ebdd0b] transition-colors">
                   Our Menu
                 </a>
               </li>
               <li>
-                <a href="#signature" className="hover:text-[#E8C979] transition-colors">
+                <a href="#signature" className="hover:text-[#ebdd0b] transition-colors">
                   Signature Buckets
                 </a>
               </li>
               <li>
-                <a href="#story" className="hover:text-[#E8C979] transition-colors">
+                <a href="#story" className="hover:text-[#ebdd0b] transition-colors">
                   Our Craft & Story
                 </a>
               </li>
               <li>
-                <a href="#gallery" className="hover:text-[#E8C979] transition-colors">
+                <a href="#gallery" className="hover:text-[#ebdd0b] transition-colors">
                   Store Ambiance
                 </a>
               </li>
               <li>
-                <a href="#reviews" className="hover:text-[#E8C979] transition-colors">
+                <a href="#reviews" className="hover:text-[#ebdd0b] transition-colors">
                   Customer Reviews
                 </a>
               </li>
               <li>
-                <a href="#visit" className="hover:text-[#E8C979] transition-colors">
+                <a href="#visit" className="hover:text-[#ebdd0b] transition-colors">
                   Find Our Branch
                 </a>
               </li>
@@ -107,7 +107,7 @@ export default function Footer() {
             </h4>
             <div className="space-y-1.5 text-xs">
               <p className="text-white font-medium">Monday – Sunday</p>
-              <p className="text-[#E8C979]">11:00 AM – 11:00 PM</p>
+              <p className="text-[#ebdd0b]">11:00 AM – 11:00 PM</p>
               <p className="text-[11px] text-[#6E675F] pt-1">
                 Dine-in, Counter Takeaway & WhatsApp Delivery
               </p>
@@ -135,7 +135,7 @@ export default function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full pl-3 pr-10 py-2.5 rounded-xl bg-[#141210] border border-white/10 text-xs text-white placeholder-[#6E675F] focus:border-[#C9A24B] focus:outline-none"
+                  className="w-full pl-3 pr-10 py-2.5 rounded-xl bg-[#141210] border border-white/10 text-xs text-white placeholder-[#6E675F] focus:border-[#ebdd0b] focus:outline-none"
                 />
                 <button
                   type="submit"
@@ -157,13 +157,13 @@ export default function Footer() {
 
           <div className="flex items-center gap-1">
             <span>Crafted with</span>
-            <Heart className="w-3.5 h-3.5 fill-[#D32314] text-[#D32314]" />
+            <Heart className="w-3.5 h-3.5 fill-[#dd2023] text-[#dd2023]" />
             <span>for fried chicken lovers in Nelamangala</span>
           </div>
 
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-1 text-[#A69F96] hover:text-[#E8C979] transition-colors"
+            className="flex items-center gap-1 text-[#A69F96] hover:text-[#ebdd0b] transition-colors"
           >
             <span>Back to top</span>
             <ArrowUp className="w-3.5 h-3.5" />

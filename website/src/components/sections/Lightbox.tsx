@@ -68,7 +68,7 @@ export default function Lightbox({
         {/* Previous Button */}
         <button
           onClick={onPrev}
-          className="absolute left-4 sm:left-8 z-50 p-3 rounded-full bg-black/60 hover:bg-[#C9A24B] hover:text-black text-white border border-white/20 transition-all"
+          className="absolute left-4 sm:left-8 z-50 p-3 rounded-full bg-black/60 hover:bg-[#ebdd0b] hover:text-black text-white border border-white/20 transition-all"
           aria-label="Previous Photo"
         >
           <ChevronLeft className="w-6 h-6" />
@@ -77,7 +77,7 @@ export default function Lightbox({
         {/* Next Button */}
         <button
           onClick={onNext}
-          className="absolute right-4 sm:right-8 z-50 p-3 rounded-full bg-black/60 hover:bg-[#C9A24B] hover:text-black text-white border border-white/20 transition-all"
+          className="absolute right-4 sm:right-8 z-50 p-3 rounded-full bg-black/60 hover:bg-[#ebdd0b] hover:text-black text-white border border-white/20 transition-all"
           aria-label="Next Photo"
         >
           <ChevronRight className="w-6 h-6" />
@@ -108,7 +108,7 @@ export default function Lightbox({
               {currentPhoto.title}
             </h3>
             <p className="text-xs text-[#A69F96] mt-0.5">{currentPhoto.subtitle}</p>
-            <span className="inline-block mt-2 px-3 py-1 rounded-full text-[10px] font-bold text-[#E8C979] bg-white/5 border border-white/10">
+            <span className="inline-block mt-2 px-3 py-1 rounded-full text-[10px] font-bold text-[#ebdd0b] bg-white/5 border border-white/10">
               {currentIndex + 1} / {photos.length}
             </span>
           </div>

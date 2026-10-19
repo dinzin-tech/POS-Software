@@ -49,7 +49,7 @@ export default function AmbianceGallery() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#C9A24B] mb-3">
+          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#ebdd0b] mb-3">
             <Camera className="w-4 h-4" />
             <span>Store Experience</span>
           </div>
@@ -71,7 +71,7 @@ export default function AmbianceGallery() {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, delay: idx * 0.1 }}
               onClick={() => setLightboxIndex(idx)}
-              className="group relative aspect-[16/10] rounded-2xl overflow-hidden cursor-pointer border border-white/10 hover:border-[#C9A24B]/50 transition-all duration-300 shadow-xl"
+              className="group relative aspect-[16/10] rounded-2xl overflow-hidden cursor-pointer border border-white/10 hover:border-[#ebdd0b]/50 transition-all duration-300 shadow-xl"
             >
               <Image
                 src={photo.src}
@@ -86,14 +86,14 @@ export default function AmbianceGallery() {
               <div className="absolute inset-0 p-6 flex flex-col justify-end">
                 <div className="flex items-end justify-between">
                   <div>
-                    <h3 className="font-serif-lux text-lg sm:text-xl font-bold text-white group-hover:text-[#E8C979] transition-colors">
+                    <h3 className="font-serif-lux text-lg sm:text-xl font-bold text-white group-hover:text-[#ebdd0b] transition-colors">
                       {photo.title}
                     </h3>
                     <p className="text-xs text-[#A69F96] mt-1 line-clamp-1">
                       {photo.subtitle}
                     </p>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-[#C9A24B] group-hover:text-black transition-colors shrink-0 ml-4">
+                  <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-[#ebdd0b] group-hover:text-black transition-colors shrink-0 ml-4">
                     <Maximize2 className="w-4 h-4" />
                   </div>
                 </div>

@@ -28,7 +28,7 @@ export default function MenuTabs({
               {isActive && (
                 <motion.div
                   layoutId="activeCategoryPill"
-                  className="absolute inset-0 bg-gold-gradient rounded-full shadow-[0_0_20px_rgba(201,162,75,0.3)] z-0"
+                  className="absolute inset-0 bg-[#ebdd0b] rounded-full shadow-[0_0_20px_rgba(235,221,11,0.35)] z-0"
                   transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                 />
               )}

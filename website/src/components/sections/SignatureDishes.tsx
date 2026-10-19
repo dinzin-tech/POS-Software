@@ -14,7 +14,7 @@ export default function SignatureDishes() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16">
           <div>
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#C9A24B] mb-3">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#ebdd0b] mb-3">
               <Sparkles className="w-4 h-4" />
               <span>Chef's Hall of Fame</span>
             </div>
@@ -29,7 +29,7 @@ export default function SignatureDishes() {
           <div className="mt-6 md:mt-0">
             <a
               href="#menu"
-              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#E8C979] hover:text-white group transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#ebdd0b] hover:text-white group transition-colors"
             >
               <span>Explore Full Menu</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

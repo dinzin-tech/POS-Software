@@ -114,7 +114,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans-lux bg-[#080808] text-[#F7F3EE] min-h-screen selection:bg-[#C9A24B]/30 selection:text-[#F7F3EE] relative">
+      <body className="font-sans-lux bg-[#080808] text-[#F7F3EE] min-h-screen selection:bg-[#ebdd0b]/30 selection:text-[#F7F3EE] relative">
         <div className="fixed inset-0 pointer-events-none grain-overlay z-50 opacity-40" />
         <CustomCursor />
         {children}

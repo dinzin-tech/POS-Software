@@ -31,8 +31,8 @@ export default function Testimonials() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#E8C979] mb-3">
-            <Heart className="w-4 h-4 fill-[#D32314] text-[#D32314]" />
+          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#ebdd0b] mb-3">
+            <Heart className="w-4 h-4 fill-[#dd2023] text-[#dd2023]" />
             <span>Community Love</span>
           </div>
           <h2 className="font-serif-lux text-3xl sm:text-4xl md:text-5xl font-black text-[#F7F3EE]">
@@ -45,9 +45,9 @@ export default function Testimonials() {
 
         {/* Carousel Container */}
         <div className="max-w-4xl mx-auto relative">
-          <div className="glass-card rounded-3xl p-8 sm:p-12 border border-[#C9A24B]/30 relative shadow-2xl overflow-hidden min-h-[320px] flex flex-col justify-between">
+          <div className="glass-card rounded-3xl p-8 sm:p-12 border border-[#ebdd0b]/30 relative shadow-2xl overflow-hidden min-h-[320px] flex flex-col justify-between">
             {/* Background Giant Quote Watermark */}
-            <Quote className="absolute top-6 right-8 w-24 h-24 text-[#C9A24B]/10 pointer-events-none rotate-180" />
+            <Quote className="absolute top-6 right-8 w-24 h-24 text-[#ebdd0b]/10 pointer-events-none rotate-180" />
 
             <AnimatePresence mode="wait">
               <motion.div
@@ -59,9 +59,9 @@ export default function Testimonials() {
                 className="space-y-6"
               >
                 {/* 5 Gold Stars */}
-                <div className="flex items-center gap-1.5 text-[#E8C979]">
+                <div className="flex items-center gap-1.5 text-[#ebdd0b]">
                   {[...Array(current.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-[#E8C979]" />
+                    <Star key={i} className="w-5 h-5 fill-[#ebdd0b]" />
                   ))}
                 </div>
 
@@ -77,9 +77,9 @@ export default function Testimonials() {
                     <p className="text-xs text-[#A69F96]">{current.location} • {current.date}</p>
                   </div>
 
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1A1816] border border-[#C9A24B]/20 text-xs">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1A1816] border border-[#ebdd0b]/20 text-xs">
                     <span className="text-[#A69F96]">Favorite:</span>
-                    <strong className="text-[#E8C979] font-medium">{current.dishRecommended}</strong>
+                    <strong className="text-[#ebdd0b] font-medium">{current.dishRecommended}</strong>
                   </div>
                 </div>
               </motion.div>
@@ -94,7 +94,7 @@ export default function Testimonials() {
                     key={rev.id}
                     onClick={() => setCurrentIndex(idx)}
                     className={`h-2 rounded-full transition-all duration-300 ${
-                      currentIndex === idx ? 'w-8 bg-[#C9A24B]' : 'w-2 bg-white/20 hover:bg-white/40'
+                      currentIndex === idx ? 'w-8 bg-[#ebdd0b]' : 'w-2 bg-white/20 hover:bg-white/40'
                     }`}
                     aria-label={`Go to slide ${idx + 1}`}
                   />
@@ -105,14 +105,14 @@ export default function Testimonials() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePrev}
-                  className="p-2 rounded-full bg-white/5 hover:bg-[#C9A24B] hover:text-black text-white border border-white/10 transition-colors"
+                  className="p-2 rounded-full bg-white/5 hover:bg-[#ebdd0b] hover:text-black text-white border border-white/10 transition-colors"
                   aria-label="Previous review"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   onClick={handleNext}
-                  className="p-2 rounded-full bg-white/5 hover:bg-[#C9A24B] hover:text-black text-white border border-white/10 transition-colors"
+                  className="p-2 rounded-full bg-white/5 hover:bg-[#ebdd0b] hover:text-black text-white border border-white/10 transition-colors"
                   aria-label="Next review"
                 >
                   <ChevronRight className="w-4 h-4" />

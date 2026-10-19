@@ -53,7 +53,7 @@ export default function FullMenu() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#D32314] mb-3">
+          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#dd2023] mb-3">
             <Utensils className="w-4 h-4" />
             <span>Feast Like Royalty</span>
           </div>
@@ -76,7 +76,7 @@ export default function FullMenu() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search crispy buckets, burgers, rolls, drinks..."
-                className="w-full pl-10 pr-9 py-2.5 rounded-full bg-[#141210] border border-white/10 text-xs text-[#F7F3EE] placeholder-[#6E675F] focus:border-[#C9A24B] focus:outline-none transition-colors"
+                className="w-full pl-10 pr-9 py-2.5 rounded-full bg-[#141210] border border-white/10 text-xs text-[#F7F3EE] placeholder-[#6E675F] focus:border-[#ebdd0b] focus:outline-none transition-colors"
               />
               {searchQuery && (
                 <button
@@ -114,7 +114,7 @@ export default function FullMenu() {
                     onClick={() => setSelectedSpice(level)}
                     className={`px-2.5 py-1 rounded-full text-[11px] font-semibold capitalize transition-all ${
                       selectedSpice === level
-                        ? 'bg-[#C9A24B] text-black font-bold shadow-sm'
+                        ? 'bg-[#ebdd0b] text-black font-bold shadow-sm'
                         : 'text-[#A69F96] hover:text-white'
                     }`}
                   >
@@ -141,7 +141,7 @@ export default function FullMenu() {
           {(vegOnly || selectedSpice !== 'all' || searchQuery || activeCategory !== 'all') && (
             <button
               onClick={resetFilters}
-              className="text-[#E8C979] hover:underline flex items-center gap-1 font-semibold"
+              className="text-[#ebdd0b] hover:underline flex items-center gap-1 font-semibold"
             >
               Reset all filters
             </button>

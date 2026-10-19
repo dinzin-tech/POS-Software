@@ -18,7 +18,7 @@ export default function FloatingWhatsApp() {
       className="fixed bottom-6 right-6 z-40 flex items-center group"
     >
       {/* Tooltip on hover */}
-      <span className="hidden sm:inline-block mr-3 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1A1816]/90 text-[#F7F3EE] border border-[#C9A24B]/30 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+      <span className="hidden sm:inline-block mr-3 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1A1816]/90 text-[#F7F3EE] border border-[#ebdd0b]/30 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
         Quick WhatsApp Order
       </span>
 
