@@ -24,6 +24,7 @@ export const menuItems: MenuItem[] = [
     tags: ['Bestseller', 'Party Size', 'Pressure Fried'],
     spiceLevel: 'medium',
     isBestseller: true,
+    isHalalChicken: true,
     serves: '3–4 People',
     portion: '8 Pieces',
   },
@@ -37,6 +38,7 @@ export const menuItems: MenuItem[] = [
     tags: ['Spicy Delight', 'Chef Special'],
     spiceLevel: 'peri-peri',
     isBestseller: true,
+    isHalalChicken: true,
     serves: '3–4 People',
     portion: '8 Pieces',
   },
@@ -49,6 +51,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/signature-chicken-bucket.jpg',
     tags: ['Value Share'],
     spiceLevel: 'medium',
+    isHalalChicken: true,
     serves: '2–3 People',
     portion: '6 Pieces',
   },
@@ -61,6 +64,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/signature-chicken-bucket.jpg',
     tags: ['Duo Pack'],
     spiceLevel: 'medium',
+    isHalalChicken: true,
     serves: '2 People',
     portion: '4 Pieces',
   },
@@ -73,6 +77,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/signature-chicken-bucket.jpg',
     tags: ['Quick Bite'],
     spiceLevel: 'mild',
+    isHalalChicken: true,
     portion: '2 Pieces',
   },
   {
@@ -84,6 +89,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/signature-chicken-bucket.jpg',
     tags: ['Single'],
     spiceLevel: 'mild',
+    isHalalChicken: true,
     portion: '1 Piece',
   },
 
@@ -98,6 +104,7 @@ export const menuItems: MenuItem[] = [
     tags: ['Bestseller', 'Feast for Two', 'High Value'],
     spiceLevel: 'medium',
     isBestseller: true,
+    isHalalChicken: true,
     serves: '2 People',
   },
   {
@@ -110,6 +117,7 @@ export const menuItems: MenuItem[] = [
     tags: ['Wings & More', 'Sharing'],
     spiceLevel: 'hot',
     isBestseller: true,
+    isHalalChicken: true,
     serves: '2 People',
   },
   {
@@ -121,6 +129,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/cluck-n-patty.jpg',
     tags: ['Single Combo', 'Lunch Favorite'],
     spiceLevel: 'medium',
+    isHalalChicken: true,
     serves: '1 Person',
   },
   {
@@ -132,6 +141,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/pop-star-combo.jpg',
     tags: ['Snack Pack'],
     spiceLevel: 'mild',
+    isHalalChicken: true,
     serves: '1 Person',
   },
 
@@ -146,6 +156,7 @@ export const menuItems: MenuItem[] = [
     tags: ['Bestseller', 'Signature Crunch'],
     spiceLevel: 'hot',
     isBestseller: true,
+    isHalalChicken: true,
   },
   {
     id: 'burger-big-juicy',
@@ -157,6 +168,7 @@ export const menuItems: MenuItem[] = [
     tags: ['Cheese Melt', 'Satisfying'],
     spiceLevel: 'medium',
     isBestseller: true,
+    isHalalChicken: true,
   },
   {
     id: 'burger-smoky-chilli',
@@ -167,16 +179,18 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/hot-crispy-burger.jpg',
     tags: ['Smoky Heat'],
     spiceLevel: 'hot',
+    isHalalChicken: true,
   },
   {
     id: 'burger-tandoori',
     name: 'Tandoori Chicken Burger',
-    description: 'Grilled patty smothered in bold tandoori spiced mint mayo and crunchy red onion rings.',
+    description: 'Grilled chicken patty smothered in bold tandoori spiced mint mayo and crunchy red onion rings.',
     price: 109,
     category: 'burgers',
     image: '/images/menu/big-juicy-burger.jpg',
     tags: ['Desi Spiced'],
     spiceLevel: 'medium',
+    isHalalChicken: true,
   },
   {
     id: 'burger-classic',
@@ -187,6 +201,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/hot-crispy-burger.jpg',
     tags: ['Classic'],
     spiceLevel: 'mild',
+    isHalalChicken: true,
   },
   {
     id: 'roll-tandoori',
@@ -197,6 +212,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/tandoori-chicken-roll.jpg',
     tags: ['Street Style', 'Handheld'],
     spiceLevel: 'medium',
+    isHalalChicken: true,
   },
   {
     id: 'roll-krisper',
@@ -207,6 +223,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/tandoori-chicken-roll.jpg',
     tags: ['Crispy Wrap'],
     spiceLevel: 'mild',
+    isHalalChicken: true,
   },
   {
     id: 'roll-paneer',
@@ -231,6 +248,7 @@ export const menuItems: MenuItem[] = [
     tags: ['Fusion Favorite', 'Meal In A Bowl'],
     spiceLevel: 'hot',
     isBestseller: true,
+    isHalalChicken: true,
   },
   {
     id: 'bowl-grill-chicken',
@@ -241,6 +259,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/grill-chicken-rice-bowl.jpg',
     tags: ['Healthy Choice', 'Grilled'],
     spiceLevel: 'medium',
+    isHalalChicken: true,
   },
   {
     id: 'sandwich-clucky-chunky',
@@ -251,6 +270,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/clucky-chunky-sandwich.jpg',
     tags: ['Artisan Toast', 'Loaded'],
     spiceLevel: 'mild',
+    isHalalChicken: true,
   },
 
   // Snack Attack
@@ -264,6 +284,7 @@ export const menuItems: MenuItem[] = [
     tags: ['Bestseller', 'Snack Mania'],
     spiceLevel: 'medium',
     isBestseller: true,
+    isHalalChicken: true,
   },
   {
     id: 'snack-loaded-fries',
@@ -285,6 +306,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/crispy-chicken-strips.jpg',
     tags: ['Finger Food', 'Crunchy'],
     spiceLevel: 'mild',
+    isHalalChicken: true,
   },
   {
     id: 'snack-nuggets',
@@ -295,6 +317,7 @@ export const menuItems: MenuItem[] = [
     image: '/images/menu/crispy-chicken-strips.jpg',
     tags: ['Kids Love'],
     spiceLevel: 'mild',
+    isHalalChicken: true,
   },
 
   // Veggie Delight

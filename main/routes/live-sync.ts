@@ -38,8 +38,15 @@ router.post('/test', canManage, asyncHandler(async (req: Request, res: Response)
 }));
 
 // 4. Force Sync Now
-router.post('/sync-now', canManage, asyncHandler(async (_req: Request, res: Response) => {
-  const result = await pushLiveSync({ force: true });
+router.post('/sync-now', canManage, asyncHandler(async (req: Request, res: Response) => {
+  const { syncUrl, apiKey } = req.body ?? {};
+  if (syncUrl || apiKey) {
+    updateLiveSyncConfig({
+      ...(syncUrl ? { syncUrl } : {}),
+      ...(apiKey ? { apiKey } : {}),
+    });
+  }
+  const result = await pushLiveSync({ force: true, syncUrl, apiKey });
   const config = getLiveSyncConfig();
   res.json({ ...result, config });
 }));

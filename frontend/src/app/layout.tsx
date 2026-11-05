@@ -9,6 +9,7 @@ import { NumberInputWheelGuard } from "@/components/layout/NumberInputWheelGuard
 import { DirectionalToaster } from "@/components/layout/DirectionalToaster";
 import DesktopDragSurface from "@/components/layout/DesktopDragSurface";
 import { I18nProvider } from "@/components/providers/I18nProvider";
+import GlobalVirtualKeyboard from "@/components/keyboard/GlobalVirtualKeyboard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -82,6 +83,7 @@ export default function RootLayout({
           <NumberInputWheelGuard />
           <AuthGuard>{children}</AuthGuard>
           <DirectionalToaster />
+          <GlobalVirtualKeyboard />
         </I18nProvider>
         <script
           dangerouslySetInnerHTML={{

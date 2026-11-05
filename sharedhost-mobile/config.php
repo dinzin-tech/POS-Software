@@ -10,7 +10,7 @@ return [
      * MUST MATCH the API Key entered in DinZin POS Settings -> Mobile Access.
      * Keep this secret! Change it to your own random alphanumeric string.
      */
-    'api_key' => 'dinzin_live_sync_secret_key_change_me',
+    'api_key' => 'fivestar_pos_2026',
 
     /**
      * Mobile Dashboard PIN:
@@ -35,4 +35,13 @@ return [
      * Session lifetime in seconds for PIN login (default: 30 days).
      */
     'session_lifetime' => 2592000,
+
+    /**
+     * Razorpay Payment Gateway Configuration:
+     * Add your Razorpay Key ID here (e.g. 'rzp_live_...' or 'rzp_test_...').
+     * If configured, website customers can pay via UPI (GPay, PhonePe, Paytm), Cards, and NetBanking.
+     */
+    'razorpay_key_id' => 'rzp_test_5StarNelamangala',
+    'razorpay_key_secret' => '',
+    'razorpay_enabled' => true,
 ];

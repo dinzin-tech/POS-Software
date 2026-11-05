@@ -1,0 +1,45 @@
+# Apache configuration for Next.js static export on Shared Hosting (cPanel / Apache)
+
+Options -MultiViews
+RewriteEngine On
+
+# Forward legacy or alternate /sharedhost-mobile/ paths to /dashboard/
+RewriteRule ^sharedhost-mobile/(.*)$ /dashboard/$1 [L,QSA]
+
+# 1. Force HTTPS (Optional, active when SSL is installed)
+<IfModule mod_rewrite.c>
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# 2. Allow existing files and folders (including /sharedhost-mobile/) to be served directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 3. Clean URLs (e.g. /privacy-policy -> /privacy-policy.html)
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^([^/]+)/?$ $1.html [L]
+
+# 4. Custom 404 error page
+ErrorDocument 404 /404.html
+
+# 5. GZIP Compression for fast load times
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css application/xml application/xhtml+xml application/rss+xml application/javascript application/x-javascript application/json image/svg+xml
+</IfModule>
+
+# 6. Browser Cache Optimization
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/json "access plus 0 seconds"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+</IfModule>

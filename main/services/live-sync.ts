@@ -10,6 +10,7 @@ import {
 import { getTenantCurrency } from './refund';
 import { getCurrencyMinorUnitFactor, resolveRegionalSnapshot } from '../countries';
 import { paymentMethodBreakdown } from '../routes/cash-closures';
+import { buildMenuCatalog, getStoreStatus, pollOnlineOrders } from './online-orders';
 
 export interface LiveSyncConfig {
   enabled: boolean;
@@ -22,8 +23,22 @@ export interface LiveSyncConfig {
 }
 
 let syncTimer: NodeJS.Timeout | null = null;
+let orderPollTimer: NodeJS.Timeout | null = null;
 let debounceTimer: NodeJS.Timeout | null = null;
 let isPushing = false;
+let isPollingOrders = false;
+
+/** Ensure sync URL points to the sync.php receiving endpoint */
+export function normalizeLiveSyncUrl(rawUrl: string): string {
+  let url = (rawUrl || '').trim();
+  if (!url) return '';
+  if (url.endsWith('/')) {
+    url += 'sync.php';
+  } else if (!url.endsWith('.php')) {
+    url += '/sync.php';
+  }
+  return url;
+}
 
 /** Retrieve current Live Sync configuration from settings */
 export function getLiveSyncConfig(): LiveSyncConfig {
@@ -54,7 +69,7 @@ export function updateLiveSyncConfig(patch: Partial<LiveSyncConfig>): LiveSyncCo
     entries.live_sync_enabled = patch.enabled ? 'true' : 'false';
   }
   if (patch.syncUrl !== undefined) {
-    entries.live_sync_url = patch.syncUrl.trim();
+    entries.live_sync_url = normalizeLiveSyncUrl(patch.syncUrl);
   }
   if (patch.apiKey !== undefined) {
     entries.live_sync_key = patch.apiKey.trim();
@@ -513,6 +528,8 @@ export function buildLiveSyncPayload(): Record<string, unknown> {
     })),
     recent_bills: recentBills,
     hourly_sales: hourlySales,
+    menu_catalog: buildMenuCatalog(db),
+    store_status: getStoreStatus(db),
   };
 }
 
@@ -523,7 +540,8 @@ export async function pushLiveSync(options?: {
   apiKey?: string;
 }): Promise<{ ok: boolean; message: string }> {
   const config = getLiveSyncConfig();
-  const url = options?.syncUrl || config.syncUrl;
+  const rawUrl = options?.syncUrl || config.syncUrl;
+  const url = normalizeLiveSyncUrl(rawUrl);
   const key = options?.apiKey || config.apiKey;
 
   if (!options?.force && (!config.enabled || !url || !key)) {
@@ -545,13 +563,15 @@ export async function pushLiveSync(options?: {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12000);
 
-    const res = await fetch(url, {
+    const syncUrlWithKey = url.includes('?') ? `${url}&key=${encodeURIComponent(key)}` : `${url}?key=${encodeURIComponent(key)}`;
+    const res = await fetch(syncUrlWithKey, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-API-Key': key,
+        'Authorization': `Bearer ${key}`,
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ ...payload, api_key: key }),
       signal: controller.signal,
     });
 
@@ -565,6 +585,27 @@ export async function pushLiveSync(options?: {
       } catch {
         // ignore
       }
+      upsertSettings({
+        live_sync_last_status: 'error',
+        live_sync_last_error: errMsg,
+      });
+      return { ok: false, message: errMsg };
+    }
+
+    let data: { ok?: boolean; message?: string; error?: string } | null = null;
+    try {
+      data = (await res.json()) as { ok?: boolean; message?: string; error?: string };
+    } catch {
+      const errMsg = 'Sync failed: Endpoint returned an HTML page instead of sync.php JSON response. Ensure URL ends with /sync.php';
+      upsertSettings({
+        live_sync_last_status: 'error',
+        live_sync_last_error: errMsg,
+      });
+      return { ok: false, message: errMsg };
+    }
+
+    if (!data?.ok) {
+      const errMsg = data?.error || data?.message || 'Sync failed: Server did not confirm data persistence';
       upsertSettings({
         live_sync_last_status: 'error',
         live_sync_last_error: errMsg,
@@ -594,7 +635,9 @@ export async function pushLiveSync(options?: {
 }
 
 /** Test endpoint connectivity with credentials */
-export async function testLiveSyncConnection(url: string, key: string): Promise<{ ok: boolean; message: string }> {
+export async function testLiveSyncConnection(rawUrl: string, rawKey: string): Promise<{ ok: boolean; message: string }> {
+  const url = normalizeLiveSyncUrl(rawUrl);
+  const key = (rawKey || '').trim();
   if (!url) return { ok: false, message: 'URL is required' };
   if (!key) return { ok: false, message: 'API Key is required' };
 
@@ -614,19 +657,31 @@ export async function testLiveSyncConnection(url: string, key: string): Promise<
     clearTimeout(timeout);
 
     if (res.status === 401) {
-      return { ok: false, message: 'Unauthorized: The API Key does not match config.php' };
+      return { ok: false, message: 'Unauthorized: The API Key entered in POS does not match the api_key in config.php on the server' };
     }
 
     if (!res.ok) {
       return { ok: false, message: `Server error: HTTP ${res.status}` };
     }
 
-    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; message?: string };
+    let data: { ok?: boolean; message?: string; error?: string } | null = null;
+    try {
+      data = (await res.json()) as { ok?: boolean; message?: string; error?: string };
+    } catch {
+      return {
+        ok: false,
+        message: 'Invalid response: The URL returned an HTML page instead of sync.php JSON. Ensure the URL ends with /sync.php',
+      };
+    }
+
     if (data?.ok) {
       return { ok: true, message: data.message || 'Connection successful!' };
     }
 
-    return { ok: true, message: 'Endpoint reached successfully' };
+    return {
+      ok: false,
+      message: data?.error || data?.message || 'Server rejected connection: Invalid response from sync.php',
+    };
   } catch (error: unknown) {
     const err = error as { name?: string; message?: string };
     if (err.name === 'AbortError') {
@@ -649,11 +704,15 @@ export function triggerLiveSyncDebounced(): void {
   if (typeof debounceTimer.unref === 'function') debounceTimer.unref();
 }
 
-/** Restart periodic sync timer */
+/** Restart periodic sync timer and order polling loop */
 function restartLiveSyncTimer(): void {
   if (syncTimer) {
     clearInterval(syncTimer);
     syncTimer = null;
+  }
+  if (orderPollTimer) {
+    clearInterval(orderPollTimer);
+    orderPollTimer = null;
   }
 
   const config = getLiveSyncConfig();
@@ -664,6 +723,23 @@ function restartLiveSyncTimer(): void {
     void pushLiveSync();
   }, intervalMs);
   if (typeof syncTimer.unref === 'function') syncTimer.unref();
+
+  // Fast polling loop for incoming online orders (every 4 seconds)
+  orderPollTimer = setInterval(async () => {
+    if (isPollingOrders) return;
+    isPollingOrders = true;
+    try {
+      const processedCount = await pollOnlineOrders(config.syncUrl, config.apiKey);
+      if (processedCount > 0) {
+        triggerLiveSyncDebounced();
+      }
+    } catch {
+      // ignore
+    } finally {
+      isPollingOrders = false;
+    }
+  }, 4000);
+  if (typeof orderPollTimer.unref === 'function') orderPollTimer.unref();
 }
 
 /** Initialize Live Sync service on server startup */
@@ -677,6 +753,10 @@ export function stopLiveSync(): void {
   if (syncTimer) {
     clearInterval(syncTimer);
     syncTimer = null;
+  }
+  if (orderPollTimer) {
+    clearInterval(orderPollTimer);
+    orderPollTimer = null;
   }
   if (debounceTimer) {
     clearTimeout(debounceTimer);

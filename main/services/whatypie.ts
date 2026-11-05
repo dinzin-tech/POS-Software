@@ -625,6 +625,58 @@ export async function sendWhatyPieBillReceipt(
     (item) => `• ${item.quantity}x ${item.product_name} - ${currencySymbol}${Number(item.total).toFixed(2)}`,
   );
 
+  const syncUrl = getSettingValue('live_sync_url') || 'https://fivestarnelamangala.in/dashboard/sync.php';
+  const apiKey = getSettingValue('live_sync_key') || 'fivestar_pos_2026';
+  let baseDomain = 'https://fivestarnelamangala.in';
+  try {
+    const parsed = new URL(syncUrl);
+    baseDomain = `${parsed.protocol}//${parsed.host}`;
+  } catch {
+    // fallback
+  }
+
+  const receiptUrl = `${baseDomain}/bill.php?id=${encodeURIComponent(bill.bill_number)}`;
+
+  // Asynchronously publish receipt to cloud (4-day retention)
+  try {
+    const receiptPayload = {
+      receipt_id: bill.bill_number,
+      order_number: bill.order_id ? `ORD-${bill.order_id}` : bill.bill_number,
+      bill_number: bill.bill_number,
+      customer_name: bill.customer_name || 'Valued Customer',
+      customer_phone: recipientPhone,
+      order_type: 'Takeaway',
+      created_date_formatted: bill.created_at ? bill.created_at.replace('T', ' ').slice(0, 19) : new Date().toLocaleString('en-IN'),
+      items: items.map((it) => ({
+        name: it.product_name,
+        quantity: it.quantity,
+        price: it.quantity > 0 ? Number((it.total / it.quantity).toFixed(2)) : Number(it.total),
+        total: Number(it.total),
+      })),
+      subtotal: Number(bill.total || 0),
+      tax_amount: 0,
+      total: Number(bill.total || 0),
+      paid_amount: Number(bill.total || 0),
+      balance: 0,
+      payment_status: 'PAID',
+      payment_method: 'CASH',
+      store_name: businessName,
+      store_address: getSettingValue('address') || 'Lohith Nagara, Nelmangala.',
+      store_phone: getSettingValue('phone') || '+919353333945',
+    };
+
+    let publishEndpoint = syncUrl;
+    if (!publishEndpoint.includes('action=')) {
+      publishEndpoint += (publishEndpoint.includes('?') ? '&' : '?') + 'action=publish_receipt';
+    }
+    fetch(publishEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
+      body: JSON.stringify(receiptPayload),
+      signal: AbortSignal.timeout(4000),
+    }).catch(() => {});
+  } catch {}
+
   const formattedMessage = [
     `🧾 *BILL RECEIPT - ${businessName}*`,
     `*Bill #:* ${bill.bill_number}`,
@@ -632,6 +684,10 @@ export async function sendWhatyPieBillReceipt(
     ...(itemLines.length > 0 ? ['', '*Ordered Items:*', ...itemLines] : []),
     '',
     `*Total Paid:* ${currencySymbol}${totalAmount} ${currency}`,
+    '',
+    '📄 *VIEW / DOWNLOAD DIGITAL RECEIPT:*',
+    `👉 ${receiptUrl}`,
+    '_(Secure digital receipt link active for 4 days)_',
     '',
     'Thank you for your visit! 🙏',
   ].join('\n');

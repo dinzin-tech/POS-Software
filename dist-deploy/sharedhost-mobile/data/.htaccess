@@ -1,0 +1,11 @@
+# Prevent direct public HTTP access to all JSON data files
+<FilesMatch "\.(json|lock)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(json|lock)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>

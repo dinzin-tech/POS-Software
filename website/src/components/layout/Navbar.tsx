@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,13 +12,18 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   const itemsCount = useCartStore((state) => state.getItemCount());
   const toggleCart = useCartStore((state) => state.toggleCart);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      setIsScrolled(window.scrollY > 30);
 
       const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
       if (totalScroll > 0) {
@@ -31,104 +36,106 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'Menu', href: '#menu' },
-    { name: 'Signature Dishes', href: '#signature' },
-    { name: 'Our Story', href: '#story' },
-    { name: 'Ambiance', href: '#gallery' },
-    { name: 'Reviews', href: '#reviews' },
-    { name: 'Visit Us', href: '#visit' },
+    { name: 'Menu', href: '/#menu' },
+    { name: 'Signature Dishes', href: '/#signature' },
+    { name: 'Our Craft', href: '/#story' },
+    { name: 'Ambiance', href: '/#gallery' },
+    { name: 'Reviews', href: '/#reviews' },
+    { name: 'Visit Us', href: '/#visit' },
   ];
 
   return (
     <>
-      {/* Top Reading Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 h-[2px] z-[60] bg-transparent">
+      {/* 1px Kinpaku Gold Reading Progress Rule */}
+      <div className="fixed top-0 left-0 right-0 h-[1px] z-[60] bg-transparent">
         <div
-          className="h-full bg-[#ebdd0b] transition-all duration-75"
+          className="h-full bg-[var(--ks-kinpaku)] transition-all duration-75"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
       {/* Main Sticky Navbar */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
           isScrolled
-            ? 'glass-nav py-3 shadow-[0_10px_30px_rgba(0,0,0,0.8)]'
-            : 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-5'
+            ? 'border-b border-[var(--ks-gold-hairline)] py-2.5 sm:py-3 shadow-md'
+            : 'bg-gradient-to-b from-[var(--ks-lacquer-deep)] via-[var(--ks-lacquer-black)]/80 to-transparent py-3 sm:py-4'
         }`}
+        style={{
+          backgroundColor: isScrolled ? 'rgba(10, 9, 8, 0.98)' : undefined,
+          backdropFilter: isScrolled ? 'blur(12px)' : undefined,
+          WebkitBackdropFilter: isScrolled ? 'blur(12px)' : undefined,
+        }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            {/* Brand Logo */}
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-lg overflow-hidden border border-[#ebdd0b]/30 shadow-md group-hover:border-[#ebdd0b] transition-colors">
+            {/* Brand Logo & Wordmark */}
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-[2px] overflow-hidden border border-[var(--ks-gold-hairline)] bg-[var(--ks-raised-lacquer)] group-hover:border-[var(--ks-kinpaku)] transition-colors shrink-0">
                 <Image
                   src="/images/logo/five-star-emblem.png"
-                  alt="Five Star Chicken Logo"
+                  alt="Five Star Chicken"
                   fill
+                  sizes="40px"
                   className="object-contain p-1"
                   priority
                 />
               </div>
               <div className="flex flex-col">
-                <span className="font-serif-lux text-lg sm:text-xl font-bold tracking-wider text-[#F7F3EE] uppercase flex items-center gap-1.5">
-                  Five Star <span className="text-[#ebdd0b] text-xs font-sans-lux px-1.5 py-0.5 rounded border border-[#ebdd0b]/40">Nelamangala</span>
+                <span className="font-display text-base sm:text-xl font-light tracking-[0.14em] text-[var(--ks-champagne)] uppercase flex items-center gap-1.5 sm:gap-2 leading-none">
+                  Five Star <span className="font-mono text-[10px] sm:text-xs text-[var(--ks-kinpaku)] px-1 sm:px-1.5 py-0.5 rounded-[2px] border border-[var(--ks-gold-hairline-strong)] tracking-widest">RESTAURANT</span>
                 </span>
-                <span className="text-[10px] tracking-widest text-[#A69F96] uppercase font-sans-lux">
-                  Crispy • Juicy • Legendary
+                <span className="text-[10px] sm:text-xs tracking-[0.12em] text-[var(--ks-text-muted)] uppercase font-mono mt-0.5">
+                  Dine-In & Takeaway • Nelamangala
                 </span>
               </div>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-7">
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="text-xs uppercase tracking-widest font-medium text-[#A69F96] hover:text-[#ebdd0b] transition-colors relative py-1 group"
+                  className="text-xs uppercase tracking-[0.14em] font-medium text-[var(--ks-text-muted)] hover:text-[var(--ks-champagne)] transition-colors relative py-1 group"
                 >
                   {link.name}
-                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#ebdd0b] group-hover:w-full transition-all duration-300" />
+                  <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[var(--ks-kinpaku)] group-hover:w-full transition-all duration-200" />
                 </Link>
               ))}
             </nav>
 
-            {/* Action Buttons: Cart & Order Now */}
-            <div className="flex items-center gap-3 sm:gap-4">
+            {/* Action Buttons: Cart & Order Now & Mobile Toggle */}
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Cart Drawer Trigger */}
               <button
                 onClick={toggleCart}
                 aria-label="Open Cart"
-                className="relative p-2.5 rounded-full bg-[#1A1816] border border-[#ebdd0b]/25 hover:border-[#ebdd0b]/70 hover:bg-[#25221F] text-[#F7F3EE] transition-all group"
+                className="relative p-2 min-w-[38px] min-h-[38px] rounded-[2px] bg-[var(--ks-raised-lacquer)] border border-[var(--ks-gold-hairline)] hover:border-[var(--ks-gold-hairline-strong)] text-[var(--ks-champagne)] transition-colors group flex items-center justify-center"
               >
-                <ShoppingBag className="w-5 h-5 text-[#ebdd0b] group-hover:scale-110 transition-transform" />
-                {itemsCount > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] px-1 bg-[#dd2023] text-white text-[11px] font-bold rounded-full flex items-center justify-center border-2 border-[#080808] shadow-sm animate-pulse"
-                  >
+                <ShoppingBag className="w-4 h-4 text-[var(--ks-kinpaku)]" />
+                {mounted && itemsCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-[var(--ks-kinpaku)] text-[var(--ks-dark-ink)] font-mono text-[11px] font-bold rounded-[2px] flex items-center justify-center">
                     {itemsCount}
-                  </motion.span>
+                  </span>
                 )}
               </button>
 
-              {/* Gold "Order Now" CTA */}
-              <a
-                href="#menu"
-                className="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase text-[#0A0A0A] bg-gold-gradient hover:opacity-95 shadow-[0_0_20px_rgba(235,221,11,0.25)] hover:shadow-[0_0_30px_rgba(235,221,11,0.4)] transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+              {/* Kinpaku Gold "Order Now" CTA (Strictly desktop/tablet only, hidden on mobile) */}
+              <Link
+                href="/#menu"
+                className="!hidden sm:!inline-flex ks-btn-primary text-xs py-2 px-5 min-h-[36px]"
               >
                 Order Now
-              </a>
+              </Link>
 
               {/* Mobile Menu Toggle Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle Navigation Menu"
-                className="md:hidden p-2 rounded-lg bg-[#141210] border border-[#ebdd0b]/25 text-[#F7F3EE] hover:text-[#ebdd0b]"
+                className="md:hidden p-2 min-w-[38px] min-h-[38px] rounded-[2px] bg-[var(--ks-raised-lacquer)] border border-[var(--ks-gold-hairline)] text-[var(--ks-champagne)] hover:text-[var(--ks-kinpaku)] flex items-center justify-center"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
               </button>
             </div>
           </div>
@@ -139,63 +146,60 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-40 bg-[#0A0908]/98 backdrop-blur-2xl flex flex-col justify-between pt-24 pb-8 px-6 md:hidden overflow-y-auto"
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+            style={{ backgroundColor: 'var(--ks-lacquer-deep)' }}
+            className="fixed inset-0 z-40 bg-neutral-950 flex flex-col justify-between pt-24 pb-8 px-6 md:hidden overflow-y-auto border-b border-[var(--ks-gold-hairline)]"
           >
-            <div className="flex flex-col space-y-6 pt-4">
-              <div className="flex items-center gap-3 pb-4 border-b border-[#ebdd0b]/20">
+            <div className="flex flex-col space-y-6 pt-2">
+              <div className="flex items-center gap-3 pb-4 border-b border-[var(--ks-gold-hairline)]">
                 <Image
                   src="/images/logo/five-star-emblem.png"
                   alt="Five Star Chicken"
-                  width={40}
-                  height={40}
-                  className="rounded-md"
+                  width={36}
+                  height={36}
+                  className="rounded-[2px] border border-[var(--ks-gold-hairline)]"
                 />
                 <div>
-                  <h3 className="font-serif-lux text-lg font-bold text-white">Five Star Chicken</h3>
-                  <p className="text-xs text-[#A69F96]">Nelamangala, Bengaluru</p>
+                  <h3 className="font-display text-xl font-light tracking-wide text-[var(--ks-champagne)]">
+                    Five Star Chicken Restaurant
+                  </h3>
+                  <p className="text-xs text-[var(--ks-text-muted)] font-mono">Nelamangala Flagship • Dine-In</p>
                 </div>
               </div>
 
-              <div className="flex flex-col space-y-4">
-                {navLinks.map((link, idx) => (
-                  <motion.div
+              <div className="flex flex-col space-y-1">
+                {navLinks.map((link) => (
+                  <Link
                     key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-xl font-headline font-light text-[var(--ks-champagne)] hover:text-[var(--ks-kinpaku)] tracking-wide transition-colors py-3 border-b border-[var(--ks-gold-hairline)] min-h-[46px] flex items-center"
                   >
-                    <Link
-                      href={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block text-lg font-serif-lux text-[#F7F3EE] hover:text-[#ebdd0b] tracking-wide transition-colors py-2 border-b border-white/5"
-                    >
-                      {link.name}
-                    </Link>
-                  </motion.div>
+                    {link.name}
+                  </Link>
                 ))}
               </div>
             </div>
 
-            <div className="pt-6 space-y-4">
-              <a
-                href="#menu"
+            <div className="pt-6 space-y-4 pb-4">
+              <Link
+                href="/#menu"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full block py-3.5 text-center text-sm font-bold tracking-wider uppercase text-[#0A0A0A] bg-gold-gradient rounded-full shadow-lg"
+                className="w-full !flex items-center justify-center ks-btn-primary py-3.5 min-h-[46px] text-xs font-semibold tracking-wider uppercase text-center"
               >
                 Order Online Now
-              </a>
+              </Link>
 
-              <div className="flex items-center justify-center gap-6 pt-2 text-xs text-[#A69F96]">
+              <div className="flex items-center justify-between pt-2 text-xs text-[var(--ks-text-muted)] border-t border-[var(--ks-gold-hairline)] font-mono">
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-[#ebdd0b]" />
+                  <Clock className="w-3.5 h-3.5 text-[var(--ks-kinpaku)]" />
                   <span>11:00 AM – 11:00 PM</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Phone className="w-4 h-4 text-[#dd2023]" />
+                  <Phone className="w-3.5 h-3.5 text-[var(--ks-patina)]" />
                   <span>{siteConfig.phone}</span>
                 </div>
               </div>

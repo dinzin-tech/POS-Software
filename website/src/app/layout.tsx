@@ -1,21 +1,29 @@
 import type { Metadata } from 'next';
-import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
+import { Alumni_Sans, Albert_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { siteConfig } from '@/config/site';
 import CartDrawer from '@/components/cart/CartDrawer';
-import CustomCursor from '@/components/layout/CustomCursor';
 import FloatingWhatsApp from '@/components/ui/FloatingWhatsApp';
 
-const playfair = Playfair_Display({
+const alumni = Alumni_Sans({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  variable: '--font-alumni',
   display: 'swap',
+  weight: ['100', '200', '300', '400', '500', '600', '700'],
 });
 
-const jakarta = Plus_Jakarta_Sans({
+const albert = Albert_Sans({
   subsets: ['latin'],
-  variable: '--font-jakarta',
+  variable: '--font-albert',
   display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+  weight: ['400', '500', '600'],
 });
 
 export const metadata: Metadata = {
@@ -24,6 +32,8 @@ export const metadata: Metadata = {
   description: `${siteConfig.tagline}. Authentic pressure-fried crispy chicken, gourmet burgers, loaded combos, and decadent treats in Nelamangala, Bengaluru. Order online directly via WhatsApp!`,
   keywords: [
     'Five Star Chicken Nelamangala',
+    '100% Halal Cut Chicken Nelamangala',
+    'Halal Fried Chicken Bengaluru',
     'Fried Chicken Nelamangala',
     'Crispy Chicken Bengaluru',
     'Chicken Burgers Nelamangala',
@@ -68,12 +78,14 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Restaurant',
     name: siteConfig.name,
+    legalName: siteConfig.tradeName,
+    taxID: siteConfig.gstin,
     image: ['/images/menu/signature-chicken-bucket.jpg', '/images/interior/dining-hall-world-map.jpg'],
     '@id': 'https://fivestarchicken-nelamangala.in',
     url: 'https://fivestarchicken-nelamangala.in',
     telephone: siteConfig.phone,
     menu: 'https://fivestarchicken-nelamangala.in/#menu',
-    servesCuisine: ['Fried Chicken', 'Burgers', 'Fast Food', 'Snacks'],
+    servesCuisine: ['100% Halal Fried Chicken', 'Burgers', 'Fast Food', 'Snacks'],
     priceRange: '₹₹',
     address: {
       '@type': 'PostalAddress',
@@ -107,16 +119,17 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${playfair.variable} ${jakarta.variable} scroll-smooth`}>
+    <html
+      lang="en"
+      className={`${alumni.variable} ${albert.variable} ${jetbrainsMono.variable} scroll-smooth`}
+    >
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans-lux bg-[#080808] text-[#F7F3EE] min-h-screen selection:bg-[#ebdd0b]/30 selection:text-[#F7F3EE] relative">
-        <div className="fixed inset-0 pointer-events-none grain-overlay z-50 opacity-40" />
-        <CustomCursor />
+      <body className="font-sans bg-[var(--ks-lacquer-black)] text-[var(--ks-text-warm)] min-h-screen selection:bg-[var(--ks-kinpaku)] selection:text-[var(--ks-dark-ink)] relative antialiased">
         {children}
         <CartDrawer />
         <FloatingWhatsApp />

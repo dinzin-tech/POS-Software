@@ -1,0 +1,1844 @@
+{
+    "status": "active",
+    "synced_at": "2026-10-29T04:16:32.848Z",
+    "store": {
+        "name": "Five  Star",
+        "currency": "INR",
+        "currency_symbol": "₹",
+        "timezone": "Asia/Kolkata",
+        "address": "",
+        "phone": ""
+    },
+    "today": {
+        "date": "2026-10-29",
+        "net_sales": 0,
+        "gross_sales": 0,
+        "refunds": 0,
+        "discounts": 0,
+        "taxes": 0,
+        "bill_count": 0,
+        "avg_bill": 0,
+        "items_sold_count": 0,
+        "active_orders_count": 1,
+        "occupied_tables_count": 0,
+        "total_tables_count": 1
+    },
+    "comparison": {
+        "yesterday": {
+            "gross_sales": 0,
+            "refunds": 0,
+            "net_sales": 0,
+            "discounts": 0,
+            "taxes": 0,
+            "bill_count": 0,
+            "avg_bill": 0,
+            "discount_bills_count": 0
+        },
+        "this_week": {
+            "gross_sales": 42,
+            "refunds": 0,
+            "net_sales": 42,
+            "discounts": 0,
+            "taxes": 2,
+            "bill_count": 1,
+            "avg_bill": 42,
+            "discount_bills_count": 0
+        },
+        "this_month": {
+            "gross_sales": 5142,
+            "refunds": 0,
+            "net_sales": 5142,
+            "discounts": 0,
+            "taxes": 70.54,
+            "bill_count": 31,
+            "avg_bill": 165.87,
+            "discount_bills_count": 0
+        },
+        "diff_vs_yesterday": 0,
+        "growth_pct": null
+    },
+    "operations": {
+        "cancelled_items_count": 0,
+        "cancelled_items_total": 0,
+        "discount_bills_count": 0,
+        "peak_hour": {
+            "hour": 0,
+            "label": "None yet",
+            "sales": 0,
+            "bills": 0
+        }
+    },
+    "categories": [],
+    "staff_sales": [],
+    "active_orders": [
+        {
+            "id": 44,
+            "order_number": "TOK-0002",
+            "status": "pending",
+            "type": "delivery",
+            "total": 1025.85,
+            "created_at": "2026-10-28 17:28:11",
+            "customer_name": "Antigravity Verification",
+            "customer_phone": "9886438778",
+            "delivery_address": "",
+            "table_name": "",
+            "items": [
+                {
+                    "name": "Signature Crispy Chicken (8 Pcs Bucket)",
+                    "quantity": 1,
+                    "price": 699
+                },
+                {
+                    "name": "Hot Crispy Chicken Burger",
+                    "quantity": 2,
+                    "price": 139
+                }
+            ]
+        }
+    ],
+    "payment_methods": [],
+    "order_types": [],
+    "top_items": [],
+    "recent_bills": [
+        {
+            "id": 41,
+            "bill_number": "INVOICE-0034",
+            "paid_amount": 42,
+            "subtotal": 40,
+            "tax_amount": 2,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-25 09:15:13",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Coffee",
+            "items": [
+                {
+                    "name": "Coffee",
+                    "quantity": 1,
+                    "price": 40,
+                    "total": 40
+                }
+            ]
+        },
+        {
+            "id": 33,
+            "bill_number": "INVOICE-0026",
+            "paid_amount": 225,
+            "subtotal": 225,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-14 01:12:20",
+            "customer_name": "Sanjeev Kumar",
+            "customer_phone": "+917019409891",
+            "items_summary": "1x Meal, 3x Tea",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 3,
+                    "price": 25,
+                    "total": 75
+                }
+            ]
+        },
+        {
+            "id": 32,
+            "bill_number": "INVOICE-0025",
+            "paid_amount": 150,
+            "subtotal": 150,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "Cash",
+            "paid_at": "2026-10-13 19:14:15",
+            "customer_name": "Walk-in Customer",
+            "customer_phone": "",
+            "items_summary": "1x Meal",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                }
+            ]
+        },
+        {
+            "id": 31,
+            "bill_number": "INVOICE-0024",
+            "paid_amount": 150,
+            "subtotal": 150,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "Card",
+            "paid_at": "2026-10-13 15:49:31",
+            "customer_name": "Walk-in Customer",
+            "customer_phone": "",
+            "items_summary": "1x Meal",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                }
+            ]
+        },
+        {
+            "id": 30,
+            "bill_number": "INVOICE-0023",
+            "paid_amount": 280,
+            "subtotal": 280,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-13 15:16:53",
+            "customer_name": "Kumar",
+            "customer_phone": "+919535046200",
+            "items_summary": "1x Meal, 2x Tea, 1x Snack",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 2,
+                    "price": 25,
+                    "total": 50
+                },
+                {
+                    "name": "Snack",
+                    "quantity": 1,
+                    "price": 80,
+                    "total": 80
+                }
+            ]
+        },
+        {
+            "id": 29,
+            "bill_number": "INVOICE-0022",
+            "paid_amount": 215,
+            "subtotal": 215,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-13 15:15:08",
+            "customer_name": "Sanjeev Kumar",
+            "customer_phone": "+917019409891",
+            "items_summary": "1x Meal, 1x Tea, 1x Coffee",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 1,
+                    "price": 25,
+                    "total": 25
+                },
+                {
+                    "name": "Coffee",
+                    "quantity": 1,
+                    "price": 40,
+                    "total": 40
+                }
+            ]
+        },
+        {
+            "id": 28,
+            "bill_number": "INVOICE-0021",
+            "paid_amount": 200,
+            "subtotal": 200,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-13 15:13:58",
+            "customer_name": "MALLIKARJUN",
+            "customer_phone": "+918867466035",
+            "items_summary": "1x Meal, 2x Tea",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 2,
+                    "price": 25,
+                    "total": 50
+                }
+            ]
+        },
+        {
+            "id": 27,
+            "bill_number": "INVOICE-0020",
+            "paid_amount": 255,
+            "subtotal": 255,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-13 12:29:22",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Meal, 1x Tea, 2x Coffee",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 1,
+                    "price": 25,
+                    "total": 25
+                },
+                {
+                    "name": "Coffee",
+                    "quantity": 2,
+                    "price": 40,
+                    "total": 80
+                }
+            ]
+        },
+        {
+            "id": 26,
+            "bill_number": "INVOICE-0019",
+            "paid_amount": 200,
+            "subtotal": 200,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-13 12:01:01",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Meal, 2x Tea",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 2,
+                    "price": 25,
+                    "total": 50
+                }
+            ]
+        },
+        {
+            "id": 25,
+            "bill_number": "INVOICE-0018",
+            "paid_amount": 200,
+            "subtotal": 200,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-13 11:57:30",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Meal, 2x Tea",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 2,
+                    "price": 25,
+                    "total": 50
+                }
+            ]
+        },
+        {
+            "id": 24,
+            "bill_number": "INVOICE-0017",
+            "paid_amount": 400,
+            "subtotal": 400,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-12 15:25:58",
+            "customer_name": "Sanjeev Kumar",
+            "customer_phone": "+917019409891",
+            "items_summary": "1x Meal, 2x Tea, 3x Coffee, 1x Snack",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 2,
+                    "price": 25,
+                    "total": 50
+                },
+                {
+                    "name": "Coffee",
+                    "quantity": 3,
+                    "price": 40,
+                    "total": 120
+                },
+                {
+                    "name": "Snack",
+                    "quantity": 1,
+                    "price": 80,
+                    "total": 80
+                }
+            ]
+        },
+        {
+            "id": 20,
+            "bill_number": "INVOICE-0013",
+            "paid_amount": 200,
+            "subtotal": 200,
+            "tax_amount": 0,
+            "discount_amount": 0,
+            "payment_method": "Card",
+            "paid_at": "2026-10-12 14:33:07",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Meal, 2x Tea",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 2,
+                    "price": 25,
+                    "total": 50
+                }
+            ]
+        },
+        {
+            "id": 19,
+            "bill_number": "INVOICE-0011",
+            "paid_amount": 200,
+            "subtotal": 200,
+            "tax_amount": 9.52,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-12 13:33:20",
+            "customer_name": "Sanjeev Kumar",
+            "customer_phone": "+917019409891",
+            "items_summary": "1x Meal, 2x Tea",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 2,
+                    "price": 25,
+                    "total": 50
+                }
+            ]
+        },
+        {
+            "id": 18,
+            "bill_number": "INVOICE-0010",
+            "paid_amount": 170,
+            "subtotal": 170,
+            "tax_amount": 8.079999999999998,
+            "discount_amount": 0,
+            "payment_method": "UPI",
+            "paid_at": "2026-10-12 13:30:36",
+            "customer_name": "Sanjeev Kumar",
+            "customer_phone": "+917019409891",
+            "items_summary": "1x Snack, 1x Coffee, 2x Tea",
+            "items": [
+                {
+                    "name": "Snack",
+                    "quantity": 1,
+                    "price": 80,
+                    "total": 80
+                },
+                {
+                    "name": "Coffee",
+                    "quantity": 1,
+                    "price": 40,
+                    "total": 40
+                },
+                {
+                    "name": "Tea",
+                    "quantity": 2,
+                    "price": 25,
+                    "total": 50
+                }
+            ]
+        },
+        {
+            "id": 17,
+            "bill_number": "INVOICE-0009",
+            "paid_amount": 150,
+            "subtotal": 150,
+            "tax_amount": 7.14,
+            "discount_amount": 0,
+            "payment_method": "Zomato",
+            "paid_at": "2026-10-12 08:55:37",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Meal",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                }
+            ]
+        },
+        {
+            "id": 16,
+            "bill_number": "INVOICE-0008",
+            "paid_amount": 65,
+            "subtotal": 65,
+            "tax_amount": 3.0999999999999996,
+            "discount_amount": 0,
+            "payment_method": "Cash",
+            "paid_at": "2026-10-12 08:26:33",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Tea, 1x Coffee",
+            "items": [
+                {
+                    "name": "Tea",
+                    "quantity": 1,
+                    "price": 25,
+                    "total": 25
+                },
+                {
+                    "name": "Coffee",
+                    "quantity": 1,
+                    "price": 40,
+                    "total": 40
+                }
+            ]
+        },
+        {
+            "id": 15,
+            "bill_number": "INVOICE-0007",
+            "paid_amount": 150,
+            "subtotal": 150,
+            "tax_amount": 7.14,
+            "discount_amount": 0,
+            "payment_method": "Cash",
+            "paid_at": "2026-10-12 06:26:13",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Meal",
+            "items": [
+                {
+                    "name": "Meal",
+                    "quantity": 1,
+                    "price": 150,
+                    "total": 150
+                }
+            ]
+        },
+        {
+            "id": 14,
+            "bill_number": "INVOICE-0006",
+            "paid_amount": 80,
+            "subtotal": 80,
+            "tax_amount": 3.8,
+            "discount_amount": 0,
+            "payment_method": "Cash",
+            "paid_at": "2026-10-12 05:33:52",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Snack",
+            "items": [
+                {
+                    "name": "Snack",
+                    "quantity": 1,
+                    "price": 80,
+                    "total": 80
+                }
+            ]
+        },
+        {
+            "id": 13,
+            "bill_number": "INVOICE-0005",
+            "paid_amount": 240,
+            "subtotal": 240,
+            "tax_amount": 11.42,
+            "discount_amount": 0,
+            "payment_method": "Zomato",
+            "paid_at": "2026-10-12 05:27:45",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "2x Snack, 2x Coffee",
+            "items": [
+                {
+                    "name": "Snack",
+                    "quantity": 2,
+                    "price": 80,
+                    "total": 160
+                },
+                {
+                    "name": "Coffee",
+                    "quantity": 2,
+                    "price": 40,
+                    "total": 80
+                }
+            ]
+        },
+        {
+            "id": 12,
+            "bill_number": "INVOICE-0004",
+            "paid_amount": 65,
+            "subtotal": 65,
+            "tax_amount": 3.0999999999999996,
+            "discount_amount": 0,
+            "payment_method": "Cash",
+            "paid_at": "2026-10-12 04:52:29",
+            "customer_name": "Charan",
+            "customer_phone": "+919353333945",
+            "items_summary": "1x Tea, 1x Coffee",
+            "items": [
+                {
+                    "name": "Tea",
+                    "quantity": 1,
+                    "price": 25,
+                    "total": 25
+                },
+                {
+                    "name": "Coffee",
+                    "quantity": 1,
+                    "price": 40,
+                    "total": 40
+                }
+            ]
+        }
+    ],
+    "hourly_sales": [
+        {
+            "hour": 0,
+            "label": "00:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 1,
+            "label": "01:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 2,
+            "label": "02:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 3,
+            "label": "03:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 4,
+            "label": "04:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 5,
+            "label": "05:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 6,
+            "label": "06:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 7,
+            "label": "07:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 8,
+            "label": "08:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 9,
+            "label": "09:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 10,
+            "label": "10:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 11,
+            "label": "11:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 12,
+            "label": "12:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 13,
+            "label": "13:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 14,
+            "label": "14:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 15,
+            "label": "15:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 16,
+            "label": "16:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 17,
+            "label": "17:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 18,
+            "label": "18:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 19,
+            "label": "19:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 20,
+            "label": "20:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 21,
+            "label": "21:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 22,
+            "label": "22:00",
+            "total": 0,
+            "count": 0
+        },
+        {
+            "hour": 23,
+            "label": "23:00",
+            "total": 0,
+            "count": 0
+        }
+    ],
+    "menu_catalog": {
+        "categories": [
+            {
+                "id": "cat-express-food",
+                "name": "Food",
+                "slug": null,
+                "description": null,
+                "image_url": null,
+                "sort_order": 1
+            },
+            {
+                "id": "cat-signature",
+                "name": "Signature Range",
+                "slug": "signature",
+                "description": null,
+                "image_url": null,
+                "sort_order": 1
+            },
+            {
+                "id": "cat-express-beverages",
+                "name": "Beverages",
+                "slug": null,
+                "description": null,
+                "image_url": null,
+                "sort_order": 2
+            },
+            {
+                "id": "cat-combos",
+                "name": "Snack Packs & Feasts",
+                "slug": "combos",
+                "description": null,
+                "image_url": null,
+                "sort_order": 2
+            },
+            {
+                "id": "cat-burgers",
+                "name": "Burgers & Wraps",
+                "slug": "burgers",
+                "description": null,
+                "image_url": null,
+                "sort_order": 3
+            },
+            {
+                "id": "cat-bowls",
+                "name": "Bowls & Sandwiches",
+                "slug": "bowls",
+                "description": null,
+                "image_url": null,
+                "sort_order": 4
+            },
+            {
+                "id": "cat-snacks",
+                "name": "Snack Attack",
+                "slug": "snacks",
+                "description": null,
+                "image_url": null,
+                "sort_order": 5
+            },
+            {
+                "id": "cat-veggie",
+                "name": "Veggie Delight",
+                "slug": "veggie",
+                "description": null,
+                "image_url": null,
+                "sort_order": 6
+            },
+            {
+                "id": "cat-beverages",
+                "name": "Sip n' Slurp",
+                "slug": "beverages",
+                "description": null,
+                "image_url": null,
+                "sort_order": 7
+            },
+            {
+                "id": "cat-desserts",
+                "name": "Sweet Treats",
+                "slug": "desserts",
+                "description": null,
+                "image_url": null,
+                "sort_order": 8
+            }
+        ],
+        "items": [
+            {
+                "id": "prod-express-meal",
+                "name": "Meal",
+                "description": "",
+                "price": 170,
+                "category": "food",
+                "category_name": "Food",
+                "category_id": "cat-express-food",
+                "image": "",
+                "tags": [
+                    "[]"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "sig-bucket-8",
+                "name": "Signature Crispy Chicken (8 Pcs Bucket)",
+                "description": "Golden-crusted, tender bone-in chicken marinated in secret aromatic herbs and pressure-fried to seal in maximum juices. Serves 3-4.",
+                "price": 699,
+                "category": "signature",
+                "category_name": "Signature Range",
+                "category_id": "cat-signature",
+                "image": "/images/menu/signature-chicken-bucket.jpg",
+                "tags": [
+                    "bestseller",
+                    "party",
+                    "size",
+                    "pressure",
+                    "fried",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": true,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "prod-express-tea",
+                "name": "Tea",
+                "description": "",
+                "price": 25,
+                "category": "beverages",
+                "category_name": "Beverages",
+                "category_id": "cat-express-beverages",
+                "image": "",
+                "tags": [],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "prod-express-coffee",
+                "name": "Coffee",
+                "description": "",
+                "price": 40,
+                "category": "beverages",
+                "category_name": "Beverages",
+                "category_id": "cat-express-beverages",
+                "image": "",
+                "tags": [],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "sig-peri-8",
+                "name": "Peri Peri Fiery Chicken (8 Pcs Bucket)",
+                "description": "Crispy bone-in chicken tossed in our explosive African bird’s eye peri-peri spice dust for bold, fiery heat. Serves 3-4.",
+                "price": 699,
+                "category": "signature",
+                "category_name": "Signature Range",
+                "category_id": "cat-signature",
+                "image": "/images/menu/signature-chicken-bucket.jpg",
+                "tags": [
+                    "spicy",
+                    "delight",
+                    "chef",
+                    "special",
+                    "halal",
+                    "peri-peri"
+                ],
+                "spiceLevel": "peri-peri",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "prod-express-snack",
+                "name": "Snack",
+                "description": "",
+                "price": 80,
+                "category": "food",
+                "category_name": "Food",
+                "category_id": "cat-express-food",
+                "image": "",
+                "tags": [],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "sig-bucket-6",
+                "name": "Signature Crispy Chicken (6 Pcs Bucket)",
+                "description": "Six signature crispy fried chicken pieces with our golden crunchy breading and succulent center.",
+                "price": 529,
+                "category": "signature",
+                "category_name": "Signature Range",
+                "category_id": "cat-signature",
+                "image": "/images/menu/signature-chicken-bucket.jpg",
+                "tags": [
+                    "value",
+                    "share",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "sig-box-4",
+                "name": "Signature Crispy Chicken (4 Pcs Box)",
+                "description": "Four succulent pieces of original recipe golden fried chicken with peri-peri sprinkle sachet.",
+                "price": 359,
+                "category": "signature",
+                "category_name": "Signature Range",
+                "category_id": "cat-signature",
+                "image": "/images/menu/signature-chicken-bucket.jpg",
+                "tags": [
+                    "duo",
+                    "pack",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "sig-drum-2",
+                "name": "Crispy Chicken Drumsticks (2 Pcs)",
+                "description": "Two prime drumsticks with our signature crunch and tender seasoned interior.",
+                "price": 189,
+                "category": "signature",
+                "category_name": "Signature Range",
+                "category_id": "cat-signature",
+                "image": "/images/menu/signature-chicken-bucket.jpg",
+                "tags": [
+                    "quick",
+                    "bite",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "sig-pc-1",
+                "name": "Crispy Fried Chicken (1 Pc)",
+                "description": "A single cut of freshly fried crispy chicken piece.",
+                "price": 99,
+                "category": "signature",
+                "category_name": "Signature Range",
+                "category_id": "cat-signature",
+                "image": "/images/menu/signature-chicken-bucket.jpg",
+                "tags": [
+                    "single",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "combo-beast-feast",
+                "name": "Beast Feast (Serves 2)",
+                "description": "The ultimate monster combo: 2 Pcs Fried Chicken, 2 Classic Burgers, 1 French Fries (Reg), 6 Pcs Chicken Cheese Shots, and 2 Soft Drinks (350ml).",
+                "price": 399,
+                "category": "combos",
+                "category_name": "Snack Packs & Feasts",
+                "category_id": "cat-combos",
+                "image": "/images/menu/beast-feast-combo.jpg",
+                "tags": [
+                    "bestseller",
+                    "feast",
+                    "for",
+                    "two",
+                    "high",
+                    "value",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": true,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "combo-double-impact",
+                "name": "Double Impact Combo (Serves 2)",
+                "description": "2 Pcs Crispy Fried Chicken, 4 Pcs Peri Peri Wings, 4 Chicken Nuggets, 1 French Fries, and 2 Soft Drinks (350ml).",
+                "price": 349,
+                "category": "combos",
+                "category_name": "Snack Packs & Feasts",
+                "category_id": "cat-combos",
+                "image": "/images/menu/double-impact-combo.jpg",
+                "tags": [
+                    "wings",
+                    "&",
+                    "more",
+                    "sharing",
+                    "halal",
+                    "spicy"
+                ],
+                "spiceLevel": "hot",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "combo-cluck-patty",
+                "name": "Cluck n' Patty Combo (Serves 1)",
+                "description": "1 Classic Chicken Burger, 1 Pc Fried Chicken, 1 French Fries, and 1 Chilled Soft Drink (350ml).",
+                "price": 299,
+                "category": "combos",
+                "category_name": "Snack Packs & Feasts",
+                "category_id": "cat-combos",
+                "image": "/images/menu/cluck-n-patty.jpg",
+                "tags": [
+                    "single",
+                    "combo",
+                    "lunch",
+                    "favorite",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "combo-pop-star",
+                "name": "Pop Star Snack Pack",
+                "description": "1 Regular Crunchy Chicken Popcorn, 1 Pc Fried Chicken, and 1 Refreshing Soft Drink (350ml).",
+                "price": 249,
+                "category": "combos",
+                "category_name": "Snack Packs & Feasts",
+                "category_id": "cat-combos",
+                "image": "/images/menu/pop-star-combo.jpg",
+                "tags": [
+                    "snack",
+                    "pack",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "burger-hot-crispy",
+                "name": "Hot Crispy Chicken Burger",
+                "description": "Extra-crisp whole chicken thigh patty stacked with spicy peri-peri mayo, fresh crisp iceberg lettuce on a toasted sesame brioche bun.",
+                "price": 139,
+                "category": "burgers",
+                "category_name": "Burgers & Wraps",
+                "category_id": "cat-burgers",
+                "image": "/images/menu/hot-crispy-burger.jpg",
+                "tags": [
+                    "bestseller",
+                    "signature",
+                    "crunch",
+                    "halal",
+                    "hot"
+                ],
+                "spiceLevel": "hot",
+                "isBestseller": true,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "burger-big-juicy",
+                "name": "Big Juicy Burger",
+                "description": "Double tender chicken patty layered with melted cheese slice, tangy barbecue relish, and creamy house dressing.",
+                "price": 149,
+                "category": "burgers",
+                "category_name": "Burgers & Wraps",
+                "category_id": "cat-burgers",
+                "image": "/images/menu/big-juicy-burger.jpg",
+                "tags": [
+                    "cheese",
+                    "melt",
+                    "satisfying",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "burger-smoky-chilli",
+                "name": "Smoky Chilli Burger",
+                "description": "Spicy chicken patty infused with smoky chipotle sauce, caramelized onion glaze, and pickled jalapeños.",
+                "price": 149,
+                "category": "burgers",
+                "category_name": "Burgers & Wraps",
+                "category_id": "cat-burgers",
+                "image": "/images/menu/hot-crispy-burger.jpg",
+                "tags": [
+                    "smoky",
+                    "heat",
+                    "halal",
+                    "spicy"
+                ],
+                "spiceLevel": "hot",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "burger-tandoori",
+                "name": "Tandoori Chicken Burger",
+                "description": "Grilled chicken patty smothered in bold tandoori spiced mint mayo and crunchy red onion rings.",
+                "price": 109,
+                "category": "burgers",
+                "category_name": "Burgers & Wraps",
+                "category_id": "cat-burgers",
+                "image": "/images/menu/big-juicy-burger.jpg",
+                "tags": [
+                    "desi",
+                    "spiced",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "burger-classic",
+                "name": "Classic Crunchy Burger",
+                "description": "Golden chicken patty with classic garlic mayo and crunchy shredded lettuce.",
+                "price": 99,
+                "category": "burgers",
+                "category_name": "Burgers & Wraps",
+                "category_id": "cat-burgers",
+                "image": "/images/menu/hot-crispy-burger.jpg",
+                "tags": [
+                    "classic",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "roll-tandoori",
+                "name": "Tandoori Chicken Roll",
+                "description": "Juicy spiced chicken kebab pieces rolled in a warm flaky paratha with mint glaze and chatpata onions.",
+                "price": 99,
+                "category": "burgers",
+                "category_name": "Burgers & Wraps",
+                "category_id": "cat-burgers",
+                "image": "/images/menu/tandoori-chicken-roll.jpg",
+                "tags": [
+                    "street",
+                    "style",
+                    "handheld",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "roll-krisper",
+                "name": "Krisper Chicken Roll",
+                "description": "Crunchy chicken tenders rolled with honey mustard slaw in a toasted golden wrap.",
+                "price": 109,
+                "category": "burgers",
+                "category_name": "Burgers & Wraps",
+                "category_id": "cat-burgers",
+                "image": "/images/menu/tandoori-chicken-roll.jpg",
+                "tags": [
+                    "crispy",
+                    "wrap",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "roll-paneer",
+                "name": "Royal Paneer Wrapper",
+                "description": "Marinated soft cottage cheese fingers wrapped with tandoori mayo and crunchy bell peppers.",
+                "price": 129,
+                "category": "burgers",
+                "category_name": "Burgers & Wraps",
+                "category_id": "cat-burgers",
+                "image": "/images/menu/paneer-wrapper.jpg",
+                "tags": [
+                    "vegetarian",
+                    "cheesy",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "bowl-asian-fried",
+                "name": "Asian Boneless Fried Chicken Bowl",
+                "description": "Crisp golden boneless chicken bites served on steaming aromatic herb rice, accompanied by spicy Schezwan or rich Kerala Curry glaze and cold drink.",
+                "price": 199,
+                "category": "bowls",
+                "category_name": "Bowls & Sandwiches",
+                "category_id": "cat-bowls",
+                "image": "/images/menu/asian-fried-chicken-bowl.jpg",
+                "tags": [
+                    "fusion",
+                    "favorite",
+                    "meal",
+                    "in",
+                    "a",
+                    "bowl",
+                    "halal",
+                    "spicy"
+                ],
+                "spiceLevel": "hot",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "bowl-grill-chicken",
+                "name": "Grill Chicken Rice Bowl",
+                "description": "Tender marinated flame-grilled chicken chunks served over aromatic basmati pilaf with roasted pepper salsa.",
+                "price": 149,
+                "category": "bowls",
+                "category_name": "Bowls & Sandwiches",
+                "category_id": "cat-bowls",
+                "image": "/images/menu/grill-chicken-rice-bowl.jpg",
+                "tags": [
+                    "healthy",
+                    "choice",
+                    "grilled",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "sandwich-clucky-chunky",
+                "name": "Clucky Chunky Gourmet Sandwich",
+                "description": "Thick grilled sourdough stuffed with succulent chunky chicken shreds, herb mayo, and melted cheese.",
+                "price": 169,
+                "category": "bowls",
+                "category_name": "Bowls & Sandwiches",
+                "category_id": "cat-bowls",
+                "image": "/images/menu/clucky-chunky-sandwich.jpg",
+                "tags": [
+                    "artisan",
+                    "toast",
+                    "loaded",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "snack-loaded-popcorn",
+                "name": "Loaded Chicken Popcorn",
+                "description": "Bite-sized crispy chicken poppers drizzled with warm cheddar cheese sauce, fiery peri-peri sprinkles, and spring onions.",
+                "price": 99,
+                "category": "snacks",
+                "category_name": "Snack Attack",
+                "category_id": "cat-snacks",
+                "image": "/images/menu/loaded-chicken-popcorn.jpg",
+                "tags": [
+                    "bestseller",
+                    "snack",
+                    "mania",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": true,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "snack-loaded-fries",
+                "name": "Loaded Cheesy Fries",
+                "description": "Crispy skin-on golden potato fries smothered in creamy melted cheese sauce, salsa drizzle, and herbs.",
+                "price": 89,
+                "category": "snacks",
+                "category_name": "Snack Attack",
+                "category_id": "cat-snacks",
+                "image": "/images/menu/loaded-cheesy-fries.jpg",
+                "tags": [
+                    "vegetarian",
+                    "cheesy",
+                    "delight",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "snack-strips",
+                "name": "Crispy Chicken Strips (4 Pcs)",
+                "description": "100% whole muscle chicken breast tenders breaded in seasoned panko crumbs with garlic mayo dip.",
+                "price": 139,
+                "category": "snacks",
+                "category_name": "Snack Attack",
+                "category_id": "cat-snacks",
+                "image": "/images/menu/crispy-chicken-strips.jpg",
+                "tags": [
+                    "finger",
+                    "food",
+                    "crunchy",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "snack-nuggets",
+                "name": "Golden Chicken Nuggets (6 Pcs)",
+                "description": "Tender bite-sized chicken nuggets flash-fried golden brown with sweet chilli dip.",
+                "price": 69,
+                "category": "snacks",
+                "category_name": "Snack Attack",
+                "category_id": "cat-snacks",
+                "image": "/images/menu/crispy-chicken-strips.jpg",
+                "tags": [
+                    "kids",
+                    "love",
+                    "halal"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": false,
+                "isHalalChicken": true,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "veg-meal-deal",
+                "name": "Veggie Delight Meal Deal",
+                "description": "1 Veggie Surprise Burger, 2 Pcs Veg Bites, 2 Pcs Potato Kievs, and 1 Refreshing Cold Drink (350ml).",
+                "price": 249,
+                "category": "veggie",
+                "category_name": "Veggie Delight",
+                "category_id": "cat-veggie",
+                "image": "/images/menu/veggie-meal-deal.jpg",
+                "tags": [
+                    "vegetarian",
+                    "complete",
+                    "meal",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "veg-big-box",
+                "name": "Veggie Big Box Feast",
+                "description": "1 Royal Paneer Burger, 5 Pcs Potato Kievs, 3 Pcs Crispy Veg Fingers, 1 French Fries, and 1 Soft Drink.",
+                "price": 279,
+                "category": "veggie",
+                "category_name": "Veggie Delight",
+                "category_id": "cat-veggie",
+                "image": "/images/menu/veggie-big-box.jpg",
+                "tags": [
+                    "vegetarian",
+                    "feast",
+                    "shareable",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "veg-burger-crispy",
+                "name": "Crispy Veggie Surprise Burger",
+                "description": "Spiced potato and sweet corn patty encrusted with golden crumbs, topped with mint mayo and pickled cucumber.",
+                "price": 89,
+                "category": "veggie",
+                "category_name": "Veggie Delight",
+                "category_id": "cat-veggie",
+                "image": "/images/menu/crispy-veg-burger.jpg",
+                "tags": [
+                    "vegetarian",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "bev-mojito",
+                "name": "Sparkling Classic Mint Mojito",
+                "description": "Crushed garden fresh mint leaves, zesty lemon wedges, chilled sparkling soda, and organic cane syrup.",
+                "price": 69,
+                "category": "beverages",
+                "category_name": "Sip n' Slurp",
+                "category_id": "cat-beverages",
+                "image": "/images/menu/sparkling-mojitos.jpg",
+                "tags": [
+                    "chilled",
+                    "cooler",
+                    "refreshing",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "bev-blue-curacao",
+                "name": "Electric Blue Curacao Splash",
+                "description": "Vibrant blue citrus syrup shaken with crushed ice and sparkling lemon-lime fizz.",
+                "price": 69,
+                "category": "beverages",
+                "category_name": "Sip n' Slurp",
+                "category_id": "cat-beverages",
+                "image": "/images/menu/sparkling-mojitos.jpg",
+                "tags": [
+                    "signature",
+                    "drink",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "bev-cappuccino",
+                "name": "Artisan Cappuccino / Latte",
+                "description": "Freshly ground Arabica espresso topped with creamy steamed microfoam and cocoa dust.",
+                "price": 129,
+                "category": "beverages",
+                "category_name": "Sip n' Slurp",
+                "category_id": "cat-beverages",
+                "image": "/images/menu/cappuccino-coffee.jpg",
+                "tags": [
+                    "hot",
+                    "brew",
+                    "barista",
+                    "craft",
+                    "veg"
+                ],
+                "spiceLevel": "hot",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "bev-masala-tea",
+                "name": "Kadak Masala Chai + Butter Cookie",
+                "description": "Slow-simmered Assam black tea infused with crushed cardamom, ginger, cloves, served with bakery butter cookies.",
+                "price": 69,
+                "category": "beverages",
+                "category_name": "Sip n' Slurp",
+                "category_id": "cat-beverages",
+                "image": "/images/menu/cappuccino-coffee.jpg",
+                "tags": [
+                    "comfort",
+                    "hot",
+                    "local",
+                    "favorite",
+                    "veg"
+                ],
+                "spiceLevel": "hot",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "des-brownie-bomb",
+                "name": "Sizzling Brownie Bomb with Ice Cream",
+                "description": "Warm, gooey walnut dark chocolate brownie crowned with velvety vanilla bean ice cream and hot chocolate fudge drizzle.",
+                "price": 99,
+                "category": "desserts",
+                "category_name": "Sweet Treats",
+                "category_id": "cat-desserts",
+                "image": "/images/menu/brownie-bomb-icecream.jpg",
+                "tags": [
+                    "bestseller",
+                    "pure",
+                    "indulgence",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": true,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "des-fudge-brownie",
+                "name": "American Rich Fudge Brownie",
+                "description": "Decadent baked chocolate cake square with crackly crust and rich dense center.",
+                "price": 109,
+                "category": "desserts",
+                "category_name": "Sweet Treats",
+                "category_id": "cat-desserts",
+                "image": "/images/menu/fudge-brownie.jpg",
+                "tags": [
+                    "chocoholic",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            },
+            {
+                "id": "des-ice-cream",
+                "name": "Artisan Ice Cream (2 Scoops)",
+                "description": "Two generous scoops of gourmet ice cream. Choose from Belgian Chocolate, Madagascar Vanilla, or Moroccan Hazelnut.",
+                "price": 99,
+                "category": "desserts",
+                "category_name": "Sweet Treats",
+                "category_id": "cat-desserts",
+                "image": "/images/menu/ice-cream-scoops.jpg",
+                "tags": [
+                    "cool",
+                    "treat",
+                    "veg"
+                ],
+                "spiceLevel": "mild",
+                "isBestseller": false,
+                "isVeg": true,
+                "isHalalChicken": false,
+                "stock_status": "in_stock",
+                "stock_quantity": null,
+                "low_stock_threshold": null,
+                "track_inventory": false,
+                "is_active": true
+            }
+        ]
+    },
+    "store_status": {
+        "is_open": false,
+        "status_text": "Currently Closed",
+        "message": "Opens at 11:00",
+        "opening_hours": {
+            "display": "11:00 AM – 11:00 PM",
+            "openHour": 11,
+            "closeHour": 23,
+            "days": "Monday – Sunday"
+        }
+    },
+    "server_received_at": "2026-10-29T04:16:32+00:00"
+}

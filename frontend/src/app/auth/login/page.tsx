@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, LifeBuoy, MessageCircle, Ticket } from 'lucide-react';
+import { Eye, EyeOff, LifeBuoy, MessageCircle, Ticket, Keyboard } from 'lucide-react';
 import { ROLE_LABEL_KEYS } from '@/lib/i18n-enums';
 import { SupportTicketForm, PRE_LOGIN_SUPPORT_ENDPOINTS } from '@/components/support/SupportTicketForm';
 
@@ -221,13 +221,25 @@ function LoginContent() {
               <Button type="submit" disabled={loading} className="w-full" size="lg">
                 {loading ? t('signingIn') : t('signIn')}
               </Button>
-              <button
-                type="button"
-                onClick={() => router.push('/auth/recover')}
-                className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {t('forgotPasswordLink')}
-              </button>
+              <div className="flex items-center justify-between text-sm pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('dinzin:show-keyboard', { detail: { mode: 'alpha' } }));
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-1 px-2 rounded-md hover:bg-muted"
+                >
+                  <Keyboard size={14} />
+                  <span>Touch Keyboard</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/auth/recover')}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {t('forgotPasswordLink')}
+                </button>
+              </div>
             </form>
           </CardContent>
         </Card>

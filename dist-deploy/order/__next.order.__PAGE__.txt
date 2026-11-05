@@ -1,0 +1,57 @@
+1:"$Sreact.fragment"
+3:"/_next/static/chunks/42onvq6nokjl2.js"
+4:"/_next/static/chunks/1arciis-9fnxb.js"
+5:"/_next/static/chunks/1847jkzvpf__t.js"
+6:I[39756,["$3","$4","$5"],"default"]
+7:I[37457,["$3","$4","$5"],"default"]
+8:I[35171,["$3","$4","$5"],"default"]
+9:I[17866,["$3","$4","$5"],"default"]
+10:"$Sreact.suspense"
+16:"ViewportBoundary"
+17:I[97367,["$3","$4","$5"],"$16"]
+18:"MetadataBoundary"
+19:I[97367,["$3","$4","$5"],"$18"]
+:HL["/_next/static/chunks/2k2vmtq2rq2xb.css","style"]
+2:T436,{"@context":"https://schema.org","@type":"Restaurant","name":"Five Star Chicken Restaurant","legalName":"CHANDU ENTERPRISES","taxID":"29CVIPR3058J1ZY","image":["/images/menu/signature-chicken-bucket.jpg","/images/interior/dining-hall-world-map.jpg"],"@id":"https://fivestarchicken-nelamangala.in","url":"https://fivestarchicken-nelamangala.in","telephone":"+91 98864 38778","menu":"https://fivestarchicken-nelamangala.in/#menu","servesCuisine":["100% Halal Fried Chicken","Burgers","Fast Food","Snacks"],"priceRange":"₹₹","address":{"@type":"PostalAddress","streetAddress":"Ground Floor, No. 131, Kasaba Hobali, Binnamangala, Arasinakunte, Nelamangala, Bengaluru Rural, Karnataka - 562123","addressLocality":"Nelamangala","addressRegion":"Karnataka","postalCode":"562123","addressCountry":"IN"},"geo":{"@type":"GeoCoordinates","latitude":13.088689750966637,"longitude":77.41090161024658},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"11:00","closes":"23:00"}]}b:X
+e:X
+e:C
+f:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","$10",null,{"fallback":["$","div",null,{"className":"min-h-screen bg-[var(--ks-lacquer-black)] text-[var(--ks-text-warm)] flex flex-col items-center justify-center p-6 text-center font-mono","children":[["$","div",null,{"className":"w-12 h-12 rounded-[2px] border-2 border-[var(--ks-kinpaku)] border-t-transparent animate-spin mb-4"}],["$","span",null,{"className":"text-sm text-[var(--ks-champagne)]","children":"Loading In-Store Menu..."}],["$","span",null,{"className":"text-xs text-[var(--ks-text-muted)] mt-1","children":"Five Star Chicken • Nelamangala Flagship"}]]}],"children":"$L11"}],["$L12","$L13"],"$L14"]}],"p":"$@15","v":null,"s":"$b"}}]]
+c:[["children",{"s":"order","h":96,"d":{"r":["$","$1","c",{"children":[null,["$","$L6",null,{"parallelRouterKey":"children","template":["$","$L7",null,{}]}]]}],"p":"$@d","v":"$e","s":"$b"},"c":"$Qf"}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/2k2vmtq2rq2xb.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/42onvq6nokjl2.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/1arciis-9fnxb.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/1847jkzvpf__t.js","async":true}]],["$","html",null,{"lang":"en","className":"ll1faa_variable nl-EQG_variable gwGESa_variable scroll-smooth","children":[["$","head",null,{"children":["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"$2"}}]}],["$","body",null,{"className":"font-sans bg-[var(--ks-lacquer-black)] text-[var(--ks-text-warm)] min-h-screen selection:bg-[var(--ks-kinpaku)] selection:text-[var(--ks-dark-ink)] relative antialiased","children":[["$","$L6",null,{"parallelRouterKey":"children","template":["$","$L7",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}],["$","$L8",null,{}],["$","$L9",null,{}]]}]]}]]}],"p":"$@a","v":null,"s":"$b"},"c":"$Qc"},"h":{"r":["$","$1","h",{"children":[null,["$","$L17",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","$L19",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$10",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"In-Store QR Order & Live Token | Five Star Chicken Restaurant"}],["$","meta","1",{"name":"description","content":"Scan and order directly at Five Star Chicken, Nelamangala Flagship. Instant KOT routing, live order tokens, and secure digital bills."}],["$","meta","2",{"name":"author","content":"Five Star Chicken Restaurant"}],["$","meta","3",{"name":"keywords","content":"Five Star Chicken Nelamangala,100% Halal Cut Chicken Nelamangala,Halal Fried Chicken Bengaluru,Fried Chicken Nelamangala,Crispy Chicken Bengaluru,Chicken Burgers Nelamangala,Online Chicken Delivery Nelamangala,Five Star Restaurant NH48"}],"$L1a","$L1b","$L1c","$L1d","$L1e","$L1f","$L20","$L21","$L22","$L23","$L24","$L25","$L26","$L27","$L28","$L29","$L2a","$L2b"]}]}],null]}],"$L2c"]}],"p":"$@2d","v":null,"s":"$b"}},"a":"$@2e","u":"$@2f","b":"N6JMFUXukIg4NrgUJy9BL"}
+30:"/_next/static/chunks/3gqvwtg2t36na.js"
+31:"/_next/static/chunks/3pmqxz74c68k5.js"
+32:I[17100,["$3","$4","$5","$30","$31"],"default"]
+33:I[97367,["$3","$4","$5"],"OutletBoundary"]
+35:I[27201,["$3","$4","$5"],"IconMark"]
+11:["$","$L32",null,{}]
+12:["$","script","script-0",{"src":"/_next/static/chunks/3gqvwtg2t36na.js","async":true}]
+13:["$","script","script-1",{"src":"/_next/static/chunks/3pmqxz74c68k5.js","async":true}]
+14:["$","$L33",null,{"children":["$","$10",null,{"name":"Next.MetadataOutlet","children":"$@34"}]}]
+1a:["$","meta","4",{"property":"og:title","content":"Five Star Chicken Restaurant | Nelamangala Flagship"}]
+1b:["$","meta","5",{"property":"og:description","content":"An upgraded full-service dine-in restaurant by Five Star Chicken in Nelamangala. Featuring authentic pressure-fried crispy chicken, gourmet burgers, rice bowls, beverages, and desserts in a contemporary family dining atmosphere."}]
+1c:["$","meta","6",{"property":"og:url","content":"https://fivestarchicken-nelamangala.in/"}]
+1d:["$","meta","7",{"property":"og:site_name","content":"Five Star Chicken Restaurant"}]
+1e:["$","meta","8",{"property":"og:locale","content":"en_IN"}]
+1f:["$","meta","9",{"property":"og:image","content":"https://fivestarchicken-nelamangala.in/images/menu/signature-chicken-bucket.jpg"}]
+20:["$","meta","10",{"property":"og:image:width","content":"1200"}]
+21:["$","meta","11",{"property":"og:image:height","content":"630"}]
+22:["$","meta","12",{"property":"og:image:alt","content":"Five Star Chicken Restaurant Signature Crispy Chicken Bucket"}]
+23:["$","meta","13",{"property":"og:type","content":"website"}]
+24:["$","meta","14",{"name":"twitter:card","content":"summary_large_image"}]
+25:["$","meta","15",{"name":"twitter:title","content":"Five Star Chicken Restaurant | Nelamangala Flagship"}]
+26:["$","meta","16",{"name":"twitter:description","content":"An upgraded full-service dine-in restaurant by Five Star Chicken in Nelamangala. Featuring authentic pressure-fried crispy chicken, gourmet burgers, rice bowls, beverages, and desserts in a contemporary family dining atmosphere."}]
+27:["$","meta","17",{"name":"twitter:image","content":"https://fivestarchicken-nelamangala.in/images/menu/signature-chicken-bucket.jpg"}]
+28:["$","link","18",{"rel":"icon","href":"/favicon.ico?favicon.117ezoe8m31dk.ico","sizes":"48x48","type":"image/x-icon"}]
+29:["$","link","19",{"rel":"icon","href":"/images/logo/five-star-emblem.png"}]
+2a:["$","link","20",{"rel":"apple-touch-icon","href":"/images/logo/five-star-emblem.png"}]
+2b:["$","$L35","21",{}]
+2c:["$","meta",null,{"name":"next-size-adjust","content":""}]
+b:300
+34:null
+2f:true
+b:C
+2e:0
+d:"$undefined"
+a:"$undefined"
+2d:"$undefined"
+15:"$undefined"

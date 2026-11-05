@@ -12,26 +12,25 @@ export default function FloatingWhatsApp() {
   return (
     <motion.aside
       aria-label="WhatsApp quick ordering"
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 1, type: 'spring', stiffness: 260, damping: 20 }}
-      className="fixed bottom-6 right-6 z-40 flex items-center group"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5, duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+      className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-30 flex items-center group"
     >
       {/* Tooltip on hover */}
-      <span className="hidden sm:inline-block mr-3 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1A1816]/90 text-[#F7F3EE] border border-[#ebdd0b]/30 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-        Quick WhatsApp Order
+      <span className="hidden sm:inline-block mr-2.5 px-2.5 py-1 rounded-[2px] text-xs font-mono font-medium bg-[var(--ks-lacquer-deep)] text-[var(--ks-champagne)] border border-[var(--ks-gold-hairline)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none">
+        WhatsApp Order & Support
       </span>
 
-      {/* Floating Button with pulsing ring */}
+      {/* Floating Button */}
       <a
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Direct WhatsApp Order"
-        className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-[0_4px_25px_rgba(37,211,102,0.45)] hover:shadow-[0_4px_35px_rgba(37,211,102,0.65)] hover:scale-110 active:scale-95 transition-all duration-200"
+        className="relative flex items-center justify-center w-12 h-12 rounded-[4px] bg-[#25D366] text-white shadow-lg hover:brightness-105 active:scale-95 transition-all duration-150 border border-white/20"
       >
-        <span className="absolute -inset-1 rounded-full bg-[#25D366]/30 animate-ping pointer-events-none" />
-        <MessageCircle className="w-7 h-7 fill-white text-[#25D366]" />
+        <MessageCircle className="w-6 h-6 fill-white text-[#25D366]" />
       </a>
     </motion.aside>
   );

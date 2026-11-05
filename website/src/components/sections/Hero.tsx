@@ -2,132 +2,139 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Star, ArrowDown, Sparkles, Flame, ShieldCheck } from 'lucide-react';
-import { siteConfig } from '@/config/site';
+import { Star, ArrowDown, Flame, ShieldCheck, Award } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[92vh] sm:min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16">
-      {/* Cinematic Background Image with Dark Vignette */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/interior/dining-hall-world-map.jpg"
-          alt="Five Star Chicken Nelamangala Ambiance"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center scale-105 filter brightness-[0.38] contrast-[1.12]"
-        />
-        {/* Multilayered radial and gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-black/60 to-black/80" />
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-black/40 to-[#080808]" />
+    <section className="relative min-h-[88vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden pt-28 pb-16 bg-[var(--ks-lacquer-black)]">
+      {/* Background Architectural Atmosphere */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* Mobile View: High-contrast focus on the golden crispy chicken */}
+        <div className="relative w-full h-full sm:hidden">
+          <Image
+            src="/images/hero/hero-fried-chicken-mobile.webp"
+            alt="Five Star Crispy Fried Chicken Banner"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-top filter brightness-[0.45] contrast-[1.12]"
+          />
+        </div>
+
+        {/* Desktop View: Full widescreen panoramic immersion */}
+        <div className="hidden sm:block relative w-full h-full">
+          <Image
+            src="/images/hero/hero-fried-chicken-banner.webp"
+            alt="Five Star Crispy Fried Chicken Panoramic Banner"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[center_60%] filter brightness-[0.42] contrast-[1.14]"
+          />
+        </div>
+
+        {/* Cinematic Vignette Overlays for Maximum Legibility & Brand Mood */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--ks-lacquer-black)] via-[var(--ks-lacquer-black)]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--ks-lacquer-black)]/85 via-transparent to-[var(--ks-lacquer-black)]" />
+        <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-[var(--ks-lacquer-black)]/85 via-[var(--ks-lacquer-black)]/30 to-transparent" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-        {/* Floating Top Pill */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1A1816]/90 border border-[#ebdd0b]/40 text-[#ebdd0b] text-xs font-semibold uppercase tracking-widest shadow-[0_0_20px_rgba(235,221,11,0.2)] mb-6 backdrop-blur-md"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-[#ebdd0b]" />
-          <span>Now Serving Nelamangala, Bengaluru</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse" />
-        </motion.div>
-
-        {/* Big Serif Headline */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+        {/* Large Architectural Display Headline (Alumni Sans weight 100/300, no gradient text, no kicker) */}
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.15 }}
-          className="font-serif-lux text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-[#F7F3EE] max-w-5xl leading-[1.08]"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="font-display text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-thin tracking-[-0.01em] text-[var(--ks-champagne)] max-w-5xl leading-[1.08] sm:leading-[1.01]"
         >
-          Legendary <span className="text-gold-gradient italic">Crunch.</span>
+          CRUNCH IN GOLD.
           <br />
-          Five Star <span className="text-fire-gradient">Juiciness.</span>
+          <span className="font-normal text-[var(--ks-kinpaku)]">JUICY TO THE BONE.</span>
         </motion.h1>
 
-        {/* Tagline / Subtitle */}
+        {/* Subtitle with measure 65-75ch */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="mt-6 text-base sm:text-lg md:text-xl text-[#A69F96] max-w-2xl leading-relaxed font-light"
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-5 sm:mt-6 text-sm sm:text-base md:text-lg text-[var(--ks-text-muted)] max-w-2xl leading-relaxed font-body"
         >
-          Experience pressure-fried fried chicken, fiery peri-peri buckets, and artisan burgers marinated with over four decades of global culinary heritage.
+          The upgraded full-service dine-in restaurant by Five Star Chicken. Authentic pressure-fried crispy chicken, fiery peri-peri buckets, gourmet burgers, rice bowls, and sizzling desserts in Nelamangala.
         </motion.p>
 
-        {/* Dual CTAs */}
+        {/* Dual CTAs (2px radius, crisp hairlines, high contrast, full width on mobile) */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.45 }}
-          className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto"
         >
           <a
             href="#menu"
-            className="w-full sm:w-auto px-8 py-4 rounded-full text-sm font-bold uppercase tracking-wider text-white bg-fire-gradient hover:bg-fire-gradient-hover shadow-[0_0_30px_rgba(221,32,35,0.5)] transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 group"
+            className="w-full sm:w-auto ks-btn-primary min-h-[46px] px-8 text-center justify-center"
           >
-            <Flame className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
             <span>Order Online Now</span>
           </a>
 
           <a
             href="#signature"
-            className="w-full sm:w-auto px-8 py-4 rounded-full text-sm font-bold uppercase tracking-wider text-[#F7F3EE] bg-[#161412]/80 hover:bg-[#201D1A] border border-[#ebdd0b]/40 hover:border-[#ebdd0b] backdrop-blur-md transition-all flex items-center justify-center"
+            className="w-full sm:w-auto ks-btn-secondary min-h-[46px] px-8 text-center justify-center"
           >
-            Explore Bestsellers
+            <span>Explore Bestsellers</span>
           </a>
         </motion.div>
 
-        {/* Floating Trust & Quality Badges */}
+        {/* Structured Bento Grid Proof Tiles (No nested cards, 1px gold hairline, 6px radius) */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 w-full max-w-4xl"
+          transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-12 sm:mt-18 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 w-full max-w-4xl"
         >
-          <div className="glass-card rounded-xl p-3 sm:p-4 text-center">
-            <div className="flex items-center justify-center gap-1 text-[#ebdd0b] mb-1">
+          <div className="ks-tile p-3 sm:p-4 text-center">
+            <div className="flex items-center justify-center gap-1 text-[var(--ks-kinpaku)] mb-1">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3.5 h-3.5 fill-[#ebdd0b]" />
+                <Star key={i} className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-[var(--ks-kinpaku)]" />
               ))}
             </div>
-            <div className="text-sm sm:text-base font-bold text-white">4.9 ★ Rating</div>
-            <div className="text-[10px] text-[#A69F96]">5,000+ Happy Foodies</div>
+            <div className="font-mono-num text-xs sm:text-base font-semibold text-[var(--ks-champagne)]">
+              4.9 ★ Rating
+            </div>
+            <div className="text-[11px] sm:text-xs text-[var(--ks-text-muted)] font-mono mt-0.5">5,000+ Patrons</div>
           </div>
 
-          <div className="glass-card rounded-xl p-3 sm:p-4 text-center">
-            <ShieldCheck className="w-4 h-4 text-[#ebdd0b] mx-auto mb-1" />
-            <div className="text-sm sm:text-base font-bold text-white">Fresh Daily</div>
-            <div className="text-[10px] text-[#A69F96]">Never Frozen Cuts</div>
+          <div className="ks-tile p-3 sm:p-4 text-center border-[oklch(70%_0.12_188_/_0.3)] bg-[oklch(70%_0.12_188_/_0.06)]">
+            <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--ks-patina)] mx-auto mb-1" />
+            <div className="font-mono-num text-xs sm:text-base font-semibold text-[var(--ks-patina)]">
+              100% Halal Cut
+            </div>
+            <div className="text-[11px] sm:text-xs text-[var(--ks-text-muted)] font-mono mt-0.5">Fresh Farm Poultry Daily</div>
           </div>
 
-          <div className="glass-card rounded-xl p-3 sm:p-4 text-center">
-            <Flame className="w-4 h-4 text-[#dd2023] mx-auto mb-1" />
-            <div className="text-sm sm:text-base font-bold text-white">Secret Herbs</div>
-            <div className="text-[10px] text-[#A69F96]">Signature Marinade</div>
+          <div className="ks-tile p-3 sm:p-4 text-center">
+            <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--ks-kinpaku)] mx-auto mb-1" />
+            <div className="text-xs sm:text-base font-semibold text-[var(--ks-champagne)] font-title">
+              Secret Herbs
+            </div>
+            <div className="text-[11px] sm:text-xs text-[var(--ks-text-muted)] font-mono mt-0.5">Pressure-Fry Sealed</div>
           </div>
 
-          <div className="glass-card rounded-xl p-3 sm:p-4 text-center">
-            <Sparkles className="w-4 h-4 text-[#ebdd0b] mx-auto mb-1" />
-            <div className="text-sm sm:text-base font-bold text-white">10,000+ Stores</div>
-            <div className="text-[10px] text-[#A69F96]">Worldwide Heritage</div>
+          <div className="ks-tile p-3 sm:p-4 text-center">
+            <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--ks-kinpaku)] mx-auto mb-1" />
+            <div className="font-mono-num text-xs sm:text-base font-semibold text-[var(--ks-champagne)]">
+              10,000+ Stores
+            </div>
+            <div className="text-[11px] sm:text-xs text-[var(--ks-text-muted)] font-mono mt-0.5">Global Heritage</div>
           </div>
         </motion.div>
 
-        {/* Animated Scroll Down Indicator */}
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-          className="mt-12 text-[#A69F96] hover:text-[#ebdd0b] transition-colors"
-        >
-          <a href="#signature" aria-label="Scroll to Signature Dishes" className="flex flex-col items-center gap-1">
-            <span className="text-[10px] uppercase tracking-widest font-semibold">Scroll to Discover</span>
-            <ArrowDown className="w-4 h-4" />
+        {/* Subtle Scroll Down Anchor */}
+        <div className="mt-12 text-[var(--ks-text-muted)] hover:text-[var(--ks-champagne)] transition-colors">
+          <a href="#signature" aria-label="Scroll to Signature Dishes" className="flex flex-col items-center gap-1.5">
+            <span className="text-xs uppercase font-mono tracking-[0.16em]">Explore Offerings</span>
+            <ArrowDown className="w-3.5 h-3.5 text-[var(--ks-kinpaku)]" />
           </a>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

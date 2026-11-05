@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import expressRateLimit from 'express-rate-limit';
 import { getDatabase, now, generateShortId } from '../db';
 import { requirePermission } from '../services/authorization';
+import { triggerLiveSyncDebounced } from '../services/live-sync';
 
 const router = Router();
 const categoryWriteRateLimit = expressRateLimit({ windowMs: 60 * 1000, limit: 60, standardHeaders: true, legacyHeaders: false });
@@ -258,6 +259,7 @@ function createCategory(req: Request, res: Response) {
     insertCategory();
 
     const category = db.prepare('SELECT * FROM categories WHERE id = ?').get(id) as Record<string, unknown>;
+    try { triggerLiveSyncDebounced(); } catch {}
     res.status(201).json({ category: serializeCategory({ ...category, addon_group_ids: addonGroupValidation.ids || [] }) });
   } catch (error: any) {
     console.error("[API] Internal error:", error);
@@ -343,6 +345,7 @@ function updateCategory(req: Request, res: Response) {
 
     const updated = db.prepare('SELECT * FROM categories WHERE id = ?').get(categoryId) as Record<string, unknown>;
     const updatedAddonGroupIds = loadAddonGroupIdsByCategory(db, [{ id: categoryId }]).get(categoryId) || [];
+    try { triggerLiveSyncDebounced(); } catch {}
     res.json({ category: serializeCategory({ ...updated, addon_group_ids: updatedAddonGroupIds }) });
   } catch (error: any) {
     console.error("[API] Internal error:", error);
@@ -409,6 +412,7 @@ function deleteCategory(req: Request, res: Response) {
     } catch (error: any) {
       return res.status(400).json({ error: error.message });
     }
+    try { triggerLiveSyncDebounced(); } catch {}
     res.json({ message: 'Category deleted' });
   } catch (error: any) {
     console.error("[API] Internal error:", error);

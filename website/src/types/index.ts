@@ -3,14 +3,38 @@ export interface MenuItem {
   name: string;
   description: string;
   price: number;
-  category: 'signature' | 'combos' | 'burgers' | 'bowls' | 'snacks' | 'veggie' | 'beverages' | 'desserts';
+  category: string;
+  categoryName?: string;
   image: string;
   tags: string[];
-  spiceLevel: 'mild' | 'medium' | 'hot' | 'peri-peri';
+  spiceLevel: 'mild' | 'medium' | 'hot' | 'peri-peri' | string;
   isBestseller?: boolean;
   isVeg?: boolean;
+  isHalalChicken?: boolean;
   serves?: string;
   portion?: string;
+  stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
+  stockQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  trackInventory?: boolean;
+}
+
+export interface MenuCategory {
+  id: string;
+  name: string;
+  slug?: string;
+}
+
+export interface StoreStatus {
+  isOpen: boolean;
+  statusText: string;
+  message?: string;
+  openingHours?: {
+    display: string;
+    openHour: number;
+    closeHour: number;
+    days: string;
+  };
 }
 
 export interface CartItem {
@@ -19,7 +43,7 @@ export interface CartItem {
   instructions?: string;
 }
 
-export type OrderType = 'delivery' | 'pickup' | 'dine-in';
+export type OrderType = 'takeaway' | 'dine-in';
 
 export interface OrderCustomerInfo {
   name: string;
@@ -46,6 +70,12 @@ export interface SiteConfig {
   branch: string;
   tagline: string;
   description: string;
+  legalName: string;
+  tradeName: string;
+  constitution: string;
+  gstin: string;
+  fssaiNumber: string;
+  fssaiValidity?: string;
   city: string;
   address: string;
   landmark: string;
@@ -73,4 +103,6 @@ export interface SiteConfig {
     facebook: string;
     youtube: string;
   };
+  menuApiUrl?: string;
+  razorpayKeyId?: string;
 }

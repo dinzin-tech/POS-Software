@@ -155,7 +155,10 @@ export function LiveSyncSettingsCard() {
 
     setSyncingNow(true);
     try {
-      const { data } = await api.post('/live-sync/sync-now', {});
+      const { data } = await api.post('/live-sync/sync-now', {
+        syncUrl: syncUrl.trim(),
+        apiKey: apiKey.trim(),
+      });
       if (data?.ok) {
         toast.success('Live data pushed successfully!');
         if (data.config) {

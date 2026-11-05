@@ -319,7 +319,7 @@ export default function POSPage() {
   const reportOrderFailure = (entry: { code: string; title: string; message: string; detail: string; status: number | null }) => {
     setSupportError({
       title: entry.title,
-      subject: 'FloCafe order problem',
+      subject: 'DinZin order problem',
       code: entry.code,
       message: entry.message,
       payload: {
@@ -378,7 +378,7 @@ export default function POSPage() {
       const code = `print.kot.${msg.toLowerCase().includes('spool') ? 'spooler_timeout' : 'failed'}`;
       setSupportError({
         title: t('printingFailed'),
-        subject: 'FloCafe printing problem',
+        subject: 'DinZin printing problem',
         code,
         message: t('kotPrintFailed'),
         payload: { event_code: code, message: msg, category: 'printer', diagnostics: { order_id: order.id, stage: 'kot_print' } },
@@ -470,7 +470,7 @@ export default function POSPage() {
       const code = 'print.receipt.failed';
       setSupportError({
         title: t('printingFailed'),
-        subject: 'FloCafe printing problem',
+        subject: 'DinZin printing problem',
         code,
         message: t('receiptPrintFailed'),
         payload: { event_code: code, message: supportMessage, category: 'printer', diagnostics: { bill_id: bill.id, stage: 'receipt_print' } },

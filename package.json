@@ -1,6 +1,6 @@
 {
   "name": "dinzin-desktop",
-  "version": "3.12.25",
+  "version": "3.12.26",
   "description": "DinZin POS - Free, open-source, offline-first restaurant POS with KDS, SQLite, and thermal printer support.",
   "engines": {
     "node": ">=22.12.0"
@@ -13,6 +13,7 @@
     "dev:restart": "bash scripts/dev/restart.sh",
     "dev:reset": "bash scripts/dev/nuclear-reset.sh",
     "dev:frontend": "cd frontend && npm run dev",
+    "package:website-deploy": "node scripts/package-sharedhost-deploy.cjs",
     "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc && node scripts/copy-runtime-assets.cjs",
     "lint:backend": "eslint main/ shared/",
     "lint": "npm run lint:backend && npm --prefix frontend run lint",

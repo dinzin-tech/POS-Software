@@ -1,0 +1,35 @@
+{
+    "receipt_id": "TOK-0262",
+    "order_number": "ONLINE",
+    "bill_number": "INV-OK0262",
+    "online_order_id": "TOK-0262",
+    "customer_name": "Ramesh Test",
+    "customer_phone": "9876543210",
+    "order_type": "Takeaway",
+    "table_number": "",
+    "created_date_formatted": "29/10/2026 11:20:59 am",
+    "items": [
+        {
+            "id": "1",
+            "name": "Crispy Chicken",
+            "price": 150,
+            "quantity": 1,
+            "total": 150,
+            "notes": ""
+        }
+    ],
+    "subtotal": 150,
+    "tax_amount": 7.5,
+    "delivery_charge": 0,
+    "total": 157.5,
+    "paid_amount": 157.5,
+    "balance": 0,
+    "payment_status": "PAID",
+    "payment_method": "ONLINE",
+    "payment_id": "pay_test_match_99",
+    "store_name": "Five Star",
+    "store_address": "Lohith Nagara, Nelmangala.",
+    "store_phone": "+919353333945",
+    "stored_at": 1793272859,
+    "expires_at": 1793618459
+}

@@ -34,7 +34,7 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       isOpen: false,
-      orderType: 'delivery',
+      orderType: 'takeaway',
       tableNumber: '',
       specialInstructions: '',
 
@@ -95,19 +95,19 @@ export const useCartStore = create<CartState>()(
       },
 
       getTax: () => {
-        // Standard 5% GST on restaurant food
-        return Math.round(get().getSubtotal() * 0.05);
+        // Menu prices are inclusive of 5% GST (Tax = Total - Total / 1.05)
+        const total = get().getSubtotal();
+        const base = total / 1.05;
+        return Math.round((total - base) * 100) / 100;
       },
 
       getDeliveryFee: () => {
-        const subtotal = get().getSubtotal();
-        if (get().orderType !== 'delivery' || subtotal === 0) return 0;
-        // Free delivery on orders above ₹499, otherwise ₹30
-        return subtotal >= 499 ? 0 : 30;
+        return 0;
       },
 
       getTotal: () => {
-        return get().getSubtotal() + get().getTax() + get().getDeliveryFee();
+        // Menu prices are inclusive of 5% GST; order total matches menu prices exactly
+        return get().getSubtotal();
       },
     }),
     {

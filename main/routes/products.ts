@@ -10,6 +10,7 @@ import * as dns from 'dns';
 import * as https from 'https';
 import * as net from 'net';
 import { asyncHandler } from '../middleware/async-handler';
+import { triggerLiveSyncDebounced } from '../services/live-sync';
 
 const MAX_FETCH_BYTES = 10 * 1024 * 1024;
 
@@ -924,6 +925,7 @@ router.post('/', requirePermission('catalog.manage'), (req: Request, res: Respon
     insertProduct();
 
     const product = db.prepare('SELECT * FROM products WHERE id = ?').get(id);
+    try { triggerLiveSyncDebounced(); } catch {}
     res.status(201).json({ product: serializeProduct(product) });
   } catch (error: any) {
     console.error("[API] Internal error:", error);
@@ -1140,6 +1142,7 @@ router.put('/:id', requirePermission('catalog.manage'), (req: Request, res: Resp
     updateProduct();
 
     const updated = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
+    try { triggerLiveSyncDebounced(); } catch {}
     res.json({ product: serializeProduct(updated) });
   } catch (error: any) {
     console.error("[API] Internal error:", error);
@@ -1164,6 +1167,7 @@ router.delete('/:id', requirePermission('catalog.manage'), (req: Request, res: R
     }
 
     db.prepare('UPDATE products SET deleted_at = ? WHERE id = ?').run(now(), req.params.id);
+    try { triggerLiveSyncDebounced(); } catch {}
     res.json({ message: 'Product deleted' });
   } catch (error: any) {
     console.error("[API] Internal error:", error);
@@ -1214,6 +1218,7 @@ router.post('/:id/stock', requirePermission('inventory.manage'), (req: Request, 
       }
       return db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
     })();
+    try { triggerLiveSyncDebounced(); } catch {}
     res.json({ product: serializeProduct(updated) });
   } catch (error: any) {
     console.error("[API] Internal error:", error);
