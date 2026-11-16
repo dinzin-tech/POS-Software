@@ -61,6 +61,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => { ipcRenderer.removeListener('update-status', handler); };
   },
 
+  onOnlineOrderReceived: (callback: (data: { id: number; orderNumber: string }) => void) => {
+    const handler = (_event: unknown, data: { id: number; orderNumber: string }) => callback(data);
+    ipcRenderer.on('online-order-received', handler);
+    return () => { ipcRenderer.removeListener('online-order-received', handler); };
+  },
+
   // Windows/Linux title-bar menu row. The labels come from the main-process
   // application menu; each click pops that entry's real submenu.
   getApplicationMenu: () => ipcRenderer.invoke('get-application-menu'),

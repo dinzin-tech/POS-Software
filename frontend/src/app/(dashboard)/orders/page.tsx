@@ -365,6 +365,11 @@ export default function OrdersPage() {
 
     connectWS();
 
+    const cleanupOnlineOrders = (window as any).electronAPI?.onOnlineOrderReceived?.((data: { id: number; orderNumber: string }) => {
+      fetchOrders();
+      toast.success(`Online Order #${data.orderNumber} arrived!`, { duration: 6000 });
+    });
+
     return () => {
       clearInterval(interval);
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
@@ -372,6 +377,7 @@ export default function OrdersPage() {
         ws.onclose = null;
         ws.close();
       }
+      if (typeof cleanupOnlineOrders === 'function') cleanupOnlineOrders();
     };
      
     // eslint-disable-next-line react-hooks/exhaustive-deps

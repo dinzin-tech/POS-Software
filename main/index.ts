@@ -36,6 +36,7 @@ import {
 } from './update-state';
 import { createAutoUpdaterErrorHandler, createRestartAndInstallHandler, type UpdateShutdownState } from './updater-shutdown';
 import { clearStaleRenderCachesOnVersionChange } from './startup-cache';
+import { addOrderIngestedListener } from './services/online-orders';
 import { createLocalWindowOpenHandler, createMainWindow, resolveTitleBarMode, type TitleBarMode } from './window-options';
 import { applyTitleBarOverlayTheme, resolveTitleBarOverlayColors, resolveInitialIsDark, resolveThemeMode, type ThemeMode } from './title-bar-theme';
 import {
@@ -646,6 +647,16 @@ function createWindow(): void {
     resolvedTitleBarMode,
   );
   mainWindow = createdWindow;
+
+  addOrderIngestedListener(({ id, orderNumber }) => {
+    try {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('online-order-received', { id, orderNumber });
+      }
+    } catch {
+      // ignore
+    }
+  });
 
   mainWindow.once('ready-to-show', () => {
     if (isDev) {

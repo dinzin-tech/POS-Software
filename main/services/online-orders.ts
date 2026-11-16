@@ -52,6 +52,16 @@ export interface RawOnlineOrder {
   created_at?: string;
 }
 
+export type OrderIngestedListener = (event: { id: number; orderNumber: string; order: RawOnlineOrder }) => void;
+const orderIngestedListeners: OrderIngestedListener[] = [];
+export function addOrderIngestedListener(fn: OrderIngestedListener): () => void {
+  orderIngestedListeners.push(fn);
+  return () => {
+    const idx = orderIngestedListeners.indexOf(fn);
+    if (idx !== -1) orderIngestedListeners.splice(idx, 1);
+  };
+}
+
 /** Build live dynamic menu catalog and categories for website sync */
 export function buildMenuCatalog(db: ReturnType<typeof getDatabase>) {
   const categories = db.prepare(`
@@ -203,9 +213,9 @@ export async function sendOrderWhatsAppMessage(params: {
     });
     console.log('[OnlineOrders] Sent WhatsApp via Baileys:', { ok: res.ok, messageId: res.messageId });
     return { ok: res.ok, error: res.error };
-  } catch (err: any) {
-    console.error('[OnlineOrders] Failed to dispatch WhatsApp:', err?.message);
-    return { ok: false, error: err?.message || 'Failed to send WhatsApp message' };
+  } catch (err: unknown) {
+    console.error('[OnlineOrders] Failed to dispatch WhatsApp:', (err as Error)?.message);
+    return { ok: false, error: (err as Error)?.message || 'Failed to send WhatsApp message' };
   }
 }
 
@@ -447,9 +457,9 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
       );
       billId = Number(billRes.lastInsertRowid);
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[OnlineOrders] Transaction failure while saving order:', err);
-    return { ok: false, error: err?.message || 'Database transaction error' };
+    return { ok: false, error: (err as Error)?.message || 'Database transaction error' };
   }
 
   if (!createdOrderId || !createdOrderNumber) {
@@ -458,45 +468,60 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
 
   console.log(`[OnlineOrders] Successfully created local order #${createdOrderNumber} (ID: ${createdOrderId}) from ${raw.order_id}`);
 
-  // Broadcast to connected KDS screens and trigger debounced cloud sync
+  // Broadcast to connected KDS screens, active listeners, and trigger debounced cloud sync
   try {
     notifyOrderUpdated();
-  } catch (err: any) {
-    console.warn('[OnlineOrders] Failed to broadcast KDS update:', err?.message);
+  } catch (err: unknown) {
+    console.warn('[OnlineOrders] Failed to broadcast KDS update:', (err as Error)?.message);
+  }
+
+  for (const listener of orderIngestedListeners) {
+    try {
+      listener({ id: createdOrderId, orderNumber: createdOrderNumber, order: raw });
+    } catch (listenerErr: unknown) {
+      console.warn('[OnlineOrders] Listener callback error:', (listenerErr as Error)?.message);
+    }
   }
 
   // 7. Auto Print KOT
   try {
     if (isKotPrintingEnabled()) {
-      const orderData: any = db.prepare('SELECT * FROM orders WHERE id = ?').get(createdOrderId);
+      const orderData = db.prepare('SELECT * FROM orders WHERE id = ?').get(createdOrderId) as Record<string, unknown> | undefined;
       if (orderData) {
         if (orderData.table_id) {
-          const t: any = db.prepare('SELECT number FROM tables WHERE id = ?').get(orderData.table_id);
-          if (t) orderData.table = { name: t.number };
+          const t = db.prepare('SELECT number FROM tables WHERE id = ?').get(orderData.table_id as string) as { number?: string } | undefined;
+          if (t?.number) orderData.table = { name: t.number };
         }
         if (orderData.customer_id) {
-          const c: any = db.prepare('SELECT name FROM customers WHERE id = ?').get(orderData.customer_id);
-          if (c) orderData.customer = { name: c.name };
+          const c = db.prepare('SELECT name FROM customers WHERE id = ?').get(orderData.customer_id as string) as { name?: string } | undefined;
+          if (c?.name) orderData.customer = { name: c.name };
         }
 
         const effectiveItems = getEffectiveOrderItems(db, String(createdOrderId));
-        const groups = routeItemsToStations(db, effectiveItems).filter((g) => g.items.length > 0);
+        let groups = routeItemsToStations(db, effectiveItems).filter((g) => g.items.length > 0);
+        if (groups.length === 0 && effectiveItems.length > 0) {
+          groups = [{ stationName: 'Kitchen', printer: null, items: effectiveItems }];
+        }
 
         for (const g of groups) {
           void printKOTDetailed(orderData, g.items, g.stationName, false, g.printer || undefined)
             .then((res) => {
-              console.log(`[OnlineOrders] KOT printed for station "${g.stationName}":`, res.ok ? 'SUCCESS' : res.detail);
+              if (res.ok) {
+                console.log(`[OnlineOrders] KOT auto-printed successfully for station "${g.stationName}" (Order #${createdOrderNumber})`);
+              } else {
+                console.warn(`[OnlineOrders] KOT auto-print not dispatched for "${g.stationName}":`, res.detail);
+              }
             })
-            .catch((e) => {
-              console.error(`[OnlineOrders] KOT print error for "${g.stationName}":`, e?.message);
+            .catch((e: unknown) => {
+              console.error(`[OnlineOrders] KOT print error for "${g.stationName}":`, (e as Error)?.message);
             });
         }
       }
     } else {
       console.log('[OnlineOrders] KOT printing skipped (disabled in store settings)');
     }
-  } catch (printErr: any) {
-    console.error('[OnlineOrders] Automatic KOT trigger failed:', printErr?.message);
+  } catch (printErr: unknown) {
+    console.error('[OnlineOrders] Automatic KOT trigger failed:', (printErr as Error)?.message);
   }
 
   // 8. Auto Send Bill Receipt via WhatsApp with Digital Receipt Link
@@ -557,6 +582,9 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
     if (!publishEndpoint.includes('action=')) {
       publishEndpoint += (publishEndpoint.includes('?') ? '&' : '?') + 'action=publish_receipt';
     }
+    if (!publishEndpoint.includes('key=')) {
+      publishEndpoint += `&key=${encodeURIComponent(apiKey)}`;
+    }
 
     fetch(publishEndpoint, {
       method: 'POST',
@@ -615,8 +643,8 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
       billId,
       customerId: raw.customer.name,
     });
-  } catch (waErr: any) {
-    console.error('[OnlineOrders] Automatic WhatsApp trigger failed:', waErr?.message);
+  } catch (waErr: unknown) {
+    console.error('[OnlineOrders] Automatic WhatsApp trigger failed:', (waErr as Error)?.message);
   }
 
   return { ok: true, orderId: createdOrderId, orderNumber: createdOrderNumber };
@@ -628,8 +656,8 @@ export async function pollOnlineOrders(syncUrl: string, apiKey: string): Promise
 
   try {
     const fetchUrl = syncUrl.includes('?')
-      ? `${syncUrl}&action=get_orders`
-      : `${syncUrl}?action=get_orders`;
+      ? `${syncUrl}&action=get_orders&key=${encodeURIComponent(apiKey)}`
+      : `${syncUrl}?action=get_orders&key=${encodeURIComponent(apiKey)}`;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 7000);
@@ -645,6 +673,7 @@ export async function pollOnlineOrders(syncUrl: string, apiKey: string): Promise
     clearTimeout(timeout);
 
     if (!res.ok) {
+      console.warn(`[OnlineOrders] Polling failed with HTTP ${res.status}: ${res.statusText}`);
       return 0;
     }
 
@@ -662,14 +691,16 @@ export async function pollOnlineOrders(syncUrl: string, apiKey: string): Promise
       const result = await ingestOnlineOrder(ord);
       if (result.ok) {
         ackIds.push(ord.order_id);
+      } else {
+        console.error(`[OnlineOrders] Failed to ingest order ${ord.order_id}:`, result.error);
       }
     }
 
     // Acknowledge processed orders with shared host
     if (ackIds.length > 0) {
       const ackUrl = syncUrl.includes('?')
-        ? `${syncUrl}&action=ack_orders`
-        : `${syncUrl}?action=ack_orders`;
+        ? `${syncUrl}&action=ack_orders&key=${encodeURIComponent(apiKey)}`
+        : `${syncUrl}?action=ack_orders&key=${encodeURIComponent(apiKey)}`;
 
       await fetch(ackUrl, {
         method: 'POST',
@@ -677,16 +708,16 @@ export async function pollOnlineOrders(syncUrl: string, apiKey: string): Promise
           'Content-Type': 'application/json',
           'X-API-Key': apiKey,
         },
-        body: JSON.stringify({ order_ids: ackIds }),
+        body: JSON.stringify({ order_ids: ackIds, api_key: apiKey }),
       }).catch((e) => console.warn('[OnlineOrders] Ack failed:', e?.message));
 
       console.log(`[OnlineOrders] Acknowledged ${ackIds.length} processed order(s)`);
     }
 
     return ackIds.length;
-  } catch (err: any) {
-    if (err?.name !== 'AbortError') {
-      console.warn('[OnlineOrders] Polling error:', err?.message || err);
+  } catch (err: unknown) {
+    if ((err as { name?: string })?.name !== 'AbortError') {
+      console.warn('[OnlineOrders] Polling error:', (err as Error)?.message || err);
     }
     return 0;
   }

@@ -477,15 +477,29 @@ if ($action === 'submit_order' || $action === 'order') {
         exit;
     }
 
-    if ($orderType === 'dine-in' && $tableNumber === '') {
-        http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Please provide table number for dine-in orders']);
-        exit;
+    // Payment details (Razorpay Online / Cash on Delivery)
+    $paymentStatus = strtolower(trim((string)($payload['payment_status'] ?? ($payload['paymentStatus'] ?? 'unpaid'))));
+    $paymentMethod = strtolower(trim((string)($payload['payment_method'] ?? ($payload['paymentMethod'] ?? 'cash'))));
+    $paymentId = trim((string)($payload['payment_id'] ?? ($payload['paymentId'] ?? ($payload['razorpay_payment_id'] ?? ''))));
+    $razorpayOrderId = trim((string)($payload['razorpay_order_id'] ?? ''));
+    $razorpaySignature = trim((string)($payload['razorpay_signature'] ?? ''));
+
+    $isPaid = ($paymentStatus === 'paid') || ($paymentId !== '');
+    if ($isPaid) {
+        $paymentStatus = 'paid';
+        if ($paymentMethod === 'cash') {
+            $paymentMethod = 'online';
+        }
     }
 
-    // 3. Validate stock if catalog exists
+    // Online orders from website do not require a table
+    if ($tableNumber === '') {
+        $tableNumber = '';
+    }
+
+    // 3. Validate stock if catalog exists (only block if payment hasn't already been completed)
     $menuFile = $dataDir . '/menu_catalog.json';
-    if (file_exists($menuFile)) {
+    if (!$isPaid && file_exists($menuFile)) {
         $menuRaw = @file_get_contents($menuFile);
         $menuData = json_decode($menuRaw ?: '[]', true);
         if (is_array($menuData) && !empty($menuData['items'])) {
@@ -545,21 +559,6 @@ if ($action === 'submit_order' || $action === 'order') {
         : round($subtotal, 2);
     // 5% GST included component (Tax = Total - Total / 1.05)
     $taxAmount = round($grandTotal - ($grandTotal / 1.05), 2);
-
-    // Payment details (Razorpay Online / Cash on Delivery)
-    $paymentStatus = strtolower(trim((string)($payload['payment_status'] ?? ($payload['paymentStatus'] ?? 'unpaid'))));
-    $paymentMethod = strtolower(trim((string)($payload['payment_method'] ?? ($payload['paymentMethod'] ?? 'cash'))));
-    $paymentId = trim((string)($payload['payment_id'] ?? ($payload['paymentId'] ?? ($payload['razorpay_payment_id'] ?? ''))));
-    $razorpayOrderId = trim((string)($payload['razorpay_order_id'] ?? ''));
-    $razorpaySignature = trim((string)($payload['razorpay_signature'] ?? ''));
-
-    $isPaid = ($paymentStatus === 'paid') || ($paymentId !== '');
-    if ($isPaid) {
-        $paymentStatus = 'paid';
-        if ($paymentMethod === 'cash') {
-            $paymentMethod = 'online';
-        }
-    }
 
     $newOrder = [
         'order_id' => $orderId,

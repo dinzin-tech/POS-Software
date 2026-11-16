@@ -411,7 +411,15 @@ export default function POSPage() {
     const syncFullscreen = () => setFullscreen(document.fullscreenElement != null);
     syncFullscreen();
     document.addEventListener('fullscreenchange', syncFullscreen);
-    return () => document.removeEventListener('fullscreenchange', syncFullscreen);
+
+    const cleanupOnlineOrders = (window as any).electronAPI?.onOnlineOrderReceived?.((data: { id: number; orderNumber: string }) => {
+      toast.success(`Online Order #${data.orderNumber} arrived!`, { duration: 6000 });
+    });
+
+    return () => {
+      document.removeEventListener('fullscreenchange', syncFullscreen);
+      if (typeof cleanupOnlineOrders === 'function') cleanupOnlineOrders();
+    };
   }, []);
 
   const toggleFullscreen = useCallback(async () => {

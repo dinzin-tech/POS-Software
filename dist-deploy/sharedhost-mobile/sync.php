@@ -98,13 +98,29 @@ $completedOrdersFile = $dataDir . '/completed_orders.json';
 // Action: GET ORDERS (Local POS polls for new online orders)
 if ($action === 'get_orders') {
     $orders = [];
-    if (file_exists($pendingOrdersFile)) {
-        $raw = file_get_contents($pendingOrdersFile);
-        $decoded = json_decode($raw ?: '[]', true);
-        if (is_array($decoded)) {
-            $orders = $decoded;
+    $candidateFiles = array_unique([
+        $pendingOrdersFile,
+        dirname(__DIR__) . '/dashboard/data/pending_orders.json',
+        dirname(__DIR__) . '/sharedhost-mobile/data/pending_orders.json',
+    ]);
+
+    $seen = [];
+    foreach ($candidateFiles as $filePath) {
+        if (file_exists($filePath)) {
+            $raw = @file_get_contents($filePath);
+            $decoded = json_decode($raw ?: '[]', true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $ord) {
+                    $id = $ord['order_id'] ?? ($ord['id'] ?? '');
+                    if ($id !== '' && !isset($seen[$id])) {
+                        $seen[$id] = true;
+                        $orders[] = $ord;
+                    }
+                }
+            }
         }
     }
+
     echo json_encode([
         'ok' => true,
         'count' => count($orders),
@@ -128,15 +144,22 @@ if ($action === 'ack_orders') {
         exit;
     }
 
-    $pending = [];
     $ackMap = array_flip($ackIds);
     $acknowledged = [];
 
-    if (file_exists($pendingOrdersFile)) {
-        $fp = fopen($pendingOrdersFile, 'c+');
+    $candidateFiles = array_unique([
+        $pendingOrdersFile,
+        dirname(__DIR__) . '/dashboard/data/pending_orders.json',
+        dirname(__DIR__) . '/sharedhost-mobile/data/pending_orders.json',
+    ]);
+
+    foreach ($candidateFiles as $filePath) {
+        if (!file_exists($filePath)) continue;
+        $fp = fopen($filePath, 'c+');
         if ($fp && flock($fp, LOCK_EX)) {
             $raw = stream_get_contents($fp);
             $current = json_decode($raw ?: '[]', true);
+            $pending = [];
             if (is_array($current)) {
                 foreach ($current as $ord) {
                     $id = $ord['order_id'] ?? ($ord['id'] ?? '');
