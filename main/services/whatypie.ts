@@ -21,6 +21,11 @@ export interface TemplateVariableContext {
   currencySymbol?: string;
   customerName?: string;
   stageLabel?: string;
+  orderType?: string;
+  itemsSummary?: string;
+  paymentStatus?: string;
+  receiptUrl?: string;
+  storePhone?: string;
 }
 
 export interface SendWhatyPieParams {
@@ -250,19 +255,50 @@ export function resolveTemplateVariables(
   const parts = body.split(/\{\{(?:\d+|[a-zA-Z0-9_]+)\}\}/);
   const result: string[] = [];
 
-  const businessName = ctx.businessName || 'Five Star';
+  const businessName = ctx.businessName || 'Five Star Chicken Restaurant';
   const billOrOrder = ctx.billNumber || ctx.orderNumber || '-';
   const totalAmount = ctx.totalAmount || '0.00';
   const currency = ctx.currency || ctx.currencySymbol || 'INR';
   const customerName = ctx.customerName || 'Valued Customer';
   const stageLabel = ctx.stageLabel || 'Confirmed';
+  const orderType = ctx.orderType || 'Takeaway';
+  const itemsSummary = ctx.itemsSummary || 'Order Items';
+  const paymentStatus = ctx.paymentStatus || 'PAID';
+  const receiptUrl = ctx.receiptUrl || 'https://fivestarnelamangala.in';
+  const storePhone = ctx.storePhone || '+91 98864 38778';
+
+  // Fast-track: Exact positional mapping for approved fivestar_bill_receipt template
+  // Variables in Meta positional order:
+  // 1: storeName, 2: orderNumber, 3: billNumber, 4: customerName, 5: type,
+  // 10: itemsSummary, 6: total, 7: paymentStatus, 8: receiptUrl, 9: storePhone
+  if (template.name === 'fivestar_bill_receipt') {
+    const fivestarDefaults = [
+      businessName,
+      ctx.orderNumber || billOrOrder,
+      ctx.billNumber || billOrOrder,
+      customerName,
+      orderType,
+      itemsSummary,
+      totalAmount,
+      paymentStatus,
+      receiptUrl,
+      storePhone,
+    ];
+    return fivestarDefaults.slice(0, expectedCount).map((defVal, idx) => {
+      const explicitVal =
+        providedVariables?.[idx] != null && String(providedVariables[idx]).trim() !== ''
+          ? String(providedVariables[idx]).trim()
+          : null;
+      return explicitVal || defVal || '-';
+    });
+  }
 
   for (let i = 0; i < expectedCount; i++) {
     const explicitVal =
       providedVariables &&
-      providedVariables[i] !== undefined &&
-      providedVariables[i] !== null &&
-      String(providedVariables[i]).trim() !== ''
+        providedVariables[i] !== undefined &&
+        providedVariables[i] !== null &&
+        String(providedVariables[i]).trim() !== ''
         ? String(providedVariables[i]).trim()
         : null;
 
@@ -372,7 +408,34 @@ export async function sendWhatyPieMessage(params: SendWhatyPieParams): Promise<S
   const baseTs = now();
   const kind = params.kind || 'manual_reply';
 
-  // 1. Record queued message in local SQLite
+  // 1. Record queued message in local SQLite (with FK safety validation)
+  let safeCustomerId: string | null = null;
+  if (params.customerId != null) {
+    const custStr = String(params.customerId).trim();
+    if (custStr) {
+      try {
+        const found = db.prepare('SELECT id FROM customers WHERE id = ? LIMIT 1').get(custStr) as { id: string } | undefined;
+        if (found) {
+          safeCustomerId = found.id;
+        }
+      } catch {
+        safeCustomerId = null;
+      }
+    }
+  }
+
+  let safeBillId: number | null = null;
+  if (params.billId != null) {
+    try {
+      const found = db.prepare('SELECT id FROM bills WHERE id = ? LIMIT 1').get(Number(params.billId)) as { id: number } | undefined;
+      if (found) {
+        safeBillId = found.id;
+      }
+    } catch {
+      safeBillId = null;
+    }
+  }
+
   let messageRowId: number;
   try {
     const insertResult = db.prepare(`
@@ -381,8 +444,8 @@ export async function sendWhatyPieMessage(params: SendWhatyPieParams): Promise<S
         body, queued_at, created_by_user_id
       ) VALUES (?, ?, ?, 'outbound', ?, 'queued', ?, ?, ?)
     `).run(
-      params.billId ?? null,
-      params.customerId ?? null,
+      safeBillId,
+      safeCustomerId,
       `+${phone}`,
       kind,
       params.message,
@@ -443,14 +506,31 @@ export async function sendWhatyPieMessage(params: SendWhatyPieParams): Promise<S
           const ctx = params.templateContext || {};
           resolvedVariables = resolveTemplateVariables(matched, ctx, resolvedVariables);
         }
-      } else if (params.templateName === 'five_start_bill_receipt') {
+      } else if (params.templateName === 'fivestar_bill_receipt' || params.templateName === 'five_start_bill_receipt') {
         if (!resolvedLanguage) resolvedLanguage = 'en_US';
         const ctx = params.templateContext || {};
-        const bName = ctx.businessName || 'Five Star';
-        const num = ctx.billNumber || ctx.orderNumber || (resolvedVariables?.[0] as string) || 'TOK-0001';
-        const tot = ctx.totalAmount || (resolvedVariables?.[2] as string) || '0.00';
-        const cur = ctx.currency || 'INR';
-        resolvedVariables = [bName, num, tot, cur];
+        const bName = ctx.businessName || 'Five Star Chicken Restaurant';
+        const oNum = ctx.orderNumber || 'TOK-0001';
+        const bNum = ctx.billNumber || oNum;
+        const cName = ctx.customerName || 'Valued Customer';
+        const oType = ctx.orderType || 'Takeaway';
+        const itms = ctx.itemsSummary || 'Order Items';
+        const tot = ctx.totalAmount || '0.00';
+        const pStatus = ctx.paymentStatus || 'PAID';
+        const rUrl = ctx.receiptUrl || 'https://fivestarnelamangala.in';
+        const sPhone = ctx.storePhone || '+91 98864 38778';
+        resolvedVariables = [
+          (resolvedVariables?.[0] as string) || bName,
+          (resolvedVariables?.[1] as string) || oNum,
+          (resolvedVariables?.[2] as string) || bNum,
+          (resolvedVariables?.[3] as string) || cName,
+          (resolvedVariables?.[4] as string) || oType,
+          (resolvedVariables?.[5] as string) || itms,
+          (resolvedVariables?.[6] as string) || tot,
+          (resolvedVariables?.[7] as string) || pStatus,
+          (resolvedVariables?.[8] as string) || rUrl,
+          (resolvedVariables?.[9] as string) || sPhone,
+        ];
       }
     } catch (tmplErr) {
       console.warn('[WhatyPie] Template auto-resolution warning:', tmplErr);
@@ -662,7 +742,7 @@ export async function sendWhatyPieBillReceipt(
       payment_method: 'CASH',
       store_name: businessName,
       store_address: getSettingValue('address') || 'Lohith Nagara, Nelmangala.',
-      store_phone: getSettingValue('phone') || '+919353333945',
+      store_phone: getSettingValue('phone') || '+918151021943',
     };
 
     let publishEndpoint = syncUrl;
@@ -674,8 +754,8 @@ export async function sendWhatyPieBillReceipt(
       headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
       body: JSON.stringify(receiptPayload),
       signal: AbortSignal.timeout(4000),
-    }).catch(() => {});
-  } catch {}
+    }).catch(() => { });
+  } catch { }
 
   const formattedMessage = [
     `🧾 *BILL RECEIPT - ${businessName}*`,
@@ -692,6 +772,8 @@ export async function sendWhatyPieBillReceipt(
     'Thank you for your visit! 🙏',
   ].join('\n');
 
+  const formattedItemsSummary = items.map((it, idx) => `${idx + 1}. ${it.product_name} x ${it.quantity} = ${currencySymbol}${Number(it.total).toFixed(2)}`).join('\n');
+
   const templateContext: TemplateVariableContext = {
     businessName,
     billNumber: bill.bill_number,
@@ -701,14 +783,33 @@ export async function sendWhatyPieBillReceipt(
     currencySymbol,
     customerName: bill.customer_name || 'Valued Customer',
     stageLabel: 'Completed',
+    orderType: 'Takeaway',
+    itemsSummary: formattedItemsSummary,
+    paymentStatus: 'PAID',
+    receiptUrl,
+    storePhone: getSettingValue('phone') || '+91 98864 38778',
   };
 
+  const isFivestarReceipt = config.templateBill.toLowerCase() === 'fivestar_bill_receipt';
   const isReceiptTemplate =
     config.templateBill.toLowerCase().includes('receipt') ||
     config.templateBill.toLowerCase().includes('bill');
-  const candidateVariables = isReceiptTemplate
-    ? [businessName, bill.bill_number, totalAmount, currency]
-    : [bill.bill_number, `${currencySymbol}${totalAmount}`, businessName, currency];
+  const candidateVariables = isFivestarReceipt
+    ? [
+      businessName,
+      bill.bill_number,
+      bill.bill_number,
+      bill.customer_name || 'Valued Customer',
+      'Takeaway',
+      formattedItemsSummary,
+      totalAmount,
+      'PAID',
+      receiptUrl,
+      getSettingValue('phone') || '+91 98864 38778',
+    ]
+    : isReceiptTemplate
+      ? [businessName, bill.bill_number, totalAmount, currency]
+      : [bill.bill_number, `${currencySymbol}${totalAmount}`, businessName, currency];
 
   return sendWhatyPieMessage({
     phone: recipientPhone,

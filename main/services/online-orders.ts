@@ -181,6 +181,9 @@ export async function sendOrderWhatsAppMessage(params: {
   message: string;
   billId?: number | null;
   customerId?: string | number | null;
+  templateName?: string;
+  templateContext?: whatypie.TemplateVariableContext;
+  templateVariables?: unknown[];
 }): Promise<{ ok: boolean; error?: string }> {
   const defaultCountry = getSettingValue('country') || 'IN';
   const parsed = parsePhoneE164(params.phone, defaultCountry);
@@ -191,14 +194,24 @@ export async function sendOrderWhatsAppMessage(params: {
 
   const wpConfig = whatypie.getWhatyPieConfig();
   if (wpConfig.provider === 'whatypie' && wpConfig.enabled) {
+    const templateName = params.templateName || wpConfig.templateBill || undefined;
     const res = await whatypie.sendWhatyPieMessage({
       phone: parsed.e164,
       message: params.message,
+      messageType: templateName ? 'template' : 'text',
+      templateName,
+      templateVariables: templateName ? (params.templateVariables ?? undefined) : undefined,
+      templateContext: params.templateContext,
       billId: params.billId ?? null,
       customerId: params.customerId ?? null,
       kind: 'bill_receipt',
     });
-    console.log('[OnlineOrders] Sent WhatsApp via WhatyPie:', { ok: res.ok, messageId: res.messageId });
+    console.log('[OnlineOrders] Sent WhatsApp via WhatyPie:', {
+      ok: res.ok,
+      messageId: res.messageId,
+      error: res.error,
+      template: templateName || 'text',
+    });
     return { ok: res.ok, error: res.error };
   }
 
@@ -237,6 +250,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
 
   let createdOrderId: number | null = null;
   let createdOrderNumber: string | null = null;
+  let createdCustomerId: string | null = null;
   let billId: number | null = null;
   let billNumber: string = '';
   const subtotal = Number(raw.subtotal || raw.total || 0);
@@ -265,6 +279,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
           `).run(customerId, raw.customer.name, raw.customer.phone, raw.customer.address || '', now(), now());
         }
       }
+      createdCustomerId = customerId;
 
       // 3. Resolve Table (if dine-in)
       let tableId: string | null = null;
@@ -527,7 +542,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
   // 8. Auto Send Bill Receipt via WhatsApp with Digital Receipt Link
   try {
     const storeName = getSettingValue('restaurant_name') || getSettingValue('business_name') || 'Five Star';
-    const storePhone = getSettingValue('phone') || '+919353333945';
+    const storePhone = getSettingValue('phone') || '+918151021943';
     const storeAddress = getSettingValue('address') || 'Lohith Nagara, Nelmangala.';
     const syncUrl = getSettingValue('live_sync_url') || 'https://fivestarnelamangala.in/dashboard/sync.php';
     const apiKey = getSettingValue('live_sync_key') || 'fivestar_pos_2026';
@@ -637,11 +652,50 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
     waText += `Thank you for visiting ${storeName}! ✨\n`;
     waText += `Powered by DinZin (dinzin.in)`;
 
+    const wpCfg = whatypie.getWhatyPieConfig();
+    const tplContext: whatypie.TemplateVariableContext = {
+      businessName: storeName,
+      orderNumber: createdOrderNumber ?? undefined,
+      billNumber: billNumber ?? undefined,
+      totalAmount: String(grandTotal),
+      currency: getSettingValue('currency') || 'INR',
+      currencySymbol: getSettingValue('currency_symbol') || '₹',
+      customerName: raw.customer.name || 'Valued Customer',
+      stageLabel: isPrepaid ? 'PAID' : 'Pay at Counter',
+      orderType: typeStr,
+      itemsSummary,
+      paymentStatus: isPrepaid
+        ? `PAID - ${raw.payment_method || 'UPI'} (Ref: ${raw.payment_id || 'Instant'})`
+        : 'Pay at Counter',
+      receiptUrl,
+      storePhone,
+    };
+    // Build ordered variable list matching fivestar_bill_receipt template slots:
+    // 1: storeName, 2: orderNumber, 3: billNumber, 4: customerName, 5: type,
+    // 10: itemsSummary, 6: total, 7: paymentStatus, 8: receiptUrl, 9: storePhone
+    const tplVars: string[] = wpCfg.templateBill
+      ? [
+        storeName,
+        createdOrderNumber ?? '',
+        billNumber ?? '',
+        raw.customer.name || 'Valued Customer',
+        typeStr,
+        itemsSummary,
+        String(grandTotal),
+        isPrepaid
+          ? `PAID - ${raw.payment_method || 'UPI'} (Ref: ${raw.payment_id || 'Instant'})`
+          : 'Pay at Counter',
+        receiptUrl,
+        storePhone,
+      ]
+      : [];
     void sendOrderWhatsAppMessage({
       phone: raw.customer.phone,
       message: waText,
       billId,
-      customerId: raw.customer.name,
+      customerId: createdCustomerId,
+      templateContext: tplContext,
+      templateVariables: tplVars.length > 0 ? tplVars : undefined,
     });
   } catch (waErr: unknown) {
     console.error('[OnlineOrders] Automatic WhatsApp trigger failed:', (waErr as Error)?.message);

@@ -4,11 +4,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Keyboard,
   ChevronDown,
+  ChevronUp,
   Delete,
   CornerDownLeft,
   RotateCcw,
   ArrowUp,
   Hash,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -119,10 +122,14 @@ function typeIntoInput(
 
 export default function GlobalVirtualKeyboard() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [mode, setMode] = useState<KeyboardMode>('alpha');
   const [shift, setShift] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
   const [activeLabel, setActiveLabel] = useState<string>('');
+  const [currentValue, setCurrentValue] = useState<string>('');
+  const [isPassword, setIsPassword] = useState(false);
+  const [showPasswordText, setShowPasswordText] = useState(false);
   const [autoShow, setAutoShow] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
     try {
@@ -165,6 +172,11 @@ export default function GlobalVirtualKeyboard() {
       const label = labelText || placeholder || ariaLabel || inputEl.name || inputEl.type || 'Input';
       setActiveLabel(label);
 
+      // Track current value and type
+      setCurrentValue(inputEl.value || '');
+      setIsPassword(inputEl.type?.toLowerCase() === 'password');
+      setShowPasswordText(false);
+
       // Automatically switch to numpad for numeric inputs
       const type = inputEl.type?.toLowerCase();
       const inputMode = inputEl.getAttribute('inputmode')?.toLowerCase();
@@ -179,6 +191,33 @@ export default function GlobalVirtualKeyboard() {
     return false;
   }, []);
 
+  // Sync live value when typing via physical keyboard or DOM changes
+  useEffect(() => {
+    const handleInputChange = (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      if (activeElementRef.current && target === activeElementRef.current) {
+        setCurrentValue(activeElementRef.current.value || '');
+      }
+    };
+    window.addEventListener('input', handleInputChange);
+    return () => {
+      window.removeEventListener('input', handleInputChange);
+    };
+  }, []);
+
+  // Escape key closes virtual keyboard
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
   // Listen globally to focusin events across all routes & components
   useEffect(() => {
     const handleFocusIn = (e: FocusEvent) => {
@@ -186,10 +225,14 @@ export default function GlobalVirtualKeyboard() {
       if (updateActiveInput(target)) {
         if (autoShow) {
           setIsOpen(true);
-          // Gently scroll field into view so keyboard doesn't occlude it
+          // Scroll target input smoothly to the top/visible area so keyboard doesn't occlude it
           setTimeout(() => {
             if (activeElementRef.current) {
-              activeElementRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              const rect = activeElementRef.current.getBoundingClientRect();
+              const keyboardHeightEstimate = 360;
+              if (rect.bottom > window.innerHeight - keyboardHeightEstimate) {
+                activeElementRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
             }
           }, 150);
         }
@@ -208,6 +251,7 @@ export default function GlobalVirtualKeyboard() {
       const customEvent = e as CustomEvent<{ mode?: KeyboardMode }>;
       if (customEvent.detail?.mode) setMode(customEvent.detail.mode);
       setIsOpen(true);
+      setIsMinimized(false);
     };
     window.addEventListener('dinzin:show-keyboard', handleShowKeyboard as EventListener);
     return () => {
@@ -238,6 +282,7 @@ export default function GlobalVirtualKeyboard() {
     if (!target) return;
 
     typeIntoInput(target, action, char);
+    setCurrentValue(target.value || '');
 
     // If shift was active (one-shot), turn off shift unless capsLock is enabled
     if (shift && !capsLock && action === 'insert') {
@@ -330,7 +375,7 @@ export default function GlobalVirtualKeyboard() {
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/60 text-xs">
               <div className="flex items-center gap-2 min-w-0">
                 <Keyboard className="size-4 text-primary shrink-0" />
-                <span className="font-semibold truncate max-w-[200px] sm:max-w-xs text-foreground/90">
+                <span className="font-semibold truncate max-w-[160px] sm:max-w-xs text-foreground/90">
                   {activeLabel ? `Typing: ${activeLabel}` : 'Touch Keyboard'}
                 </span>
                 <span className="text-[10px] text-muted-foreground hidden sm:inline">
@@ -339,13 +384,14 @@ export default function GlobalVirtualKeyboard() {
               </div>
 
               {/* Mode Switcher & Actions */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <div className="flex items-center bg-muted rounded-lg p-0.5 border border-border/50 text-[11px] font-medium">
                   <button
                     type="button"
                     onPointerDown={(e) => {
                       e.preventDefault();
                       setMode('alpha');
+                      setIsMinimized(false);
                     }}
                     className={cn(
                       'px-2.5 py-1 rounded-md transition-colors',
@@ -359,6 +405,7 @@ export default function GlobalVirtualKeyboard() {
                     onPointerDown={(e) => {
                       e.preventDefault();
                       setMode('symbols');
+                      setIsMinimized(false);
                     }}
                     className={cn(
                       'px-2.5 py-1 rounded-md transition-colors',
@@ -372,6 +419,7 @@ export default function GlobalVirtualKeyboard() {
                     onPointerDown={(e) => {
                       e.preventDefault();
                       setMode('numpad');
+                      setIsMinimized(false);
                     }}
                     className={cn(
                       'px-2.5 py-1 rounded-md transition-colors flex items-center gap-1',
@@ -383,7 +431,7 @@ export default function GlobalVirtualKeyboard() {
                   </button>
                 </div>
 
-                {/* Auto-popup preference toggle */}
+                {/* Auto-popup preference toggle (Always visible for easy switching when using physical keyboard) */}
                 <button
                   type="button"
                   onPointerDown={(e) => {
@@ -391,14 +439,29 @@ export default function GlobalVirtualKeyboard() {
                     toggleAutoShow();
                   }}
                   className={cn(
-                    'px-2 py-1 rounded-md text-[10px] border transition-colors hidden md:inline-flex',
+                    'px-2 py-1 rounded-md text-[10px] sm:text-xs font-semibold border transition-all inline-flex items-center gap-1.5',
                     autoShow
-                      ? 'border-primary/40 bg-primary/10 text-primary font-medium'
-                      : 'border-border text-muted-foreground'
+                      ? 'border-primary/50 bg-primary/15 text-primary'
+                      : 'border-border bg-muted/80 text-muted-foreground hover:text-foreground'
                   )}
-                  title="Toggle auto-show when tapping fields"
+                  title={autoShow ? 'Auto-popup is ON. Click to disable when using physical keyboard.' : 'Auto-popup is OFF. Click to enable automatic popup.'}
                 >
-                  Auto: {autoShow ? 'ON' : 'OFF'}
+                  <span className={cn('size-1.5 rounded-full', autoShow ? 'bg-primary' : 'bg-muted-foreground/60')} />
+                  <span>Auto: {autoShow ? 'ON' : 'OFF'}</span>
+                </button>
+
+                {/* Minimize / Expand Toggle */}
+                <button
+                  type="button"
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    setIsMinimized((prev) => !prev);
+                  }}
+                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  aria-label={isMinimized ? 'Expand keyboard' : 'Minimize keyboard'}
+                  title={isMinimized ? 'Expand full keyboard' : 'Minimize keyboard'}
+                >
+                  {isMinimized ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
                 </button>
 
                 {/* Hide / Dismiss Button */}
@@ -408,16 +471,75 @@ export default function GlobalVirtualKeyboard() {
                     e.preventDefault();
                     setIsOpen(false);
                   }}
-                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="rounded-lg px-2 py-1 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                   aria-label="Hide keyboard"
-                  title="Hide keyboard"
+                  title="Hide keyboard (Esc)"
                 >
-                  <ChevronDown className="size-4" />
+                  Hide
                 </button>
               </div>
             </div>
 
-            {/* Layouts */}
+            {/* Live Input Preview & Mirror Bar - Guarantees user sees what is typed even if form input is covered */}
+            <div className="flex items-center gap-2 px-3 py-1.5 mb-2 rounded-xl bg-background/90 border border-primary/25 shadow-xs">
+              <span className="text-[11px] font-semibold text-primary uppercase tracking-wider shrink-0 max-w-[120px] sm:max-w-[180px] truncate" title={activeLabel}>
+                {activeLabel ? `${activeLabel}:` : 'Input:'}
+              </span>
+
+              <div className="flex-1 font-mono text-sm sm:text-base font-medium truncate tracking-wide text-foreground min-h-[24px] flex items-center bg-muted/40 px-2.5 py-0.5 rounded-md border border-border/40">
+                {isPassword && !showPasswordText ? (
+                  currentValue ? '•'.repeat(currentValue.length) : <span className="text-muted-foreground/50 italic text-xs font-sans">Enter password...</span>
+                ) : (
+                  currentValue || <span className="text-muted-foreground/50 italic text-xs font-sans">Type here...</span>
+                )}
+                <span className="inline-block w-1.5 h-4 ml-0.5 bg-primary animate-pulse" />
+              </div>
+
+              {isPassword && (
+                <button
+                  type="button"
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    setShowPasswordText((prev) => !prev);
+                  }}
+                  className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted text-xs transition-colors shrink-0"
+                  title={showPasswordText ? 'Hide password' : 'Show password'}
+                >
+                  {showPasswordText ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                </button>
+              )}
+
+              {currentValue.length > 0 && (
+                <button
+                  type="button"
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    handleKeyAction('clear');
+                  }}
+                  className="px-2 py-0.5 rounded text-[11px] font-medium bg-muted hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors shrink-0"
+                  title="Clear field value"
+                >
+                  Clear
+                </button>
+              )}
+
+              <button
+                type="button"
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  handleKeyAction('enter');
+                }}
+                className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shrink-0 flex items-center gap-1 shadow-xs"
+                title="Submit / Next"
+              >
+                <CornerDownLeft className="size-3" />
+                <span>Done</span>
+              </button>
+            </div>
+
+            {/* Layouts (Collapsible) */}
+            {!isMinimized && (
+              <>
             {mode === 'numpad' ? (
               /* ── NUMPAD LAYOUT ── */
               <div className="grid grid-cols-4 gap-2 max-w-md mx-auto py-1">
@@ -657,6 +779,8 @@ export default function GlobalVirtualKeyboard() {
                   </button>
                 </div>
               </div>
+            )}
+              </>
             )}
           </div>
         </div>

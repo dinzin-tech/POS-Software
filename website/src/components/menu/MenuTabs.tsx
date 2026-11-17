@@ -17,24 +17,24 @@ export default function MenuTabs({
   const displayCategories = categories.length > 0 ? categories : menuCategories;
 
   return (
-    <div className="relative border-b border-[var(--ks-gold-hairline)] pb-2">
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 touch-pan-x">
+    <div className="relative pb-1">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 touch-pan-x scroll-smooth">
         {displayCategories.map((category) => {
           const isActive = activeCategory === category.id;
           return (
             <button
               key={category.id}
               onClick={() => onSelectCategory(category.id)}
-              className={`relative px-3.5 py-2 rounded-[2px] text-xs font-medium tracking-[0.06em] uppercase whitespace-nowrap transition-all duration-150 shrink-0 border min-h-[36px] flex items-center active:scale-[0.98] ${
+              className={`relative px-4 py-2 rounded-full text-xs font-semibold tracking-wide uppercase whitespace-nowrap transition-all duration-150 shrink-0 border min-h-[36px] flex items-center active:scale-[0.97] ${
                 isActive
-                  ? 'border-[var(--ks-kinpaku)] bg-[var(--ks-kinpaku)] text-[var(--ks-dark-ink)] font-semibold'
+                  ? 'border-[var(--ks-kinpaku)] bg-[var(--ks-kinpaku)] text-[var(--ks-dark-ink)] shadow-md'
                   : 'border-[var(--ks-gold-hairline)] bg-[var(--ks-graphite)] text-[var(--ks-text-muted)] hover:text-[var(--ks-champagne)] hover:border-[var(--ks-gold-hairline-strong)]'
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="activeCategoryPill"
-                  className="absolute inset-0 bg-[var(--ks-kinpaku)] rounded-[2px] z-0"
+                  className="absolute inset-0 bg-[var(--ks-kinpaku)] rounded-full z-0"
                   transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                 />
               )}

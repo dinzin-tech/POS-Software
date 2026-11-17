@@ -77,10 +77,10 @@ export default function Hero() {
           </a>
 
           <a
-            href="#signature"
+            href="#menu"
             className="w-full sm:w-auto ks-btn-secondary min-h-[46px] px-8 text-center justify-center"
           >
-            <span>Explore Bestsellers</span>
+            <span>Explore Menu</span>
           </a>
         </motion.div>
 
@@ -130,7 +130,7 @@ export default function Hero() {
 
         {/* Subtle Scroll Down Anchor */}
         <div className="mt-12 text-[var(--ks-text-muted)] hover:text-[var(--ks-champagne)] transition-colors">
-          <a href="#signature" aria-label="Scroll to Signature Dishes" className="flex flex-col items-center gap-1.5">
+          <a href="#menu" aria-label="Scroll to Menu" className="flex flex-col items-center gap-1.5">
             <span className="text-xs uppercase font-mono tracking-[0.16em]">Explore Offerings</span>
             <ArrowDown className="w-3.5 h-3.5 text-[var(--ks-kinpaku)]" />
           </a>

@@ -121,11 +121,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#signature" className="hover:text-[var(--ks-kinpaku)] transition-colors">
-                  Signature Buckets
-                </Link>
-              </li>
-              <li>
                 <Link href="/#story" className="hover:text-[var(--ks-kinpaku)] transition-colors">
                   Our Craft & Story
                 </Link>

@@ -57,8 +57,20 @@ Module._load = function (request, parent, isMain) {
     return {
       app: mockApp,
       // Stub anything else that might be imported at module level
-      BrowserWindow: class {},
-      ipcMain: { handle: () => {}, on: () => {} },
+      BrowserWindow: class {
+        constructor() {
+          this.webContents = {
+            on: () => {},
+            removeListener: () => {},
+            loadURL: () => Promise.resolve(),
+          };
+        }
+        on() {}
+        removeListener() {}
+        isDestroyed() { return false; }
+        close() {}
+      },
+      ipcMain: { handle: () => {}, on: () => {}, removeListener: () => {} },
       dialog: {},
       shell: {},
       Menu: { buildFromTemplate: () => ({}), setApplicationMenu: () => {} },

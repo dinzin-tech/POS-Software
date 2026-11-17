@@ -37,7 +37,6 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Menu', href: '/#menu' },
-    { name: 'Signature Dishes', href: '/#signature' },
     { name: 'Our Craft', href: '/#story' },
     { name: 'Ambiance', href: '/#gallery' },
     { name: 'Reviews', href: '/#reviews' },

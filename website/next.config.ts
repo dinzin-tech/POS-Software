@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const isExport = process.env.BUILD_MODE === 'export';
 
 const nextConfig: NextConfig = {
+  experimental: {
+    agentUpgrade: 'security',
+  },
   ...(isExport
     ? {
         output: 'export',

@@ -102,9 +102,9 @@ export default function FullMenu() {
           </div>
         </div>
 
-        {/* Filter Controls: Search + Veg Switch + Spice Filter */}
-        <div className="mb-8 space-y-3 sm:space-y-4">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        {/* Filter Controls: Sticky Search + Veg Switch + Spice Filter + Categories */}
+        <div className="sticky top-[56px] sm:top-[64px] z-30 bg-[var(--ks-lacquer-black)]/95 backdrop-blur-md pt-2 pb-2 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border-b border-[var(--ks-gold-hairline)] mb-6 space-y-2.5 shadow-lg">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
             {/* Search Input */}
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ks-text-muted)]" />
@@ -112,8 +112,8 @@ export default function FullMenu() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search crispy buckets, burgers, rolls, drinks..."
-                className="w-full pl-10 pr-9 py-2.5 rounded-[4px] bg-[var(--ks-graphite)] border border-[var(--ks-gold-hairline)] text-xs sm:text-sm text-[var(--ks-champagne)] placeholder-[var(--ks-text-muted)] focus:border-[var(--ks-kinpaku)] focus:outline-none transition-colors min-h-[42px]"
+                placeholder="Search chicken, burgers, combos, rolls..."
+                className="w-full pl-10 pr-9 py-2 rounded-full bg-[var(--ks-graphite)] border border-[var(--ks-gold-hairline)] text-xs sm:text-sm text-[var(--ks-champagne)] placeholder-[var(--ks-text-muted)] focus:border-[var(--ks-kinpaku)] focus:outline-none transition-colors min-h-[38px]"
               />
               {searchQuery && (
                 <button
@@ -131,29 +131,29 @@ export default function FullMenu() {
               {/* Pure Veg Toggle */}
               <button
                 onClick={() => setVegOnly(!vegOnly)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium tracking-wide border transition-all shrink-0 min-h-[36px] ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide border transition-all shrink-0 min-h-[34px] ${
                   vegOnly
-                    ? 'bg-[oklch(70%_0.12_188_/_0.15)] text-[var(--ks-patina)] border-[var(--ks-patina)]'
+                    ? 'bg-emerald-950/40 text-emerald-400 border-emerald-500 shadow-sm'
                     : 'bg-[var(--ks-graphite)] text-[var(--ks-text-muted)] border-[var(--ks-gold-hairline)] hover:border-[var(--ks-gold-hairline-strong)]'
                 }`}
               >
-                <span className="w-3 h-3 rounded-full border border-emerald-500 flex items-center justify-center">
+                <span className="w-3.5 h-3.5 rounded-[2px] border border-emerald-500 bg-[var(--ks-lacquer-deep)] flex items-center justify-center">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 </span>
-                <span>Pure Veg</span>
+                <span>Veg Only</span>
               </button>
 
               {/* Spice Filter Selector with horizontal scroll on narrow mobile screens */}
               <div className="overflow-x-auto no-scrollbar max-w-full">
-                <div className="flex items-center gap-1 bg-[var(--ks-graphite)] rounded-[4px] border border-[var(--ks-gold-hairline)] p-0.5 text-xs whitespace-nowrap shrink-0">
-                  <span className="px-2 text-xs uppercase font-mono font-semibold text-[var(--ks-text-muted)]">Spice:</span>
+                <div className="flex items-center gap-1 bg-[var(--ks-graphite)] rounded-full border border-[var(--ks-gold-hairline)] p-0.5 text-xs whitespace-nowrap shrink-0">
+                  <span className="px-2 text-[10px] uppercase font-mono font-bold text-[var(--ks-text-muted)]">Spice:</span>
                   {(['all', 'mild', 'medium', 'hot', 'peri-peri'] as const).map((level) => (
                     <button
                       key={level}
                       onClick={() => setSelectedSpice(level)}
-                      className={`px-2.5 py-1.5 rounded-[2px] text-xs font-medium capitalize transition-colors min-h-[32px] ${
+                      className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize transition-colors min-h-[30px] ${
                         selectedSpice === level
-                          ? 'bg-[var(--ks-kinpaku)] text-[var(--ks-dark-ink)] font-semibold'
+                          ? 'bg-[var(--ks-kinpaku)] text-[var(--ks-dark-ink)] font-bold'
                           : 'text-[var(--ks-text-muted)] hover:text-[var(--ks-champagne)]'
                       }`}
                     >
@@ -173,24 +173,30 @@ export default function FullMenu() {
           />
         </div>
 
-        {/* Results Count & Active Filters Indicator */}
-        <div className="flex items-center justify-between text-xs text-[var(--ks-text-muted)] mb-6 font-mono">
-          <span>
-            Showing <strong className="text-[var(--ks-champagne)] font-mono-num">{filteredItems.length}</strong> items
-          </span>
+        {/* Results Count & Active Category Header (Swiggy / Zomato style) */}
+        <div className="flex items-center justify-between text-xs text-[var(--ks-text-muted)] mb-4 font-mono">
+          <div className="flex items-baseline gap-2">
+            <span className="text-sm font-semibold text-[var(--ks-champagne)] font-title">
+              {categories.find((c) => c.id === activeCategory)?.name || (activeCategory === 'all' ? 'All Items' : activeCategory)}
+            </span>
+            <span className="font-mono text-xs text-[var(--ks-text-muted)]">
+              ({filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'})
+            </span>
+          </div>
+
           {(vegOnly || selectedSpice !== 'all' || searchQuery || activeCategory !== 'all') && (
             <button
               onClick={resetFilters}
-              className="text-[var(--ks-kinpaku)] hover:underline flex items-center gap-1 font-semibold"
+              className="text-[var(--ks-kinpaku)] hover:underline flex items-center gap-1 font-semibold text-xs"
             >
-              Reset all filters
+              Reset filters
             </button>
           )}
         </div>
 
         {/* Dish Grid */}
         {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 pb-28">
             <AnimatePresence>
               {filteredItems.map((item) => (
                 <motion.div

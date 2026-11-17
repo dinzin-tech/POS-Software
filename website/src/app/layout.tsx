@@ -3,6 +3,7 @@ import { Alumni_Sans, Albert_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { siteConfig } from '@/config/site';
 import CartDrawer from '@/components/cart/CartDrawer';
+import BottomCartBar from '@/components/cart/BottomCartBar';
 import FloatingWhatsApp from '@/components/ui/FloatingWhatsApp';
 
 const alumni = Alumni_Sans({
@@ -132,6 +133,7 @@ export default function RootLayout({
       <body className="font-sans bg-[var(--ks-lacquer-black)] text-[var(--ks-text-warm)] min-h-screen selection:bg-[var(--ks-kinpaku)] selection:text-[var(--ks-dark-ink)] relative antialiased">
         {children}
         <CartDrawer />
+        <BottomCartBar />
         <FloatingWhatsApp />
       </body>
     </html>

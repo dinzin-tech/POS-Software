@@ -639,7 +639,7 @@ if ($action === 'submit_order' || $action === 'order') {
         'payment_id' => $paymentId,
         'store_name' => 'Five Star',
         'store_address' => 'Lohith Nagara, Nelmangala.',
-        'store_phone' => '+919353333945',
+        'store_phone' => '+918151021943',
         'stored_at' => time(),
         'expires_at' => time() + $retentionSeconds,
     ];

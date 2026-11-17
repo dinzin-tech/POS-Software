@@ -162,7 +162,7 @@ if ($id !== '') {
                                 'payment_id' => $ord['payment_id'] ?? '',
                                 'store_name' => 'Five Star',
                                 'store_address' => 'Lohith Nagara, Nelmangala.',
-                                'store_phone' => '+919353333945',
+                                'store_phone' => '+918151021943',
                             ];
                             break 2;
                         }
@@ -179,7 +179,7 @@ if ($id !== '') {
 // Variables for display
 $storeName = $receiptData['store_name'] ?? 'Five Star';
 $storeAddress = $receiptData['store_address'] ?? 'Lohith Nagara, Nelmangala.';
-$storePhone = $receiptData['store_phone'] ?? '+919353333945';
+$storePhone = $receiptData['store_phone'] ?? '+918151021943';
 $orderNumber = $receiptData['order_number'] ?? ($id ?: 'ONLINE');
 $billNumber = $receiptData['bill_number'] ?? ('INV-' . substr(md5($id ?: '1'), 0, 4));
 $onlineOrderId = $receiptData['online_order_id'] ?? ($receiptData['receipt_id'] ?? $id);
@@ -565,7 +565,7 @@ $isPaidInFull = ($paymentStatus === 'PAID') || ($paidAmount >= $total && $total 
         This receipt was created over <strong>4 days ago</strong> and has been securely purged per our 4-day retention policy.
       </p>
       <p>
-        If you need an invoice copy for accounting, please contact Five Star Chicken Nelamangala at <strong>+91 93533 33945</strong>.
+        If you need an invoice copy for accounting, please contact Five Star Chicken Nelamangala at <strong>+91 81510 21943</strong>.
       </p>
       <a href="/" class="btn btn-secondary">← Back to Five Star Website</a>
     </div>
@@ -729,7 +729,7 @@ $isPaidInFull = ($paymentStatus === 'PAID') || ($paidAmount >= $total && $total 
         🖨️ Print / Save Receipt (PDF)
       </button>
 
-      <a href="https://wa.me/919353333945?text=<?php echo urlencode('Hi Five Star Chicken, regarding order #' . $orderNumber . ' (' . $billNumber . ')'); ?>" 
+      <a href="https://wa.me/918151021943?text=<?php echo urlencode('Hi Five Star Chicken, regarding order #' . $orderNumber . ' (' . $billNumber . ')'); ?>" 
          target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
         💬 Message Restaurant on WhatsApp
       </a>

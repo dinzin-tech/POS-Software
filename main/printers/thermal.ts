@@ -1559,6 +1559,10 @@ async function rasterizeReceiptIfEnabled(
     requestPrefix: 'receipt',
   }, document.rasterGroups);
   if (result.rasterFailed) {
+    if (!hasFinancialPrintWarning(prepared.warnings)) {
+      console.warn('[Printer] Raster rendering failed, falling back to native thermal text receipt');
+      return prepared;
+    }
     return { ...prepared, warnings: [...prepared.warnings, ...result.warnings] };
   }
   return result.rasterSelected

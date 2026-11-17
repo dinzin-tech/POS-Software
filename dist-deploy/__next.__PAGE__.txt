@@ -1,33 +1,33 @@
 1:"$Sreact.fragment"
-3:"/_next/static/chunks/42onvq6nokjl2.js"
-4:"/_next/static/chunks/1arciis-9fnxb.js"
-5:"/_next/static/chunks/1847jkzvpf__t.js"
+3:"/_next/static/chunks/1ua2kfq9s-me6.js"
+4:"/_next/static/chunks/264mvcjgoewwa.js"
+5:"/_next/static/chunks/1qinhqdjdktqv.js"
 6:I[39756,["$3","$4","$5"],"default"]
 7:I[37457,["$3","$4","$5"],"default"]
 8:I[35171,["$3","$4","$5"],"default"]
-9:I[17866,["$3","$4","$5"],"default"]
-d:"/_next/static/chunks/1j5-df7ps0j1i.js"
-e:"/_next/static/chunks/27qt-5dgh2fse.js"
-f:I[3265,["$3","$4","$5","$d","$e"],"default"]
-10:I[77258,["$3","$4","$5","$d","$e"],"default"]
-11:I[23824,["$3","$4","$5","$d","$e"],"default"]
-12:I[97048,["$3","$4","$5","$d","$e"],"default"]
-13:I[56505,["$3","$4","$5","$d","$e"],"default"]
-14:I[94812,["$3","$4","$5","$d","$e"],"default"]
-15:I[37528,["$3","$4","$5","$d","$e"],"default"]
-16:I[50380,["$3","$4","$5","$d","$e"],"default"]
-17:I[52190,["$3","$4","$5","$d","$e"],"default"]
-18:I[58234,["$3","$4","$5","$d","$e"],"default"]
+9:I[64455,["$3","$4","$5"],"default"]
+a:I[17866,["$3","$4","$5"],"default"]
+e:"/_next/static/chunks/347typ6ybf7t0.js"
+f:"/_next/static/chunks/16ovjaby93gu1.js"
+10:I[3265,["$3","$4","$5","$e","$f"],"default"]
+11:I[77258,["$3","$4","$5","$e","$f"],"default"]
+12:I[97048,["$3","$4","$5","$e","$f"],"default"]
+13:I[56505,["$3","$4","$5","$e","$f"],"default"]
+14:I[94812,["$3","$4","$5","$e","$f"],"default"]
+15:I[37528,["$3","$4","$5","$e","$f"],"default"]
+16:I[50380,["$3","$4","$5","$e","$f"],"default"]
+17:I[52190,["$3","$4","$5","$e","$f"],"default"]
+18:I[58234,["$3","$4","$5","$e","$f"],"default"]
 19:I[97367,["$3","$4","$5"],"OutletBoundary"]
 1a:"$Sreact.suspense"
 1d:"ViewportBoundary"
 1e:I[97367,["$3","$4","$5"],"$1d"]
 1f:"MetadataBoundary"
 20:I[97367,["$3","$4","$5"],"$1f"]
-:HL["/_next/static/chunks/2k2vmtq2rq2xb.css","style"]
-2:T436,{"@context":"https://schema.org","@type":"Restaurant","name":"Five Star Chicken Restaurant","legalName":"CHANDU ENTERPRISES","taxID":"29CVIPR3058J1ZY","image":["/images/menu/signature-chicken-bucket.jpg","/images/interior/dining-hall-world-map.jpg"],"@id":"https://fivestarchicken-nelamangala.in","url":"https://fivestarchicken-nelamangala.in","telephone":"+91 98864 38778","menu":"https://fivestarchicken-nelamangala.in/#menu","servesCuisine":["100% Halal Fried Chicken","Burgers","Fast Food","Snacks"],"priceRange":"₹₹","address":{"@type":"PostalAddress","streetAddress":"Ground Floor, No. 131, Kasaba Hobali, Binnamangala, Arasinakunte, Nelamangala, Bengaluru Rural, Karnataka - 562123","addressLocality":"Nelamangala","addressRegion":"Karnataka","postalCode":"562123","addressCountry":"IN"},"geo":{"@type":"GeoCoordinates","latitude":13.088689750966637,"longitude":77.41090161024658},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"11:00","closes":"23:00"}]}b:X
-c:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","main",null,{"className":"min-h-screen bg-[var(--ks-lacquer-black)] text-[var(--ks-text-warm)]","children":[["$","$Lf",null,{}],["$","$L10",null,{}],["$","$L11",null,{}],["$","$L12",null,{}],["$","$L13",null,{}],["$","$L14",null,{}],["$","$L15",null,{}],["$","$L16",null,{}],["$","$L17",null,{}],["$","$L18",null,{}]]}],[["$","script","script-0",{"src":"/_next/static/chunks/1j5-df7ps0j1i.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/27qt-5dgh2fse.js","async":true}]],["$","$L19",null,{"children":["$","$1a",null,{"name":"Next.MetadataOutlet","children":"$@1b"}]}]]}],"p":"$@1c","v":null,"s":"$b"}}]]
-0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/2k2vmtq2rq2xb.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/42onvq6nokjl2.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/1arciis-9fnxb.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/1847jkzvpf__t.js","async":true}]],["$","html",null,{"lang":"en","className":"ll1faa_variable nl-EQG_variable gwGESa_variable scroll-smooth","children":[["$","head",null,{"children":["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"$2"}}]}],["$","body",null,{"className":"font-sans bg-[var(--ks-lacquer-black)] text-[var(--ks-text-warm)] min-h-screen selection:bg-[var(--ks-kinpaku)] selection:text-[var(--ks-dark-ink)] relative antialiased","children":[["$","$L6",null,{"parallelRouterKey":"children","template":["$","$L7",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}],["$","$L8",null,{}],["$","$L9",null,{}]]}]]}]]}],"p":"$@a","v":null,"s":"$b"},"c":"$Qc"},"h":{"r":["$","$1","h",{"children":[null,["$","$L1e",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","$L20",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$1a",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Five Star Chicken Restaurant | Nelamangala Flagship"}],["$","meta","1",{"name":"description","content":"The Upgraded Dine-In Restaurant by Five Star Chicken. Authentic pressure-fried crispy chicken, gourmet burgers, loaded combos, and decadent treats in Nelamangala, Bengaluru. Order online directly via WhatsApp!"}],["$","meta","2",{"name":"author","content":"Five Star Chicken Restaurant"}],["$","meta","3",{"name":"keywords","content":"Five Star Chicken Nelamangala,100% Halal Cut Chicken Nelamangala,Halal Fried Chicken Bengaluru,Fried Chicken Nelamangala,Crispy Chicken Bengaluru,Chicken Burgers Nelamangala,Online Chicken Delivery Nelamangala,Five Star Restaurant NH48"}],"$L21","$L22","$L23","$L24","$L25","$L26","$L27","$L28","$L29","$L2a","$L2b","$L2c","$L2d","$L2e","$L2f","$L30","$L31","$L32"]}]}],null]}],"$L33"]}],"p":"$@34","v":null,"s":"$b"}},"a":"$@35","u":"$@36","b":"N6JMFUXukIg4NrgUJy9BL"}
+:HL["/_next/static/chunks/05eet4hflkv9f.css","style"]
+2:T436,{"@context":"https://schema.org","@type":"Restaurant","name":"Five Star Chicken Restaurant","legalName":"CHANDU ENTERPRISES","taxID":"29CVIPR3058J1ZY","image":["/images/menu/signature-chicken-bucket.jpg","/images/interior/dining-hall-world-map.jpg"],"@id":"https://fivestarchicken-nelamangala.in","url":"https://fivestarchicken-nelamangala.in","telephone":"+91 98864 38778","menu":"https://fivestarchicken-nelamangala.in/#menu","servesCuisine":["100% Halal Fried Chicken","Burgers","Fast Food","Snacks"],"priceRange":"₹₹","address":{"@type":"PostalAddress","streetAddress":"Ground Floor, No. 131, Kasaba Hobali, Binnamangala, Arasinakunte, Nelamangala, Bengaluru Rural, Karnataka - 562123","addressLocality":"Nelamangala","addressRegion":"Karnataka","postalCode":"562123","addressCountry":"IN"},"geo":{"@type":"GeoCoordinates","latitude":13.088689750966637,"longitude":77.41090161024658},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"11:00","closes":"23:00"}]}c:X
+d:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","main",null,{"className":"min-h-screen bg-[var(--ks-lacquer-black)] text-[var(--ks-text-warm)]","children":[["$","$L10",null,{}],["$","$L11",null,{}],["$","$L12",null,{}],["$","$L13",null,{}],["$","$L14",null,{}],["$","$L15",null,{}],["$","$L16",null,{}],["$","$L17",null,{}],["$","$L18",null,{}]]}],[["$","script","script-0",{"src":"/_next/static/chunks/347typ6ybf7t0.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/16ovjaby93gu1.js","async":true}]],["$","$L19",null,{"children":["$","$1a",null,{"name":"Next.MetadataOutlet","children":"$@1b"}]}]]}],"p":"$@1c","v":null,"s":"$c"}}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/05eet4hflkv9f.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/1ua2kfq9s-me6.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/264mvcjgoewwa.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/1qinhqdjdktqv.js","async":true}]],["$","html",null,{"lang":"en","className":"ll1faa_variable nl-EQG_variable gwGESa_variable scroll-smooth","children":[["$","head",null,{"children":["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"$2"}}]}],["$","body",null,{"className":"font-sans bg-[var(--ks-lacquer-black)] text-[var(--ks-text-warm)] min-h-screen selection:bg-[var(--ks-kinpaku)] selection:text-[var(--ks-dark-ink)] relative antialiased","children":[["$","$L6",null,{"parallelRouterKey":"children","template":["$","$L7",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}],["$","$L8",null,{}],["$","$L9",null,{}],["$","$La",null,{}]]}]]}]]}],"p":"$@b","v":null,"s":"$c"},"c":"$Qd"},"h":{"r":["$","$1","h",{"children":[null,["$","$L1e",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","$L20",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$1a",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Five Star Chicken Restaurant | Nelamangala Flagship"}],["$","meta","1",{"name":"description","content":"The Upgraded Dine-In Restaurant by Five Star Chicken. Authentic pressure-fried crispy chicken, gourmet burgers, loaded combos, and decadent treats in Nelamangala, Bengaluru. Order online directly via WhatsApp!"}],["$","meta","2",{"name":"author","content":"Five Star Chicken Restaurant"}],["$","meta","3",{"name":"keywords","content":"Five Star Chicken Nelamangala,100% Halal Cut Chicken Nelamangala,Halal Fried Chicken Bengaluru,Fried Chicken Nelamangala,Crispy Chicken Bengaluru,Chicken Burgers Nelamangala,Online Chicken Delivery Nelamangala,Five Star Restaurant NH48"}],"$L21","$L22","$L23","$L24","$L25","$L26","$L27","$L28","$L29","$L2a","$L2b","$L2c","$L2d","$L2e","$L2f","$L30","$L31","$L32"]}]}],null]}],"$L33"]}],"p":"$@34","v":null,"s":"$c"}},"a":"$@35","u":"$@36","b":"opQd2Ky59Tj2mcs-1hqOr"}
 37:I[27201,["$3","$4","$5"],"IconMark"]
 1b:null
 21:["$","meta","4",{"property":"og:title","content":"Five Star Chicken Restaurant | Nelamangala Flagship"}]
@@ -49,10 +49,10 @@ c:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$",
 31:["$","link","20",{"rel":"apple-touch-icon","href":"/images/logo/five-star-emblem.png"}]
 32:["$","$L37","21",{}]
 33:["$","meta",null,{"name":"next-size-adjust","content":""}]
-b:300
+c:300
 36:true
-b:C
+c:C
 35:0
-a:"$undefined"
+b:"$undefined"
 34:"$undefined"
 1c:"$undefined"

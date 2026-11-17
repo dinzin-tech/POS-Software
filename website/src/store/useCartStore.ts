@@ -10,7 +10,7 @@ interface CartState {
   specialInstructions: string;
 
   // Actions
-  addItem: (item: MenuItem, quantity?: number, instructions?: string) => void;
+  addItem: (item: MenuItem, quantity?: number, instructions?: string, openDrawer?: boolean) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -38,7 +38,7 @@ export const useCartStore = create<CartState>()(
       tableNumber: '',
       specialInstructions: '',
 
-      addItem: (item, quantity = 1, instructions = '') => {
+      addItem: (item, quantity = 1, instructions = '', openDrawer = false) => {
         set((state) => {
           const existingIndex = state.items.findIndex((i) => i.item.id === item.id);
           if (existingIndex > -1) {
@@ -47,11 +47,11 @@ export const useCartStore = create<CartState>()(
             if (instructions) {
               updated[existingIndex].instructions = instructions;
             }
-            return { items: updated, isOpen: true };
+            return { items: updated, ...(openDrawer ? { isOpen: true } : {}) };
           }
           return {
             items: [...state.items, { item, quantity, instructions }],
-            isOpen: true,
+            ...(openDrawer ? { isOpen: true } : {}),
           };
         });
       },
