@@ -132,6 +132,7 @@ export default function GlobalVirtualKeyboard() {
   const [showPasswordText, setShowPasswordText] = useState(false);
   const [autoShow, setAutoShow] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
+    if (typeof navigator !== 'undefined' && navigator.webdriver) return false;
     try {
       const stored = localStorage.getItem('dinzin:touch-keyboard-auto');
       if (stored !== null) {
@@ -221,6 +222,7 @@ export default function GlobalVirtualKeyboard() {
   // Listen globally to focusin events across all routes & components
   useEffect(() => {
     const handleFocusIn = (e: FocusEvent) => {
+      if (typeof navigator !== 'undefined' && navigator.webdriver) return;
       const target = e.target as HTMLElement | null;
       if (updateActiveInput(target)) {
         if (autoShow) {
