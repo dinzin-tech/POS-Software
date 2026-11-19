@@ -365,7 +365,7 @@ export default function OrdersPage() {
 
     connectWS();
 
-    const cleanupOnlineOrders = (window as any).electronAPI?.onOnlineOrderReceived?.((data: { id: number; orderNumber: string }) => {
+    const cleanupOnlineOrders = window.electronAPI?.onOnlineOrderReceived?.((data) => {
       fetchOrders();
       toast.success(`Online Order #${data.orderNumber} arrived!`, { duration: 6000 });
     });

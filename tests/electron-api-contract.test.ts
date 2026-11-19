@@ -79,7 +79,7 @@ async function run(): Promise<void> {
     'backupDatabase', 'checkForUpdates', 'dbApplySafeFixes', 'dbHealthCheck',
     'dbInitialize', 'getAppInfo', 'getApplicationMenu', 'getBetaChannel', 'getKdsInfo',
     'getLogTail', 'getMasterPinStatus', 'getPrinters', 'getSettings', 'getStatus', 'getUpdateStatus',
-    'getWindowState', 'onMenuAction', 'onUpdateStatus', 'onWindowStateChanged', 'openApplicationMenu', 'openKdsWindow', 'openWhatsAppShare', 'pickRestoreFile', 'platform', 'reportRendererError', 'restartAndInstall',
+    'getWindowState', 'onMenuAction', 'onOnlineOrderReceived', 'onUpdateStatus', 'onWindowStateChanged', 'openApplicationMenu', 'openKdsWindow', 'openWhatsAppShare', 'pickRestoreFile', 'platform', 'reportRendererError', 'restartAndInstall',
     'rasterizeKotDocument', 'rasterizePrintDocument', 'restoreBackup', 'setBetaChannel', 'setSetting', 'setThemeEffective',
     'windowAction', 'windowReady',
   ].sort());
@@ -138,6 +138,16 @@ async function run(): Promise<void> {
   assert.deepEqual(receivedWindowStates, [windowStatePayload]);
   unsubscribeWindowState();
   assert.equal(eventHandlers.has('window-state-changed'), false);
+
+  const receivedOrders: unknown[] = [];
+  const unsubscribeOrders = (exposedApi!['onOnlineOrderReceived'] as (callback: (data: unknown) => void) => () => void)(
+    (data) => receivedOrders.push(data),
+  );
+  const sampleOrder = { id: 10, orderNumber: 'ORD-10' };
+  eventHandlers.get('online-order-received')?.({}, sampleOrder);
+  assert.deepEqual(receivedOrders, [sampleOrder]);
+  unsubscribeOrders();
+  assert.equal(eventHandlers.has('online-order-received'), false);
 
   assert.deepEqual(calls, [
     { channel: 'get-settings', args: [] },

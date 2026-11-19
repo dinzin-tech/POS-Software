@@ -78,6 +78,9 @@ export interface ElectronAPI {
   // to install; a denied request resolves with success:false instead of restarting.
   restartAndInstall: (pin?: string) => Promise<ElectronActionResult>;
 
+  // Online orders
+  onOnlineOrderReceived?: (callback: (data: { id: number; orderNumber: string }) => void) => () => void;
+
   // Platform
   platform: string;
 }

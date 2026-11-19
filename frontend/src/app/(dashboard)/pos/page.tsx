@@ -412,7 +412,7 @@ export default function POSPage() {
     syncFullscreen();
     document.addEventListener('fullscreenchange', syncFullscreen);
 
-    const cleanupOnlineOrders = (window as any).electronAPI?.onOnlineOrderReceived?.((data: { id: number; orderNumber: string }) => {
+    const cleanupOnlineOrders = window.electronAPI?.onOnlineOrderReceived?.((data) => {
       toast.success(`Online Order #${data.orderNumber} arrived!`, { duration: 6000 });
     });
 
