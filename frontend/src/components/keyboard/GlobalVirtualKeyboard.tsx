@@ -131,7 +131,7 @@ export default function GlobalVirtualKeyboard() {
   const [isPassword, setIsPassword] = useState(false);
   const [showPasswordText, setShowPasswordText] = useState(false);
   const [autoShow, setAutoShow] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
+    if (typeof window === 'undefined') return false;
     if (typeof navigator !== 'undefined' && navigator.webdriver) return false;
     try {
       const stored = localStorage.getItem('dinzin:touch-keyboard-auto');
@@ -139,7 +139,15 @@ export default function GlobalVirtualKeyboard() {
         return stored === 'true';
       }
     } catch {}
-    return true;
+    if (
+      typeof window !== 'undefined' &&
+      typeof navigator !== 'undefined' &&
+      navigator.maxTouchPoints > 0 &&
+      window.matchMedia?.('(pointer: coarse)').matches
+    ) {
+      return true;
+    }
+    return false;
   });
 
   const activeElementRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);

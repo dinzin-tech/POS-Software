@@ -15,7 +15,7 @@ const POSTPAID_ATTEMPT_PREFIX = 'flo.postpaid.order.attempt';
 const PREPAID_ATTEMPT_KEY = 'flo.prepaid.checkout.attempt';
 
 const STORAGE_UNAVAILABLE_MESSAGE =
-  'Order not saved because this device is blocking local storage. Free up disk space or restart FloCafe, then try again.';
+  /Order not saved because this device is blocking local storage\. Free up disk space or restart (DinZin|FloCafe), then try again\./;
 
 interface StorageBlockOptions {
   prefixes: string[];
