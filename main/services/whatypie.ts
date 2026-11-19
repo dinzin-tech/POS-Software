@@ -269,20 +269,21 @@ export function resolveTemplateVariables(
 
   // Fast-track: Exact positional mapping for approved fivestar_bill_receipt template
   // Variables in Meta positional order:
-  // 1: storeName, 2: orderNumber, 3: billNumber, 4: customerName, 5: type,
-  // 10: itemsSummary, 6: total, 7: paymentStatus, 8: receiptUrl, 9: storePhone
+  // {{1}}: businessName, {{2}}: orderNumber, {{3}}: billNumber, {{4}}: customerName, {{5}}: orderType,
+  // {{6}}: totalAmount, {{7}}: paymentStatus, {{8}}: receiptUrl, {{9}}: storePhone, {{10}}: itemsSummary
   if (template.name === 'fivestar_bill_receipt') {
+    const cleanTotal = totalAmount ? String(totalAmount).replace(/^[₹$\s]+/, '') : '0.00';
     const fivestarDefaults = [
-      businessName,
-      ctx.orderNumber || billOrOrder,
-      ctx.billNumber || billOrOrder,
-      customerName,
-      orderType,
-      itemsSummary,
-      totalAmount,
-      paymentStatus,
-      receiptUrl,
-      storePhone,
+      businessName,                   // {{1}} Business / Store Name
+      ctx.orderNumber || billOrOrder, // {{2}} Order No
+      ctx.billNumber || billOrOrder,  // {{3}} Invoice No
+      customerName,                   // {{4}} Customer Name
+      orderType,                      // {{5}} Order Type (Dine-in / Takeaway / Online)
+      cleanTotal,                     // {{6}} Total Amount
+      paymentStatus,                  // {{7}} Payment Status (PAID / Pay at Counter)
+      receiptUrl,                     // {{8}} Digital Bill Receipt URL
+      storePhone,                     // {{9}} Store Phone Number
+      itemsSummary,                   // {{10}} Items Ordered list
     ];
     return fivestarDefaults.slice(0, expectedCount).map((defVal, idx) => {
       const explicitVal =
@@ -514,22 +515,25 @@ export async function sendWhatyPieMessage(params: SendWhatyPieParams): Promise<S
         const bNum = ctx.billNumber || oNum;
         const cName = ctx.customerName || 'Valued Customer';
         const oType = ctx.orderType || 'Takeaway';
-        const itms = ctx.itemsSummary || 'Order Items';
-        const tot = ctx.totalAmount || '0.00';
+        const tot = ctx.totalAmount ? String(ctx.totalAmount).replace(/^[₹$\s]+/, '') : '0.00';
         const pStatus = ctx.paymentStatus || 'PAID';
         const rUrl = ctx.receiptUrl || 'https://fivestarnelamangala.in';
-        const sPhone = ctx.storePhone || '+91 98864 38778';
+        const sPhone = ctx.storePhone || getSettingValue('phone') || getSettingValue('business_phone') || getSettingValue('whatypie_sender_phone') || '+91 93533 33945';
+        const itms = ctx.itemsSummary || 'Order Items';
+        // Meta parameter mapping:
+        // {{1}}: businessName, {{2}}: orderNumber, {{3}}: billNumber, {{4}}: customerName, {{5}}: orderType,
+        // {{6}}: totalAmount, {{7}}: paymentStatus, {{8}}: receiptUrl, {{9}}: storePhone, {{10}}: itemsSummary
         resolvedVariables = [
           (resolvedVariables?.[0] as string) || bName,
           (resolvedVariables?.[1] as string) || oNum,
           (resolvedVariables?.[2] as string) || bNum,
           (resolvedVariables?.[3] as string) || cName,
           (resolvedVariables?.[4] as string) || oType,
-          (resolvedVariables?.[5] as string) || itms,
-          (resolvedVariables?.[6] as string) || tot,
-          (resolvedVariables?.[7] as string) || pStatus,
-          (resolvedVariables?.[8] as string) || rUrl,
-          (resolvedVariables?.[9] as string) || sPhone,
+          (resolvedVariables?.[5] as string) || tot,
+          (resolvedVariables?.[6] as string) || pStatus,
+          (resolvedVariables?.[7] as string) || rUrl,
+          (resolvedVariables?.[8] as string) || sPhone,
+          (resolvedVariables?.[9] as string) || itms,
         ];
       }
     } catch (tmplErr) {
@@ -665,9 +669,12 @@ export async function sendWhatyPieBillReceipt(
   const db = getDatabase();
   const bill = db.prepare(`
     SELECT b.id, b.bill_number, b.total, b.order_id, b.customer_id, b.created_at,
-           c.name AS customer_name, c.phone AS customer_phone
+           b.payment_status,
+           c.name AS customer_name, c.phone AS customer_phone,
+           o.order_number, o.type AS order_type
     FROM bills b
     LEFT JOIN customers c ON c.id = b.customer_id
+    LEFT JOIN orders o ON o.id = b.order_id
     WHERE b.id = ?
   `).get(billId) as {
     id: number;
@@ -676,8 +683,11 @@ export async function sendWhatyPieBillReceipt(
     order_id: number;
     customer_id: number | null;
     created_at: string;
+    payment_status: string | null;
     customer_name: string | null;
     customer_phone: string | null;
+    order_number: string | null;
+    order_type: string | null;
   } | undefined;
 
   if (!bill) {
@@ -742,7 +752,7 @@ export async function sendWhatyPieBillReceipt(
       payment_method: 'CASH',
       store_name: businessName,
       store_address: getSettingValue('address') || 'Lohith Nagara, Nelmangala.',
-      store_phone: getSettingValue('phone') || '+918151021943',
+      store_phone: getSettingValue('phone') || '+919886426278',
     };
 
     let publishEndpoint = syncUrl;
@@ -772,40 +782,50 @@ export async function sendWhatyPieBillReceipt(
     'Thank you for your visit! 🙏',
   ].join('\n');
 
-  const formattedItemsSummary = items.map((it, idx) => `${idx + 1}. ${it.product_name} x ${it.quantity} = ${currencySymbol}${Number(it.total).toFixed(2)}`).join('\n');
+  const formattedItemsSummary = items.length > 0
+    ? items.map((it, idx) => `${idx + 1}. ${it.product_name} x ${it.quantity} = ${currencySymbol}${Number(it.total).toFixed(0)}`).join('\n')
+    : '1. Order Items';
+
+  const orderType = bill.order_type === 'dine-in' ? 'Dine-In' : bill.order_type === 'delivery' ? 'Delivery' : bill.order_type === 'online' ? 'Online' : 'Takeaway';
+  const paymentStatus = bill.payment_status ? bill.payment_status.toUpperCase() : 'PAID';
+  const cleanTotal = totalAmount.replace(/^[₹$\s]+/, '');
+  const resolvedStorePhone = getSettingValue('phone') || getSettingValue('business_phone') || getSettingValue('whatypie_sender_phone') || '+91 93533 33945';
 
   const templateContext: TemplateVariableContext = {
     businessName,
     billNumber: bill.bill_number,
-    orderNumber: bill.bill_number,
-    totalAmount,
+    orderNumber: bill.order_number || bill.bill_number,
+    totalAmount: cleanTotal,
     currency,
     currencySymbol,
     customerName: bill.customer_name || 'Valued Customer',
     stageLabel: 'Completed',
-    orderType: 'Takeaway',
+    orderType,
     itemsSummary: formattedItemsSummary,
-    paymentStatus: 'PAID',
+    paymentStatus,
     receiptUrl,
-    storePhone: getSettingValue('phone') || '+91 98864 38778',
+    storePhone: resolvedStorePhone,
   };
 
   const isFivestarReceipt = config.templateBill.toLowerCase() === 'fivestar_bill_receipt';
   const isReceiptTemplate =
     config.templateBill.toLowerCase().includes('receipt') ||
     config.templateBill.toLowerCase().includes('bill');
+  // WhatsApp Cloud API positional parameter alignment:
+  // {{1}}: businessName, {{2}}: orderNumber, {{3}}: billNumber, {{4}}: customerName, {{5}}: orderType,
+  // {{6}}: totalAmount, {{7}}: paymentStatus, {{8}}: receiptUrl, {{9}}: storePhone, {{10}}: itemsSummary
   const candidateVariables = isFivestarReceipt
     ? [
-      businessName,
-      bill.bill_number,
-      bill.bill_number,
-      bill.customer_name || 'Valued Customer',
-      'Takeaway',
-      formattedItemsSummary,
-      totalAmount,
-      'PAID',
-      receiptUrl,
-      getSettingValue('phone') || '+91 98864 38778',
+      businessName,                                     // {{1}} Business Name
+      bill.order_number || bill.bill_number,            // {{2}} Order No
+      bill.bill_number,                                 // {{3}} Invoice No
+      bill.customer_name || 'Valued Customer',          // {{4}} Customer Name
+      orderType,                                        // {{5}} Type
+      cleanTotal,                                       // {{6}} Total Amount (e.g. 170.00)
+      paymentStatus,                                    // {{7}} Payment Status (e.g. PAID)
+      receiptUrl,                                       // {{8}} Digital Bill Receipt URL
+      resolvedStorePhone,                               // {{9}} Store Phone
+      formattedItemsSummary,                            // {{10}} Items Ordered list
     ]
     : isReceiptTemplate
       ? [businessName, bill.bill_number, totalAmount, currency]

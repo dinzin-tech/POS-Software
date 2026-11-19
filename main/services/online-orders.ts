@@ -542,7 +542,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
   // 8. Auto Send Bill Receipt via WhatsApp with Digital Receipt Link
   try {
     const storeName = getSettingValue('restaurant_name') || getSettingValue('business_name') || 'Five Star';
-    const storePhone = getSettingValue('phone') || '+918151021943';
+    const storePhone = getSettingValue('phone') || '+919886426278';
     const storeAddress = getSettingValue('address') || 'Lohith Nagara, Nelmangala.';
     const syncUrl = getSettingValue('live_sync_url') || 'https://fivestarnelamangala.in/dashboard/sync.php';
     const apiKey = getSettingValue('live_sync_key') || 'fivestar_pos_2026';
@@ -652,41 +652,43 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
     waText += `Thank you for visiting ${storeName}! ✨\n`;
     waText += `Powered by DinZin (dinzin.in)`;
 
+    const cleanGrandTotal = String(grandTotal).replace(/^[₹$\s]+/, '');
+    const payStatus = isPrepaid
+      ? `PAID ONLINE (${raw.payment_method || 'UPI'})`
+      : 'Pay at Counter';
+    const resolvedStorePhone = getSettingValue('phone') || getSettingValue('business_phone') || getSettingValue('whatypie_sender_phone') || storePhone || '+91 93533 33945';
+
     const wpCfg = whatypie.getWhatyPieConfig();
     const tplContext: whatypie.TemplateVariableContext = {
       businessName: storeName,
       orderNumber: createdOrderNumber ?? undefined,
       billNumber: billNumber ?? undefined,
-      totalAmount: String(grandTotal),
+      totalAmount: cleanGrandTotal,
       currency: getSettingValue('currency') || 'INR',
       currencySymbol: getSettingValue('currency_symbol') || '₹',
       customerName: raw.customer.name || 'Valued Customer',
       stageLabel: isPrepaid ? 'PAID' : 'Pay at Counter',
       orderType: typeStr,
       itemsSummary,
-      paymentStatus: isPrepaid
-        ? `PAID - ${raw.payment_method || 'UPI'} (Ref: ${raw.payment_id || 'Instant'})`
-        : 'Pay at Counter',
+      paymentStatus: payStatus,
       receiptUrl,
-      storePhone,
+      storePhone: resolvedStorePhone,
     };
-    // Build ordered variable list matching fivestar_bill_receipt template slots:
-    // 1: storeName, 2: orderNumber, 3: billNumber, 4: customerName, 5: type,
-    // 10: itemsSummary, 6: total, 7: paymentStatus, 8: receiptUrl, 9: storePhone
+    // Build ordered variable list matching approved fivestar_bill_receipt template slots:
+    // {{1}}: storeName, {{2}}: orderNumber, {{3}}: billNumber, {{4}}: customerName, {{5}}: type,
+    // {{6}}: total, {{7}}: paymentStatus, {{8}}: receiptUrl, {{9}}: storePhone, {{10}}: itemsSummary
     const tplVars: string[] = wpCfg.templateBill
       ? [
-        storeName,
-        createdOrderNumber ?? '',
-        billNumber ?? '',
-        raw.customer.name || 'Valued Customer',
-        typeStr,
-        itemsSummary,
-        String(grandTotal),
-        isPrepaid
-          ? `PAID - ${raw.payment_method || 'UPI'} (Ref: ${raw.payment_id || 'Instant'})`
-          : 'Pay at Counter',
-        receiptUrl,
-        storePhone,
+        storeName,                                      // {{1}} Business Name
+        createdOrderNumber ?? '',                       // {{2}} Order No
+        billNumber ?? '',                               // {{3}} Invoice No
+        raw.customer.name || 'Valued Customer',         // {{4}} Customer Name
+        typeStr,                                        // {{5}} Order Type
+        cleanGrandTotal,                                // {{6}} Total Amount
+        payStatus,                                      // {{7}} Payment Status
+        receiptUrl,                                     // {{8}} Digital Bill Receipt URL
+        resolvedStorePhone,                             // {{9}} Store Phone
+        itemsSummary,                                   // {{10}} Items Ordered list
       ]
       : [];
     void sendOrderWhatsAppMessage({

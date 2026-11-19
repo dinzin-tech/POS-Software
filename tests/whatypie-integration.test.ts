@@ -129,6 +129,49 @@ async function main() {
     assertEqual(resolved[2], '225.00', 'variable 3 maps to total amount');
     assertEqual(resolved[3], 'INR', 'variable 4 maps to currency');
 
+    // 6. Test approved fivestar_bill_receipt with 10 variables in Meta parameter order:
+    // {{1}}: businessName, {{2}}: orderNumber, {{3}}: billNumber, {{4}}: customerName, {{5}}: orderType,
+    // {{6}}: totalAmount, {{7}}: paymentStatus, {{8}}: receiptUrl, {{9}}: storePhone, {{10}}: itemsSummary
+    const mockFivestar10VarTemplate = {
+      name: 'fivestar_bill_receipt',
+      language: 'en_US',
+      category: 'UTILITY',
+      status: 'approved',
+      bodyVariables: [
+        { key: '1' }, { key: '2' }, { key: '3' }, { key: '4' }, { key: '5' },
+        { key: '6' }, { key: '7' }, { key: '8' }, { key: '9' }, { key: '10' },
+      ],
+      body: '🍗 *{{1}}* – Thank you for your order! 🙏\n\n📋 *Order Summary*\nOrder No: *{{2}}*\nInvoice: {{3}}\nCustomer: {{4}}\nType: {{5}}\n\n🛒 *Items Ordered:*\n{{10}}\n\n💰 *Total: ₹{{6}}*\nPayment: {{7}}\n\n📄 *View your digital bill receipt:*\n{{8}}\n\n📞 Need help? Call us: {{9}}\n\nThank you for choosing Five Star Chicken Restaurant! ✨',
+    };
+
+    const resolved10 = resolveTemplateVariables(
+      mockFivestar10VarTemplate,
+      {
+        businessName: 'Five Star Chicken Restaurant',
+        orderNumber: 'TOK-0003',
+        billNumber: 'INVOICE-0051',
+        customerName: 'Charan',
+        orderType: 'Dine-In',
+        totalAmount: '199.00',
+        paymentStatus: 'PAID (ONLINE)',
+        receiptUrl: 'https://fivestarnelamangala.in/bill.php?id=INVOICE-0051',
+        storePhone: '+91 93533 33945',
+        itemsSummary: '1. Hot Crispy Chicken Burger x 1 = ₹139\n2. Kadak Masala Chai x 1 = ₹69',
+      },
+    );
+
+    assertEqual(resolved10.length, 10, 'fivestar_bill_receipt resolves all 10 variables');
+    assertEqual(resolved10[0], 'Five Star Chicken Restaurant', '{{1}} is businessName');
+    assertEqual(resolved10[1], 'TOK-0003', '{{2}} is orderNumber');
+    assertEqual(resolved10[2], 'INVOICE-0051', '{{3}} is billNumber');
+    assertEqual(resolved10[3], 'Charan', '{{4}} is customerName');
+    assertEqual(resolved10[4], 'Dine-In', '{{5}} is orderType');
+    assertEqual(resolved10[5], '199.00', '{{6}} is totalAmount');
+    assertEqual(resolved10[6], 'PAID (ONLINE)', '{{7}} is paymentStatus');
+    assertEqual(resolved10[7], 'https://fivestarnelamangala.in/bill.php?id=INVOICE-0051', '{{8}} is receiptUrl');
+    assertEqual(resolved10[8], '+91 93533 33945', '{{9}} is storePhone');
+    assertEqual(resolved10[9], '1. Hot Crispy Chicken Burger x 1 = ₹139\n2. Kadak Masala Chai x 1 = ₹69', '{{10}} is itemsSummary');
+
     // Test padding when template expects more variables than provided
     const padded = resolveTemplateVariables(
       {
