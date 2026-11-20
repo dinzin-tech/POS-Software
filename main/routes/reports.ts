@@ -228,9 +228,26 @@ router.get('/financial-summary', requirePermission('reports.financial.view'), (r
     const db = getDatabase();
     const minorFactor = getCurrencyMinorUnitFactor(getTenantCurrency(db));
     const collections = db.prepare(`
-      SELECT COUNT(*) AS bill_count, COALESCE(SUM(paid_amount), 0) AS gross_collected
+      SELECT
+        COUNT(*) AS bill_count,
+        COALESCE(SUM(paid_amount), 0) AS gross_collected,
+        COALESCE(SUM(subtotal), 0) AS food_sales,
+        COALESCE(SUM(service_charge), 0) AS service_charges,
+        COALESCE(SUM(delivery_charge), 0) AS delivery_charges,
+        COALESCE(SUM(packaging_charge), 0) AS packaging_charges,
+        COALESCE(SUM(tax_amount), 0) AS taxes,
+        COALESCE(SUM(discount_amount), 0) AS discounts
       FROM bills WHERE paid_at >= ? AND paid_at < ?
-    `).get(start, end) as { bill_count: number; gross_collected: number };
+    `).get(start, end) as {
+      bill_count: number;
+      gross_collected: number;
+      food_sales: number;
+      service_charges: number;
+      delivery_charges: number;
+      packaging_charges: number;
+      taxes: number;
+      discounts: number;
+    };
     const refundTotals = db.prepare(`
       SELECT COUNT(*) AS refund_count, COALESCE(SUM(CAST(r.amount_cents AS REAL)) / ?, 0) AS refunded
       FROM refunds r JOIN bills b ON b.id = r.bill_id
@@ -262,6 +279,12 @@ router.get('/financial-summary', requirePermission('reports.financial.view'), (r
         billCount: Number(collections.bill_count || 0),
         refundCount: Number(refundTotals.refund_count || 0),
         averageOrderValue: collections.bill_count ? (grossCollected - refunded) / collections.bill_count : 0,
+        foodSales: Number(collections.food_sales || 0),
+        serviceCharges: Number(collections.service_charges || 0),
+        deliveryCharges: Number(collections.delivery_charges || 0),
+        packagingCharges: Number(collections.packaging_charges || 0),
+        taxes: Number(collections.taxes || 0),
+        discounts: Number(collections.discounts || 0),
         paymentMethods: paymentMethodBreakdown(db, { startDate, endDate, paidOnly: true, attributeRefundsToBillDate: true }),
         refunds,
       },

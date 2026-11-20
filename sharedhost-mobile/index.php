@@ -1397,6 +1397,14 @@ $hasPin = !empty($config['dashboard_pin']);
 
       <div class="hero-substats">
         <div class="substat-item">
+          <span>Food Subtotal:</span>
+          <strong id="uiFoodSales">₹0.00</strong>
+        </div>
+        <div class="substat-item">
+          <span>Extra Fees:</span>
+          <strong id="uiExtraCharges" style="color: var(--accent);">₹0.00</strong>
+        </div>
+        <div class="substat-item">
           <span>Gross:</span>
           <strong id="uiGrossSales">₹0.00</strong>
         </div>
@@ -1733,6 +1741,12 @@ $hasPin = !empty($config['dashboard_pin']);
       document.getElementById('uiNetSales').textContent = netSales.toLocaleString('en-IN', {
         minimumFractionDigits: 2, maximumFractionDigits: 2
       });
+      const extraFees = Number((source.service_charges || 0) + (source.delivery_charges || 0));
+      const foodSales = Number(source.food_sales !== undefined ? source.food_sales : (source.gross_sales - extraFees));
+      const elFood = document.getElementById('uiFoodSales');
+      if (elFood) elFood.textContent = formatMoney(foodSales, currencySymbol);
+      const elExtra = document.getElementById('uiExtraCharges');
+      if (elExtra) elExtra.textContent = formatMoney(extraFees, currencySymbol);
       document.getElementById('uiGrossSales').textContent = formatMoney(source.gross_sales, currencySymbol);
       document.getElementById('uiRefunds').textContent = '-' + formatMoney(source.refunds, currencySymbol);
       document.getElementById('uiBillCount').textContent = source.bill_count || 0;

@@ -108,7 +108,12 @@ export default function CartDrawer() {
   const subtotal = getSubtotal();
   const tax = getTax();
   const deliveryFee = getDeliveryFee();
-  const total = getTotal();
+  const baseTotal = getTotal();
+
+  // 2% Online Convenience Fee for Razorpay online transactions (covering gateway commission)
+  const ONLINE_CONVENIENCE_FEE_PCT = 0.02;
+  const convenienceFee = paymentMethod === 'online' ? Math.round(subtotal * ONLINE_CONVENIENCE_FEE_PCT * 100) / 100 : 0;
+  const total = Math.round((subtotal + convenienceFee) * 100) / 100;
 
   const defaultApiUrl = siteConfig.menuApiUrl || '/dashboard/api.php';
   const candidateUrls = Array.from(new Set([
@@ -149,6 +154,8 @@ export default function CartDrawer() {
         subtotal,
         tax_amount: tax,
         delivery_fee: deliveryFee,
+        convenience_fee: convenienceFee,
+        service_charge: convenienceFee,
         total,
         payment_status: paymentData.payment_status,
         payment_method: paymentData.payment_method,
@@ -686,11 +693,11 @@ export default function CartDrawer() {
                             <span className="text-xs font-bold text-[var(--ks-champagne)]">Pay Online</span>
                           </div>
                           <span className="text-[10px] px-1 py-0.5 rounded bg-[oklch(70%_0.12_188_/_0.2)] text-[var(--ks-patina)] font-mono font-bold">
-                            Razorpay
+                            +2% Fee
                           </span>
                         </div>
                         <p className="text-[10px] text-[var(--ks-text-muted)] leading-tight">
-                          UPI (GPay / PhonePe / Paytm), Cards, NetBanking
+                          UPI, Cards, NetBanking (Razorpay)
                         </p>
                       </button>
 
@@ -709,11 +716,11 @@ export default function CartDrawer() {
                             <span className="text-xs font-bold text-[var(--ks-champagne)]">Pay at Counter</span>
                           </div>
                           <span className="text-[10px] px-1 py-0.5 rounded bg-[var(--ks-graphite)] text-[var(--ks-text-muted)] font-mono">
-                            Cash / UPI
+                            ₹0 Fee
                           </span>
                         </div>
                         <p className="text-[10px] text-[var(--ks-text-muted)] leading-tight">
-                          Pay upon collection at the counter or when dining in
+                          Cash or UPI at counter / dining in
                         </p>
                       </button>
                     </div>
@@ -723,13 +730,19 @@ export default function CartDrawer() {
                 {/* Price Breakdown */}
                 <div className="p-3 rounded-[4px] bg-[var(--ks-lacquer-deep)] border border-[var(--ks-gold-hairline)] space-y-1.5 text-xs text-[var(--ks-text-muted)] font-mono">
                   <div className="flex justify-between">
-                    <span>Item Total</span>
+                    <span>Food Subtotal</span>
                     <span className="font-mono-num text-[var(--ks-champagne)] font-medium">₹{subtotal}</span>
                   </div>
                   <div className="flex justify-between text-[11px]">
                     <span>GST (5% Included)</span>
                     <span className="font-mono-num text-[var(--ks-champagne)] font-medium">₹{tax}</span>
                   </div>
+                  {paymentMethod === 'online' && convenienceFee > 0 && (
+                    <div className="flex justify-between text-[11px] text-[var(--ks-champagne)] bg-[oklch(70%_0.12_188_/_0.08)] px-1.5 py-0.5 rounded">
+                      <span className="flex items-center gap-1">Online Convenience Fee (2%)</span>
+                      <span className="font-mono-num font-medium">₹{convenienceFee.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between pt-2 border-t border-[var(--ks-gold-hairline)] text-sm font-bold text-[var(--ks-champagne)]">
                     <span>Total Amount</span>
                     <span className="font-mono-num text-base text-[var(--ks-kinpaku)] font-bold">₹{total}</span>

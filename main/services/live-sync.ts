@@ -146,10 +146,14 @@ export function buildLiveSyncPayload(): Record<string, unknown> {
         COALESCE((SELECT SUM(CAST(amount_cents AS REAL)) / ? FROM refunds WHERE created_at >= ? AND created_at < ?), 0) AS refunds,
         COALESCE((SELECT SUM(discount_amount) FROM bills WHERE paid_at >= ? AND paid_at < ?), 0) AS discounts,
         COALESCE((SELECT SUM(tax_amount) FROM bills WHERE paid_at >= ? AND paid_at < ?), 0) AS taxes,
+        COALESCE((SELECT SUM(subtotal) FROM bills WHERE paid_at >= ? AND paid_at < ?), 0) AS food_sales,
+        COALESCE((SELECT SUM(service_charge) FROM bills WHERE paid_at >= ? AND paid_at < ?), 0) AS service_charges,
+        COALESCE((SELECT SUM(delivery_charge) FROM bills WHERE paid_at >= ? AND paid_at < ?), 0) AS delivery_charges,
         (SELECT COUNT(*) FROM bills WHERE paid_at >= ? AND paid_at < ?) AS bill_count,
         (SELECT COUNT(*) FROM bills WHERE discount_amount > 0 AND paid_at >= ? AND paid_at < ?) AS discount_bills_count
-    `).get(start, end, minorFactor, start, end, start, end, start, end, start, end, start, end) as {
+    `).get(start, end, minorFactor, start, end, start, end, start, end, start, end, start, end, start, end, start, end, start, end) as {
       gross_sales: number; refunds: number; discounts: number; taxes: number;
+      food_sales: number; service_charges: number; delivery_charges: number;
       bill_count: number; discount_bills_count: number;
     };
 
@@ -159,6 +163,9 @@ export function buildLiveSyncPayload(): Record<string, unknown> {
     const count = Number(row?.bill_count || 0);
     const discounts = Number(row?.discounts || 0);
     const taxes = Number(row?.taxes || 0);
+    const foodSales = Number(row?.food_sales || 0);
+    const serviceCharges = Number(row?.service_charges || 0);
+    const deliveryCharges = Number(row?.delivery_charges || 0);
     const discountBillsCount = Number(row?.discount_bills_count || 0);
     const avg = count > 0 ? Math.round((net / count) * 100) / 100 : 0;
 
@@ -168,6 +175,9 @@ export function buildLiveSyncPayload(): Record<string, unknown> {
       net_sales: Math.round(net * 100) / 100,
       discounts: Math.round(discounts * 100) / 100,
       taxes: Math.round(taxes * 100) / 100,
+      food_sales: Math.round(foodSales * 100) / 100,
+      service_charges: Math.round(serviceCharges * 100) / 100,
+      delivery_charges: Math.round(deliveryCharges * 100) / 100,
       bill_count: count,
       avg_bill: avg,
       discount_bills_count: discountBillsCount,

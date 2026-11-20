@@ -73,6 +73,12 @@ interface FinancialSummary {
   billCount: number;
   refundCount: number;
   averageOrderValue: number;
+  foodSales?: number;
+  serviceCharges?: number;
+  deliveryCharges?: number;
+  packagingCharges?: number;
+  taxes?: number;
+  discounts?: number;
   paymentMethods: PaymentMethodBreakdown[];
   refunds: RefundActivity[];
 }
@@ -712,6 +718,72 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {canViewFinancials && financialSummary && (
+            <div className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                    <Banknote size={17} />
+                  </span>
+                  <div>
+                    <h2 className="font-semibold text-foreground text-sm sm:text-base">Revenue & Order Charges Breakdown</h2>
+                    <p className="text-xs text-muted-foreground">Itemized food subtotal vs extra fees (convenience fee, delivery, taxes)</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Net Collections:</span>
+                  <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                    {fmtFinancial(financialSummary.netCollected)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+                <div className="rounded-xl border border-border bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground font-medium">Food Subtotal</p>
+                  <p className="mt-1 text-base font-bold text-foreground font-mono">
+                    {fmtFinancial(financialSummary.foodSales ?? 0)}
+                  </p>
+                  <span className="text-[11px] text-muted-foreground">Actual order items</span>
+                </div>
+
+                <div className="rounded-xl border border-blue-200/60 bg-blue-50/50 dark:border-blue-900/40 dark:bg-blue-950/20 p-3">
+                  <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">Extra Charges</p>
+                  <p className="mt-1 text-base font-bold text-blue-800 dark:text-blue-200 font-mono">
+                    {fmtFinancial(financialSummary.serviceCharges ?? 0)}
+                  </p>
+                  <span className="text-[11px] text-blue-600/80 dark:text-blue-400">Online convenience fee</span>
+                </div>
+
+                <div className="rounded-xl border border-border bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground font-medium">Delivery Charges</p>
+                  <p className="mt-1 text-base font-bold text-foreground font-mono">
+                    {fmtFinancial(financialSummary.deliveryCharges ?? 0)}
+                  </p>
+                  <span className="text-[11px] text-muted-foreground">Fulfillment fee</span>
+                </div>
+
+                <div className="rounded-xl border border-border bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground font-medium">Taxes (GST)</p>
+                  <p className="mt-1 text-base font-bold text-foreground font-mono">
+                    {fmtFinancial(financialSummary.taxes ?? 0)}
+                  </p>
+                  <span className="text-[11px] text-muted-foreground">Included GST</span>
+                </div>
+
+                <div className="rounded-xl border border-border bg-muted/40 p-3 col-span-2 sm:col-span-4 lg:col-span-1">
+                  <p className="text-xs text-muted-foreground font-medium">Gross Collections</p>
+                  <p className="mt-1 text-base font-bold text-foreground font-mono">
+                    {fmtFinancial(financialSummary.grossCollected ?? 0)}
+                  </p>
+                  <span className="text-[11px] text-muted-foreground">
+                    {financialSummary.billCount} settled {financialSummary.billCount === 1 ? 'bill' : 'bills'}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 

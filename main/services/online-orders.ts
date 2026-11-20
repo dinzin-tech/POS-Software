@@ -42,6 +42,8 @@ export interface RawOnlineOrder {
   subtotal?: number;
   tax_amount?: number;
   delivery_fee?: number;
+  convenience_fee?: number;
+  service_charge?: number;
   total: number;
   payment_status?: 'paid' | 'unpaid' | string;
   payment_method?: string;
@@ -271,7 +273,8 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
   const subtotal = Number(raw.subtotal || raw.total || 0);
   const taxAmount = Number(raw.tax_amount || 0);
   const delCharge = Number(raw.delivery_fee || 0);
-  const grandTotal = Number(raw.total || (subtotal + taxAmount + delCharge));
+  const convenienceFee = Number(raw.convenience_fee || raw.service_charge || 0);
+  const grandTotal = Number(raw.total || (subtotal + taxAmount + delCharge + convenienceFee));
   const isPrepaid = (raw.payment_status || '').toLowerCase() === 'paid' || !!raw.payment_id;
   const paidAmount = isPrepaid ? grandTotal : Math.min(grandTotal, Number(raw.paid_amount || 0));
   const balance = Math.max(0, grandTotal - paidAmount);
@@ -368,9 +371,9 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
         INSERT INTO orders (
           order_number, table_id, customer_id, user_id, type,
           delivery_address, special_instructions, status,
-          subtotal, tax_amount, delivery_charge, total,
+          subtotal, tax_amount, delivery_charge, service_charge, total,
           online_platform, external_order_id, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, 'website', ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, 'website', ?, ?, ?)
       `);
 
       const res = insertOrderStmt.run(
@@ -384,6 +387,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
         subtotal,
         taxAmount,
         delCharge,
+        convenienceFee,
         grandTotal,
         raw.order_id,
         now(),
@@ -472,9 +476,9 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
       const insertBillStmt = db.prepare(`
         INSERT INTO bills (
           bill_number, order_id, customer_id, subtotal, tax_amount,
-          delivery_charge, total, paid_amount, balance, payment_status,
+          delivery_charge, service_charge, total, paid_amount, balance, payment_status,
           payment_details, paid_at, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
       const billRes = insertBillStmt.run(
         billNumber,
@@ -483,6 +487,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
         subtotal,
         taxAmount,
         delCharge,
+        convenienceFee,
         grandTotal,
         paidAmount,
         balance,
@@ -605,6 +610,8 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
       subtotal,
       tax_amount: taxAmount,
       delivery_charge: 0.0,
+      service_charge: convenienceFee,
+      convenience_fee: convenienceFee,
       total: grandTotal,
       paid_amount: paidAmount,
       balance,
@@ -657,7 +664,8 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
     waText += `*Kitchen Status:* Preparing Freshly 👨‍🍳\n\n`;
     waText += `*─── ORDERED ITEMS ───*\n${itemsSummary}\n\n`;
     waText += `*─── BILLING BREAKDOWN ───*\n`;
-    waText += `Item Total: ₹${grandTotal}\n`;
+    waText += `Food Subtotal: ₹${subtotal}\n`;
+    if (convenienceFee > 0) waText += `Online Convenience Fee (2%): ₹${convenienceFee}\n`;
     if (taxAmount > 0) waText += `GST (5% Included): ₹${taxAmount}\n`;
     waText += `*TOTAL AMOUNT: ₹${grandTotal}*\n`;
     if (isPrepaid) {

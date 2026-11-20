@@ -211,7 +211,9 @@ $dateFormatted = $receiptData['created_date_formatted'] ?? date('d/m/Y g:i:s a')
 $items = $receiptData['items'] ?? [];
 $subtotal = (float)($receiptData['subtotal'] ?? 0);
 $taxAmount = (float)($receiptData['tax_amount'] ?? 0);
-$total = (float)($receiptData['total'] ?? ($subtotal + $taxAmount));
+$serviceCharge = (float)($receiptData['service_charge'] ?? ($receiptData['convenience_fee'] ?? 0));
+$deliveryCharge = (float)($receiptData['delivery_charge'] ?? 0);
+$total = (float)($receiptData['total'] ?? ($subtotal + $serviceCharge + $deliveryCharge));
 $paidAmount = (float)($receiptData['paid_amount'] ?? 0);
 $balance = (float)($receiptData['balance'] ?? max(0, $total - $paidAmount));
 $paymentStatus = strtoupper((string)($receiptData['payment_status'] ?? ($paidAmount >= $total ? 'PAID' : 'UNPAID')));
@@ -674,13 +676,25 @@ $isPaidInFull = ($paymentStatus === 'PAID') || ($paidAmount >= $total && $total 
 
         <!-- Subtotal / Tax / Total -->
         <div class="calc-row">
-          <span>Net Amount</span>
-          <span>Rs<?php echo number_format($total - $taxAmount, 2, '.', ''); ?></span>
+          <span>Subtotal</span>
+          <span>Rs<?php echo number_format($subtotal, 2, '.', ''); ?></span>
         </div>
         <?php if ($taxAmount > 0): ?>
           <div class="calc-row">
             <span>GST 5% (Included)</span>
             <span>Rs<?php echo number_format($taxAmount, 2, '.', ''); ?></span>
+          </div>
+        <?php endif; ?>
+        <?php if ($serviceCharge > 0): ?>
+          <div class="calc-row">
+            <span>Online Convenience Fee</span>
+            <span>Rs<?php echo number_format($serviceCharge, 2, '.', ''); ?></span>
+          </div>
+        <?php endif; ?>
+        <?php if ($deliveryCharge > 0): ?>
+          <div class="calc-row">
+            <span>Delivery Charge</span>
+            <span>Rs<?php echo number_format($deliveryCharge, 2, '.', ''); ?></span>
           </div>
         <?php endif; ?>
 

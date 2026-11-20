@@ -124,6 +124,42 @@ async function main() {
     assertEqual(res3Dup.ok, true, 'Legacy duplicate ingestion returns ok=true');
     assertEqual(res3Dup.orderId, res3.orderId, 'Legacy duplicate matches existing order');
 
+    // 6. Test Online Convenience Fee (2% extra charges for Razorpay payments)
+    const feeOrder = {
+      order_id: 'WEB-261120-153000-0004',
+      order_number: 'TOK-0004',
+      source: 'website',
+      customer: {
+        name: 'Razorpay Online Customer',
+        phone: '9886426278',
+      },
+      order_type: 'takeaway',
+      items: [
+        { id: 'item-4', name: 'Fried Chicken Large', price: 250, quantity: 2, total: 500 },
+      ],
+      subtotal: 500,
+      convenience_fee: 10,
+      service_charge: 10,
+      total: 510,
+      payment_status: 'paid',
+      payment_method: 'online',
+      payment_id: 'pay_rzp_test_123',
+    };
+
+    const res4 = await ingestOnlineOrder(feeOrder);
+    assertEqual(res4.ok, true, 'Online convenience fee order ingested successfully');
+
+    const savedOrder = db.prepare('SELECT * FROM orders WHERE id = ?').get(res4.orderId) as any;
+    assertEqual(Number(savedOrder.subtotal), 500, 'Order subtotal matches food total');
+    assertEqual(Number(savedOrder.service_charge), 10, 'Order service_charge matches 2% convenience fee');
+    assertEqual(Number(savedOrder.total), 510, 'Order grand total includes convenience fee');
+
+    const savedBill = db.prepare('SELECT * FROM bills WHERE order_id = ?').get(res4.orderId) as any;
+    assertEqual(Number(savedBill.subtotal), 500, 'Bill subtotal matches food total');
+    assertEqual(Number(savedBill.service_charge), 10, 'Bill service_charge matches 2% convenience fee');
+    assertEqual(Number(savedBill.total), 510, 'Bill total matches grand total');
+    assertEqual(Number(savedBill.paid_amount), 510, 'Bill paid_amount matches Razorpay paid total');
+
     console.log('All online order ingestion and idempotency tests passed successfully!');
   } finally {
     closeDatabase();

@@ -653,11 +653,15 @@ if ($action === 'submit_order' || $action === 'order') {
 
     // In Five Star POS, menu prices are inclusive of 5% GST; grand total matches menu prices
     $deliveryFee = 0.0;
+    // 2% Online Convenience Fee for Razorpay online orders
+    $convenienceFee = isset($payload['convenience_fee'])
+        ? round((float)$payload['convenience_fee'], 2)
+        : ($paymentMethod === 'online' ? round($subtotal * 0.02, 2) : 0.0);
     $grandTotal = isset($payload['total']) && (float)$payload['total'] > 0
         ? round((float)$payload['total'], 2)
-        : round($subtotal, 2);
-    // 5% GST included component (Tax = Total - Total / 1.05)
-    $taxAmount = round($grandTotal - ($grandTotal / 1.05), 2);
+        : round($subtotal + $convenienceFee, 2);
+    // 5% GST included component (Tax = Subtotal - Subtotal / 1.05)
+    $taxAmount = round($subtotal - ($subtotal / 1.05), 2);
 
     $newOrder = [
         'order_id' => $orderId,
@@ -677,6 +681,8 @@ if ($action === 'submit_order' || $action === 'order') {
         'subtotal' => $subtotal,
         'tax_amount' => $taxAmount,
         'delivery_fee' => $deliveryFee,
+        'convenience_fee' => $convenienceFee,
+        'service_charge' => $convenienceFee,
         'total' => $grandTotal,
         'payment_status' => $paymentStatus,
         'payment_method' => $paymentMethod,
@@ -733,6 +739,8 @@ if ($action === 'submit_order' || $action === 'order') {
         'subtotal' => $subtotal,
         'tax_amount' => $taxAmount,
         'delivery_charge' => 0.0,
+        'service_charge' => $convenienceFee,
+        'convenience_fee' => $convenienceFee,
         'total' => $grandTotal,
         'paid_amount' => $isPaid ? $grandTotal : 0.0,
         'balance' => $isPaid ? 0.0 : $grandTotal,

@@ -134,7 +134,12 @@ export default function OrderPageClient() {
   const cartCount = getItemCount();
   const subtotal = getSubtotal();
   const tax = getTax();
-  const total = getTotal();
+  const baseTotal = getTotal();
+
+  // 2% Online Convenience Fee for Razorpay online transactions
+  const ONLINE_CONVENIENCE_FEE_PCT = 0.02;
+  const convenienceFee = paymentMethod === 'online' ? Math.round(subtotal * ONLINE_CONVENIENCE_FEE_PCT * 100) / 100 : 0;
+  const total = Math.round((subtotal + convenienceFee) * 100) / 100;
 
   const defaultApiUrl = siteConfig.menuApiUrl || '/dashboard/api.php';
   const candidateUrls = useMemo(() => Array.from(new Set([
@@ -394,6 +399,8 @@ export default function OrderPageClient() {
         subtotal,
         tax_amount: tax,
         delivery_fee: 0,
+        convenience_fee: convenienceFee,
+        service_charge: convenienceFee,
         total,
         payment_status: paymentData.payment_status,
         payment_method: paymentData.payment_method,
@@ -1398,10 +1405,15 @@ export default function OrderPageClient() {
                           : 'bg-[var(--ks-lacquer-black)] border-[var(--ks-gold-hairline)] text-[var(--ks-text-muted)]'
                       }`}
                     >
-                      <span className="font-bold flex items-center gap-1.5 text-[var(--ks-kinpaku)]">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        Pay Online
-                      </span>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold flex items-center gap-1.5 text-[var(--ks-kinpaku)]">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          Pay Online
+                        </span>
+                        <span className="text-[10px] px-1 py-0.5 rounded bg-[oklch(70%_0.12_188_/_0.2)] text-[var(--ks-patina)] font-mono font-bold">
+                          +2% Fee
+                        </span>
+                      </div>
                       <span className="text-[10px] text-[var(--ks-text-muted)] mt-1">
                         UPI, GPay, PhonePe, Cards
                       </span>
@@ -1416,10 +1428,15 @@ export default function OrderPageClient() {
                           : 'bg-[var(--ks-lacquer-black)] border-[var(--ks-gold-hairline)] text-[var(--ks-text-muted)]'
                       }`}
                     >
-                      <span className="font-bold flex items-center gap-1.5 text-[var(--ks-champagne)]">
-                        <Banknote className="w-3.5 h-3.5" />
-                        Pay at Counter
-                      </span>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold flex items-center gap-1.5 text-[var(--ks-champagne)]">
+                          <Banknote className="w-3.5 h-3.5" />
+                          Pay at Counter
+                        </span>
+                        <span className="text-[10px] px-1 py-0.5 rounded bg-[var(--ks-graphite)] text-[var(--ks-text-muted)] font-mono">
+                          ₹0 Fee
+                        </span>
+                      </div>
                       <span className="text-[10px] text-[var(--ks-text-muted)] mt-1">
                         Cash or UPI upon arrival
                       </span>
@@ -1430,13 +1447,19 @@ export default function OrderPageClient() {
                 {/* Totals Summary */}
                 <div className="pt-2 border-t border-[var(--ks-gold-hairline)] space-y-1">
                   <div className="flex justify-between text-[var(--ks-text-muted)]">
-                    <span>Item Total:</span>
+                    <span>Food Subtotal:</span>
                     <span>₹{subtotal}</span>
                   </div>
                   <div className="flex justify-between text-[11px] text-[var(--ks-text-muted)]">
                     <span>GST (5% Included):</span>
                     <span>₹{tax}</span>
                   </div>
+                  {paymentMethod === 'online' && convenienceFee > 0 && (
+                    <div className="flex justify-between text-[11px] text-[var(--ks-champagne)] bg-[oklch(70%_0.12_188_/_0.08)] px-1.5 py-0.5 rounded">
+                      <span>Online Convenience Fee (2%):</span>
+                      <span className="font-mono-num font-medium">₹{convenienceFee.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm font-bold text-[var(--ks-kinpaku)] pt-1 border-t border-[var(--ks-gold-hairline)]/50">
                     <span>Total Amount:</span>
                     <span>₹{total}</span>

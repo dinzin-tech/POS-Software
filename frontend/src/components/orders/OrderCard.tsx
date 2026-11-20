@@ -775,7 +775,7 @@ export function OrderCard({
 
           {serviceCharge > 0 && (
             <div className="flex justify-between text-muted-foreground">
-              <span>{tReceipt('serviceCharge')}</span>
+              <span>{order.online_platform === 'website' ? 'Online Convenience Fee' : tReceipt('serviceCharge')}</span>
               <span className="font-medium text-foreground">{fmt(serviceCharge)}</span>
             </div>
           )}
