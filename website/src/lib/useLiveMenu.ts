@@ -210,10 +210,10 @@ export function useLiveMenu(): LiveMenuState {
       void fetchLiveMenu();
     }, 0);
 
-    // Poll every 30 seconds for live stock/status updates
+    // Poll every 12 seconds for live POS online/store status updates
     const interval = setInterval(() => {
       void fetchLiveMenu();
-    }, 30000);
+    }, 12000);
 
     return () => {
       clearTimeout(initialTimer);

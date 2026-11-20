@@ -37,15 +37,25 @@ header('Expires: 0');
 $action = $_GET['action'] ?? ($_POST['action'] ?? 'data');
 $dataDir = __DIR__ . '/data';
 
-// ==========================================
-// PUBLIC ENDPOINT 1: FETCH DYNAMIC MENU & STORE STATUS
-// ==========================================
-if ($action === 'menu') {
-    $menuFile = $dataDir . '/menu_catalog.json';
+/**
+ * Evaluates live restaurant open/closed status based on active POS heartbeat.
+ * FloCafe POS polls sync.php every 4 seconds when online.
+ * If no heartbeat is detected for > 90 seconds, the POS/restaurant is considered OFFLINE/CLOSED.
+ */
+function resolveDynamicStoreStatus(string $dataDir, array $config): array {
     $statusFile = $dataDir . '/store_status.json';
+    $heartbeatFile = $dataDir . '/pos_heartbeat.json';
 
-    $storeOpen = true;
-    $statusText = 'Open Now';
+    $lastHeartbeat = 0;
+    if (file_exists($heartbeatFile)) {
+        $hbRaw = @file_get_contents($heartbeatFile);
+        $hbData = json_decode($hbRaw ?: '[]', true);
+        if (is_array($hbData) && !empty($hbData['last_seen'])) {
+            $lastHeartbeat = (int)$hbData['last_seen'];
+        }
+    }
+
+    $manualOpen = true;
     $statusMessage = '';
     $openingHours = null;
 
@@ -53,19 +63,64 @@ if ($action === 'menu') {
         $statusRaw = @file_get_contents($statusFile);
         $statusData = json_decode($statusRaw ?: '[]', true);
         if (is_array($statusData)) {
-            $storeOpen = !empty($statusData['is_open']);
-            $statusText = $statusData['status_text'] ?? ($storeOpen ? 'Open Now' : 'Closed');
+            if (isset($statusData['is_open'])) {
+                $manualOpen = !empty($statusData['is_open']);
+            }
+            if ($lastHeartbeat === 0 && !empty($statusData['last_heartbeat'])) {
+                $lastHeartbeat = (int)$statusData['last_heartbeat'];
+            }
             $statusMessage = $statusData['message'] ?? '';
             $openingHours = $statusData['opening_hours'] ?? null;
         }
     }
 
-    $catalog = [
-        'ok' => true,
+    // POS heartbeat freshness: the local POS polls `get_orders` every 4 seconds when running.
+    // If we haven't seen a poll in 90 seconds, the POS system is OFF / restaurant is closed!
+    $heartbeatMaxAgeSeconds = 90;
+    $isPosOnline = ($lastHeartbeat > 0) && ((time() - $lastHeartbeat) <= $heartbeatMaxAgeSeconds);
+
+    // Dynamic Store Open condition:
+    // Store is OPEN ONLY IF:
+    // 1. POS is currently online ($isPosOnline === true)
+    // 2. POS store status is not manually paused ($manualOpen === true)
+    $storeOpen = $isPosOnline && $manualOpen;
+
+    if (!$isPosOnline) {
+        $statusText = 'Currently Closed';
+        $statusMessage = 'Restaurant POS is offline. Online ordering is available only while the restaurant is open.';
+    } elseif (!$manualOpen) {
+        $statusText = 'Temporarily Paused';
+        $statusMessage = $statusMessage ?: 'Online ordering paused temporarily by the restaurant.';
+    } else {
+        $statusText = 'Open Now';
+        $statusMessage = $statusMessage ?: 'Kitchen Active & Accepting Orders';
+    }
+
+    return [
         'store_open' => $storeOpen,
+        'pos_online' => $isPosOnline,
         'status_text' => $statusText,
         'message' => $statusMessage,
         'opening_hours' => $openingHours,
+        'last_pos_seen' => $lastHeartbeat > 0 ? date('c', $lastHeartbeat) : null,
+    ];
+}
+
+// ==========================================
+// PUBLIC ENDPOINT 1: FETCH DYNAMIC MENU & STORE STATUS
+// ==========================================
+if ($action === 'menu') {
+    $menuFile = $dataDir . '/menu_catalog.json';
+    $dynamicStatus = resolveDynamicStoreStatus($dataDir, $config);
+
+    $catalog = [
+        'ok' => true,
+        'store_open' => $dynamicStatus['store_open'],
+        'pos_online' => $dynamicStatus['pos_online'],
+        'status_text' => $dynamicStatus['status_text'],
+        'message' => $dynamicStatus['message'],
+        'opening_hours' => $dynamicStatus['opening_hours'],
+        'last_pos_seen' => $dynamicStatus['last_pos_seen'],
         'store_name' => $config['store_name'] ?? 'FloCafe',
         'payment_config' => [
             'razorpay_enabled' => !empty($config['razorpay_enabled']),
@@ -432,20 +487,19 @@ if ($action === 'submit_order' || $action === 'order') {
         exit;
     }
 
-    // 1. Verify store status
-    $statusFile = $dataDir . '/store_status.json';
-    if (file_exists($statusFile)) {
-        $statusRaw = @file_get_contents($statusFile);
-        $statusData = json_decode($statusRaw ?: '[]', true);
-        if (is_array($statusData) && isset($statusData['is_open']) && !$statusData['is_open']) {
-            http_response_code(400);
-            echo json_encode([
-                'ok' => false,
-                'error' => 'Restaurant is currently closed and not accepting online orders at this moment.',
-                'store_open' => false,
-            ]);
-            exit;
-        }
+    // 1. Verify dynamic store status (checks active POS heartbeat and manual open toggle)
+    $dynamicStatus = resolveDynamicStoreStatus($dataDir, $config);
+    if (!$dynamicStatus['store_open']) {
+        http_response_code(400);
+        echo json_encode([
+            'ok' => false,
+            'error' => $dynamicStatus['pos_online']
+                ? 'Restaurant has temporarily paused online orders.'
+                : 'Restaurant is currently closed (POS offline). Online orders are not accepted right now.',
+            'store_open' => false,
+            'pos_online' => $dynamicStatus['pos_online'],
+        ]);
+        exit;
     }
 
     // 2. Validate customer info

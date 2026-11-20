@@ -143,12 +143,13 @@ export function getStoreStatus(_db: ReturnType<typeof getDatabase>) {
   const manualOpen = getSettingValue('store_online_orders_enabled') !== 'false';
   const openHour = parseInt(getSettingValue('store_open_hour') || '11', 10);
   const closeHour = parseInt(getSettingValue('store_close_hour') || '23', 10);
+  const respectHours = getSettingValue('store_enforce_operating_hours') === 'true';
 
   const now = new Date();
   const currentHour = now.getHours();
 
   let isOpenByHours = true;
-  if (!isNaN(openHour) && !isNaN(closeHour) && openHour !== closeHour) {
+  if (respectHours && !isNaN(openHour) && !isNaN(closeHour) && openHour !== closeHour) {
     if (openHour < closeHour) {
       isOpenByHours = currentHour >= openHour && currentHour < closeHour;
     } else {
@@ -156,14 +157,17 @@ export function getStoreStatus(_db: ReturnType<typeof getDatabase>) {
     }
   }
 
+  // The POS is actively running. Store is open unless manually paused or hours strictly enforced.
   const isOpen = manualOpen && isOpenByHours;
   const statusText = isOpen ? 'Open Now' : 'Currently Closed';
   const message = !manualOpen
     ? 'Online ordering paused temporarily by the restaurant'
-    : (!isOpenByHours ? `Opens at ${openHour}:00` : 'Accepting online orders');
+    : (!isOpenByHours ? `Kitchen opens at ${openHour % 12 || 12}:00 ${openHour >= 12 ? 'PM' : 'AM'}` : 'Kitchen Active & Accepting Orders');
 
   return {
     is_open: isOpen,
+    is_pos_running: true,
+    last_heartbeat: Math.floor(Date.now() / 1000),
     status_text: statusText,
     message,
     opening_hours: {

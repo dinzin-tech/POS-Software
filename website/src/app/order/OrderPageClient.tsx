@@ -365,6 +365,12 @@ export default function OrderPageClient() {
     setIsSubmitting(true);
     setCheckoutError('');
 
+    if (!storeStatus.isOpen) {
+      setCheckoutError(storeStatus.message || 'Restaurant is currently closed and not accepting online orders.');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const orderPayload = {
         name: customerName.trim(),
@@ -1443,19 +1449,40 @@ export default function OrderPageClient() {
                 )}
 
                 {/* Submit Action */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full ks-btn-primary py-3 text-xs rounded-[3px] font-bold flex items-center justify-center gap-2 mt-2"
-                >
-                  {isSubmitting ? (
-                    <span>Processing Order & KOT...</span>
-                  ) : paymentMethod === 'online' ? (
-                    <span>Pay ₹{total} via Razorpay & Send to Kitchen →</span>
-                  ) : (
-                    <span>Confirm Order (Pay ₹{total} at Counter) →</span>
-                  )}
-                </button>
+                {!storeStatus.isOpen ? (
+                  <div className="space-y-2 mt-2">
+                    <div className="p-3 rounded bg-red-950/40 border border-red-800 text-xs text-red-300 font-mono">
+                      <div className="font-bold flex items-center gap-1.5 mb-1">
+                        <span className="w-2 h-2 rounded-full bg-[var(--ks-vermilion)] inline-block animate-pulse" />
+                        <span>Restaurant Currently Closed</span>
+                      </div>
+                      <p className="text-[var(--ks-text-muted)] text-[11px] leading-relaxed">
+                        {storeStatus.message || 'Online ordering is paused because our restaurant/POS is offline. Orders will resume when the kitchen opens.'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full py-3 text-xs rounded-[3px] font-bold flex items-center justify-center gap-2 bg-neutral-800 text-neutral-400 border border-neutral-700 cursor-not-allowed opacity-75"
+                    >
+                      <span>Restaurant Closed — Orders Paused</span>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full ks-btn-primary py-3 text-xs rounded-[3px] font-bold flex items-center justify-center gap-2 mt-2"
+                  >
+                    {isSubmitting ? (
+                      <span>Processing Order & KOT...</span>
+                    ) : paymentMethod === 'online' ? (
+                      <span>Pay ₹{total} via Razorpay & Send to Kitchen →</span>
+                    ) : (
+                      <span>Confirm Order (Pay ₹{total} at Counter) →</span>
+                    )}
+                  </button>
+                )}
               </form>
             </motion.div>
           </div>

@@ -9,20 +9,10 @@ import {
 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
+import { useLiveMenu } from '@/lib/useLiveMenu';
+
 export default function VisitUs() {
-  const [isOpenNow, setIsOpenNow] = useState(true);
-
-  useEffect(() => {
-    const checkOpenStatus = () => {
-      const now = new Date();
-      const hour = now.getHours();
-      setIsOpenNow(hour >= siteConfig.openingHours.openHour && hour < siteConfig.openingHours.closeHour);
-    };
-
-    checkOpenStatus();
-    const interval = setInterval(checkOpenStatus, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const { storeStatus } = useLiveMenu();
 
   return (
     <section id="visit" className="py-20 sm:py-24 bg-[var(--ks-lacquer-black)] relative border-t border-[var(--ks-gold-hairline)]">
@@ -47,19 +37,20 @@ export default function VisitUs() {
                   Operating Status
                 </div>
                 <div className="font-title text-base sm:text-lg font-semibold text-[var(--ks-champagne)]">
-                  {isOpenNow ? 'Kitchen Open & Serving' : 'Kitchen Closed'}
+                  {storeStatus.isOpen ? 'Kitchen Open & Serving' : 'Kitchen Closed'}
                 </div>
               </div>
 
               <div>
-                {isOpenNow ? (
+                {storeStatus.isOpen ? (
                   <span className="ks-badge-patina">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--ks-patina)]" />
-                    <span>Open Till 11 PM</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--ks-patina)] animate-pulse" />
+                    <span>Open Now • Orders Active</span>
                   </span>
                 ) : (
                   <span className="ks-badge-warning">
-                    <span>Opens at 11 AM</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--ks-vermilion)]" />
+                    <span>POS Offline • Closed</span>
                   </span>
                 )}
               </div>

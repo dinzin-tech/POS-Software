@@ -22,6 +22,7 @@ import {
 import confetti from 'canvas-confetti';
 import { useCartStore } from '@/store/useCartStore';
 import { siteConfig } from '@/config/site';
+import { useLiveMenu } from '@/lib/useLiveMenu';
 import DishPlaceholder from '@/components/ui/DishPlaceholder';
 
 function loadRazorpayScript(): Promise<boolean> {
@@ -102,6 +103,7 @@ export default function CartDrawer() {
   const [confirmedPaymentId, setConfirmedPaymentId] = useState('');
   const [isPaid, setIsPaid] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const { storeStatus } = useLiveMenu();
 
   const subtotal = getSubtotal();
   const tax = getTax();
@@ -254,6 +256,11 @@ export default function CartDrawer() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (!storeStatus.isOpen) {
+      setErrorMsg(storeStatus.message || 'Restaurant is currently closed and not accepting online orders at this moment.');
+      return;
+    }
 
     if (!customerName.trim()) {
       setErrorMsg('Please enter your name.');
@@ -731,35 +738,58 @@ export default function CartDrawer() {
             {/* Sticky Drawer Footer with Submit CTA */}
             {!isSubmitted && items.length > 0 && (
               <div className="p-4 bg-[var(--ks-lacquer-deep)] border-t border-[var(--ks-gold-hairline)]">
-                <button
-                  type="submit"
-                  form="checkout-form"
-                  disabled={isSubmitting}
-                  className="w-full ks-btn-primary py-3 px-4 rounded-[2px] text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      <span>{paymentMethod === 'online' ? 'Opening Razorpay Gateway...' : 'Sending Order to POS...'}</span>
-                    </>
-                  ) : paymentMethod === 'online' ? (
-                    <>
-                      <ShieldCheck className="w-4 h-4 text-[var(--ks-dark-ink)]" />
-                      <span>Pay ₹{total} via Razorpay</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  ) : (
-                    <>
-                      <span>{orderType === 'dine-in' ? 'Confirm Dine-In Order (Pay at Counter)' : 'Confirm Takeaway Order (Pay at Counter)'}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
-                <p className="text-xs text-center text-[var(--ks-text-muted)] mt-1.5 font-mono">
-                  {paymentMethod === 'online'
-                    ? '🔒 256-bit Encrypted Razorpay Gateway • Auto KOT & Instant Bill'
-                    : '⚡ Auto KOT generated in kitchen POS & WhatsApp receipt link sent'}
-                </p>
+                {!storeStatus.isOpen ? (
+                  <div className="space-y-2">
+                    <div className="p-3 rounded-[3px] bg-[oklch(58%_0.15_35_/_0.15)] border border-[oklch(58%_0.15_35_/_0.4)] text-[var(--ks-vermilion)] text-xs font-mono">
+                      <div className="font-bold flex items-center gap-1.5 mb-1">
+                        <span className="w-2 h-2 rounded-full bg-[var(--ks-vermilion)] inline-block animate-pulse" />
+                        <span>Restaurant Currently Closed</span>
+                      </div>
+                      <p className="text-[var(--ks-text-muted)] text-[11px] leading-relaxed">
+                        {storeStatus.message || 'Online ordering is paused because our restaurant/POS is offline. Orders will resume as soon as the kitchen opens.'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full py-3 px-4 rounded-[2px] text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-2 bg-neutral-800 text-neutral-400 border border-neutral-700 cursor-not-allowed opacity-75"
+                    >
+                      <span>Restaurant Closed — Orders Paused</span>
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      type="submit"
+                      form="checkout-form"
+                      disabled={isSubmitting}
+                      className="w-full ks-btn-primary py-3 px-4 rounded-[2px] text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          <span>{paymentMethod === 'online' ? 'Opening Razorpay Gateway...' : 'Sending Order to POS...'}</span>
+                        </>
+                      ) : paymentMethod === 'online' ? (
+                        <>
+                          <ShieldCheck className="w-4 h-4 text-[var(--ks-dark-ink)]" />
+                          <span>Pay ₹{total} via Razorpay</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </>
+                      ) : (
+                        <>
+                          <span>{orderType === 'dine-in' ? 'Confirm Dine-In Order (Pay at Counter)' : 'Confirm Takeaway Order (Pay at Counter)'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </>
+                      )}
+                    </button>
+                    <p className="text-xs text-center text-[var(--ks-text-muted)] mt-1.5 font-mono">
+                      {paymentMethod === 'online'
+                        ? '🔒 256-bit Encrypted Razorpay Gateway • Auto KOT & Instant Bill'
+                        : '⚡ Auto KOT generated in kitchen POS & WhatsApp receipt link sent'}
+                    </p>
+                  </>
+                )}
               </div>
             )}
           </motion.div>

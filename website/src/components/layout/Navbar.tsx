@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Menu as MenuIcon, X, Phone, Clock } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { siteConfig } from '@/config/site';
+import { useLiveMenu } from '@/lib/useLiveMenu';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -20,6 +21,7 @@ export default function Navbar() {
 
   const itemsCount = useCartStore((state) => state.getItemCount());
   const toggleCart = useCartStore((state) => state.toggleCart);
+  const { storeStatus } = useLiveMenu();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -106,6 +108,14 @@ export default function Navbar() {
 
             {/* Action Buttons: Cart & Order Now & Mobile Toggle */}
             <div className="flex items-center gap-2 sm:gap-3">
+              {/* Dynamic Live Status Pill */}
+              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-[var(--ks-raised-lacquer)] border border-[var(--ks-gold-hairline)] text-[11px] font-mono">
+                <span className={`w-1.5 h-1.5 rounded-full ${storeStatus.isOpen ? 'bg-[var(--ks-patina)] animate-pulse' : 'bg-[var(--ks-vermilion)]'}`} />
+                <span className={storeStatus.isOpen ? 'text-[var(--ks-patina)]' : 'text-[var(--ks-vermilion)]'}>
+                  {storeStatus.isOpen ? 'Kitchen Open' : 'Kitchen Closed'}
+                </span>
+              </div>
+
               {/* Cart Drawer Trigger */}
               <button
                 onClick={toggleCart}
@@ -123,9 +133,9 @@ export default function Navbar() {
               {/* Kinpaku Gold "Order Now" CTA (Strictly desktop/tablet only, hidden on mobile) */}
               <Link
                 href="/#menu"
-                className="!hidden sm:!inline-flex ks-btn-primary text-xs py-2 px-5 min-h-[36px]"
+                className={`!hidden sm:!inline-flex ${!storeStatus.isOpen ? 'bg-neutral-800 text-neutral-400 border border-neutral-700' : 'ks-btn-primary'} text-xs py-2 px-5 min-h-[36px] items-center justify-center`}
               >
-                Order Now
+                {storeStatus.isOpen ? 'Order Now' : 'Menu (Closed)'}
               </Link>
 
               {/* Mobile Menu Toggle Button */}
@@ -194,8 +204,10 @@ export default function Navbar() {
 
               <div className="flex items-center justify-between pt-2 text-xs text-[var(--ks-text-muted)] border-t border-[var(--ks-gold-hairline)] font-mono">
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[var(--ks-kinpaku)]" />
-                  <span>11:00 AM – 11:00 PM</span>
+                  <span className={`w-2 h-2 rounded-full ${storeStatus.isOpen ? 'bg-[var(--ks-patina)] animate-pulse' : 'bg-[var(--ks-vermilion)]'}`} />
+                  <span className={storeStatus.isOpen ? 'text-[var(--ks-patina)]' : 'text-[var(--ks-vermilion)]'}>
+                    {storeStatus.isOpen ? 'Kitchen Open' : 'Kitchen Closed'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Phone className="w-3.5 h-3.5 text-[var(--ks-patina)]" />

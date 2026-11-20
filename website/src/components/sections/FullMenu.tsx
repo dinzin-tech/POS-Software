@@ -89,12 +89,12 @@ export default function FullMenu() {
                 )}
               </div>
             ) : (
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-[4px] bg-[var(--ks-raised-lacquer)] border border-[oklch(58%_0.15_35_/_0.5)] text-xs font-medium text-[var(--ks-champagne)] max-w-xl mx-auto">
+              <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-[4px] bg-[var(--ks-raised-lacquer)] border border-[oklch(58%_0.15_35_/_0.5)] text-xs font-medium text-[var(--ks-champagne)] max-w-xl mx-auto shadow-sm">
                 <CircleAlert className="w-4 h-4 text-[var(--ks-vermilion)] shrink-0" />
                 <div className="text-left">
-                  <p className="font-semibold text-[var(--ks-vermilion)]">{storeStatus.statusText}: {storeStatus.message || 'Online order booking is paused.'}</p>
+                  <p className="font-semibold text-[var(--ks-vermilion)]">{storeStatus.statusText}: {storeStatus.message || 'Restaurant is currently closed.'}</p>
                   <p className="text-xs text-[var(--ks-text-muted)] mt-0.5 font-mono">
-                    Kitchen hours: {storeStatus.openingHours?.display || '11:00 AM – 11:00 PM'}. You can still browse our menu below.
+                    Online ordering is paused while kitchen POS is offline. You can still browse our menu below.
                   </p>
                 </div>
               </div>

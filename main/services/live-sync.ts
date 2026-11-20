@@ -745,7 +745,43 @@ function restartLiveSyncTimer(): void {
 /** Initialize Live Sync service on server startup */
 export function initLiveSync(): void {
   restartLiveSyncTimer();
-  console.log('[LiveSync] Service initialized');
+  void pushLiveSync();
+  console.log('[LiveSync] Service initialized and initial live snapshot pushed');
+}
+
+/** Notify shared host that POS is closing and online ordering should be paused */
+export async function notifyStoreClosingOnShutdown(): Promise<void> {
+  const config = getLiveSyncConfig();
+  if (!config.enabled || !config.syncUrl || !config.apiKey) return;
+  const syncUrl = normalizeLiveSyncUrl(config.syncUrl);
+  if (!syncUrl) return;
+
+  const closeEndpoint = syncUrl.includes('?')
+    ? `${syncUrl}&action=set_store_status&key=${encodeURIComponent(config.apiKey)}`
+    : `${syncUrl}?action=set_store_status&key=${encodeURIComponent(config.apiKey)}`;
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1500);
+    await fetch(closeEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': config.apiKey,
+      },
+      body: JSON.stringify({
+        is_open: false,
+        status_text: 'Currently Closed',
+        message: 'Restaurant POS is closed. Online ordering will resume when kitchen opens.',
+        api_key: config.apiKey,
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    console.log('[LiveSync] Notified shared host that POS is closed');
+  } catch {
+    // Non-fatal on shutdown
+  }
 }
 
 /** Stop Live Sync service on server shutdown */
@@ -762,5 +798,6 @@ export function stopLiveSync(): void {
     clearTimeout(debounceTimer);
     debounceTimer = null;
   }
+  void notifyStoreClosingOnShutdown();
   console.log('[LiveSync] Service stopped');
 }

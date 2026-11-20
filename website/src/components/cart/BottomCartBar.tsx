@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ShoppingBag, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/store/useCartStore';
+import { useLiveMenu } from '@/lib/useLiveMenu';
 
 export default function BottomCartBar() {
   const [mounted, setMounted] = useState(false);
@@ -11,6 +12,7 @@ export default function BottomCartBar() {
   const isOpen = useCartStore((state) => state.isOpen);
   const openCart = useCartStore((state) => state.openCart);
   const getTotal = useCartStore((state) => state.getTotal);
+  const { storeStatus } = useLiveMenu();
 
   useEffect(() => {
     setMounted(true);
@@ -34,16 +36,21 @@ export default function BottomCartBar() {
       >
         <button
           onClick={openCart}
-          className="w-full bg-[var(--ks-kinpaku)] text-[var(--ks-dark-ink)] hover:bg-[#ecd078] active:scale-[0.98] transition-all rounded-xl p-3 sm:p-3.5 shadow-2xl flex items-center justify-between gap-3 border border-[var(--ks-gold-hairline-strong)]"
+          className={`w-full ${!storeStatus.isOpen ? 'bg-[#2a2a2a] text-[#ddd]' : 'bg-[var(--ks-kinpaku)] text-[var(--ks-dark-ink)] hover:bg-[#ecd078]'} active:scale-[0.98] transition-all rounded-xl p-3 sm:p-3.5 shadow-2xl flex items-center justify-between gap-3 border ${!storeStatus.isOpen ? 'border-red-900/50' : 'border-[var(--ks-gold-hairline-strong)]'}`}
           aria-label="View Cart"
         >
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[var(--ks-dark-ink)]/15 flex items-center justify-center shrink-0">
-              <ShoppingBag className="w-5 h-5 text-[var(--ks-dark-ink)]" />
+            <div className={`w-9 h-9 rounded-lg ${!storeStatus.isOpen ? 'bg-red-900/30 text-red-400' : 'bg-[var(--ks-dark-ink)]/15 text-[var(--ks-dark-ink)]'} flex items-center justify-center shrink-0`}>
+              <ShoppingBag className="w-5 h-5" />
             </div>
             <div className="text-left font-mono leading-tight">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--ks-dark-ink)]/80">
-                {totalItems} {totalItems === 1 ? 'Item' : 'Items'} Added
+              <div className="text-[11px] font-bold uppercase tracking-wider opacity-80 flex items-center gap-1.5">
+                <span>{totalItems} {totalItems === 1 ? 'Item' : 'Items'}</span>
+                {!storeStatus.isOpen && (
+                  <span className="text-[10px] bg-red-950 text-red-400 border border-red-800 px-1 py-0.2 rounded font-bold">
+                    CLOSED
+                  </span>
+                )}
               </div>
               <div className="text-sm sm:text-base font-extrabold tracking-tight">
                 ₹{totalPrice}
@@ -51,8 +58,8 @@ export default function BottomCartBar() {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider bg-[var(--ks-dark-ink)] text-[var(--ks-kinpaku)] px-3 py-2 rounded-lg shadow-sm">
-            <span>View Cart</span>
+          <div className={`flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider ${!storeStatus.isOpen ? 'bg-neutral-800 text-neutral-300' : 'bg-[var(--ks-dark-ink)] text-[var(--ks-kinpaku)]'} px-3 py-2 rounded-lg shadow-sm`}>
+            <span>{!storeStatus.isOpen ? 'Cart (Closed)' : 'View Cart'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </div>
         </button>

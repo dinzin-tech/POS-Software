@@ -94,6 +94,49 @@ if (!is_dir($dataDir)) {
 }
 $pendingOrdersFile = $dataDir . '/pending_orders.json';
 $completedOrdersFile = $dataDir . '/completed_orders.json';
+$heartbeatFile = $dataDir . '/pos_heartbeat.json';
+
+// Record live POS heartbeat whenever authenticated request reaches sync endpoint
+$nowTime = time();
+@file_put_contents($heartbeatFile, json_encode([
+    'last_seen' => $nowTime,
+    'last_seen_iso' => date('c', $nowTime),
+    'action' => $action ?: 'push_sync',
+    'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+], JSON_UNESCAPED_SLASHES), LOCK_EX);
+
+// Action: SET STORE STATUS (POS explicitly toggles open/closed or notifies shutdown)
+if ($action === 'set_store_status') {
+    $rawInput = $rawInputCached ?? file_get_contents('php://input');
+    $payload = json_decode($rawInput ?: '[]', true) ?: $_POST;
+
+    $isOpen = !empty($payload['is_open']);
+    $statusText = $payload['status_text'] ?? ($isOpen ? 'Open Now' : 'Currently Closed');
+    $message = $payload['message'] ?? ($isOpen ? 'Kitchen Active & Accepting Orders' : 'Restaurant POS is closed.');
+
+    $statusFile = $dataDir . '/store_status.json';
+    $storeStatus = [
+        'synced_at' => date('c'),
+        'last_heartbeat' => $isOpen ? time() : 0,
+        'is_open' => $isOpen,
+        'status_text' => $statusText,
+        'message' => $message,
+        'opening_hours' => $payload['opening_hours'] ?? null,
+    ];
+    @file_put_contents($statusFile, json_encode($storeStatus, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
+
+    if (!$isOpen) {
+        @file_put_contents($heartbeatFile, json_encode(['last_seen' => 0, 'last_seen_iso' => null, 'action' => 'closed'], JSON_UNESCAPED_SLASHES), LOCK_EX);
+    }
+
+    echo json_encode([
+        'ok' => true,
+        'is_open' => $isOpen,
+        'status_text' => $statusText,
+        'message' => $message,
+    ]);
+    exit;
+}
 
 // Action: GET ORDERS (Local POS polls for new online orders)
 if ($action === 'get_orders') {
@@ -322,6 +365,7 @@ if (isset($data['store_status']) && is_array($data['store_status'])) {
     $statusFile = $dataDir . '/store_status.json';
     $storeStatus = [
         'synced_at' => date('c'),
+        'last_heartbeat' => time(),
         'is_open' => !empty($data['store_status']['is_open']),
         'status_text' => $data['store_status']['status_text'] ?? ($data['store_status']['is_open'] ? 'Open' : 'Closed'),
         'message' => $data['store_status']['message'] ?? '',
