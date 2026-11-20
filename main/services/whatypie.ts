@@ -242,6 +242,31 @@ export async function fetchWhatyPieTemplates(
   return cachedTemplates?.templates || [];
 }
 
+export function isFivestar10VarTemplate(name?: string | null): boolean {
+  if (!name) return false;
+  const n = String(name).toLowerCase().trim();
+  return (
+    n === 'fivestar_bill_v1' ||
+    n === 'fivestar_bill_receipt' ||
+    n.includes('fivestar_bill_v1') ||
+    n.includes('fivestar_bill_receipt') ||
+    n === 'fivestar_bill'
+  );
+}
+
+export function isFivestarBillTemplate(name?: string | null): boolean {
+  if (!name) return false;
+  const n = String(name).toLowerCase().trim();
+  return (
+    isFivestar10VarTemplate(n) ||
+    n === 'five_start_bill_receipt' ||
+    n.includes('fivestar') ||
+    n.includes('five_star') ||
+    n.includes('bill_receipt') ||
+    n.includes('bill_v')
+  );
+}
+
 /** Resolves and pads template variables according to approved template body structure. */
 export function resolveTemplateVariables(
   template: WhatyPieTemplateInfo,
@@ -267,11 +292,11 @@ export function resolveTemplateVariables(
   const receiptUrl = ctx.receiptUrl || 'https://fivestarnelamangala.in';
   const storePhone = ctx.storePhone || '+91 98864 38778';
 
-  // Fast-track: Exact positional mapping for approved fivestar_bill_receipt template
+  // Fast-track: Exact positional mapping for approved 10-variable fivestar bill receipt template
   // Variables in Meta positional order:
   // {{1}}: businessName, {{2}}: orderNumber, {{3}}: billNumber, {{4}}: customerName, {{5}}: orderType,
   // {{6}}: totalAmount, {{7}}: paymentStatus, {{8}}: receiptUrl, {{9}}: storePhone, {{10}}: itemsSummary
-  if (template.name === 'fivestar_bill_receipt') {
+  if (isFivestar10VarTemplate(template.name) || expectedCount === 10) {
     const cleanTotal = totalAmount ? String(totalAmount).replace(/^[₹$\s]+/, '') : '0.00';
     const fivestarDefaults = [
       businessName,                   // {{1}} Business / Store Name
@@ -285,7 +310,8 @@ export function resolveTemplateVariables(
       storePhone,                     // {{9}} Store Phone Number
       itemsSummary,                   // {{10}} Items Ordered list
     ];
-    return fivestarDefaults.slice(0, expectedCount).map((defVal, idx) => {
+    const count = expectedCount > 0 ? expectedCount : 10;
+    return fivestarDefaults.slice(0, count).map((defVal, idx) => {
       const explicitVal =
         providedVariables?.[idx] != null && String(providedVariables[idx]).trim() !== ''
           ? String(providedVariables[idx]).trim()
@@ -507,7 +533,7 @@ export async function sendWhatyPieMessage(params: SendWhatyPieParams): Promise<S
           const ctx = params.templateContext || {};
           resolvedVariables = resolveTemplateVariables(matched, ctx, resolvedVariables);
         }
-      } else if (params.templateName === 'fivestar_bill_receipt' || params.templateName === 'five_start_bill_receipt') {
+      } else if (isFivestar10VarTemplate(params.templateName)) {
         if (!resolvedLanguage) resolvedLanguage = 'en_US';
         const ctx = params.templateContext || {};
         const bName = ctx.businessName || 'Five Star Chicken Restaurant';
@@ -559,8 +585,8 @@ export async function sendWhatyPieMessage(params: SendWhatyPieParams): Promise<S
   if (params.templateName) {
     payload.templateName = params.templateName;
   }
-  if (resolvedLanguage) {
-    payload.languageCode = resolvedLanguage;
+  if (isTemplate) {
+    payload.languageCode = resolvedLanguage || 'en_US';
   }
   if (resolvedVariables && resolvedVariables.length > 0) {
     payload.templateVariables = resolvedVariables;
@@ -751,7 +777,7 @@ export async function sendWhatyPieBillReceipt(
       payment_status: 'PAID',
       payment_method: 'CASH',
       store_name: businessName,
-      store_address: getSettingValue('address') || 'Lohith Nagara, Nelmangala.',
+      store_address: getSettingValue('address') || 'BH Rd, Binnamangala, Nelmangala.',
       store_phone: getSettingValue('phone') || '+919886426278',
     };
 
@@ -807,7 +833,7 @@ export async function sendWhatyPieBillReceipt(
     storePhone: resolvedStorePhone,
   };
 
-  const isFivestarReceipt = config.templateBill.toLowerCase() === 'fivestar_bill_receipt';
+  const isFivestarReceipt = isFivestar10VarTemplate(config.templateBill);
   const isReceiptTemplate =
     config.templateBill.toLowerCase().includes('receipt') ||
     config.templateBill.toLowerCase().includes('bill');

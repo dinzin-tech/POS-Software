@@ -61,8 +61,8 @@ console.log('🔗 Copying backend & queue bridge into /dashboard and /sharedhost
 const targetSubdirs = ['dashboard', 'sharedhost-mobile'];
 const phpFiles = ['api.php', 'config.php', 'index.php', 'sync.php', 'bill.php', 'receipt.php'];
 
-// Also guarantee bill.php and receipt.php exist in the root of stageDir
-for (const bFile of ['bill.php', 'receipt.php']) {
+// Also guarantee essential PHP endpoints exist in the root of stageDir
+for (const bFile of ['bill.php', 'receipt.php', 'api.php', 'sync.php', 'config.php']) {
   const bSrc = path.join(sharedhostDir, bFile);
   if (fs.existsSync(bSrc)) {
     fs.copyFileSync(bSrc, path.join(stageDir, bFile));

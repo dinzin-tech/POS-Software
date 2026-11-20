@@ -547,7 +547,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
   try {
     const storeName = getSettingValue('restaurant_name') || getSettingValue('business_name') || 'Five Star';
     const storePhone = getSettingValue('phone') || '+919886426278';
-    const storeAddress = getSettingValue('address') || 'Lohith Nagara, Nelmangala.';
+    const storeAddress = getSettingValue('address') || 'BH Rd, Binnamangala, Nelmangala.';
     const syncUrl = getSettingValue('live_sync_url') || 'https://fivestarnelamangala.in/dashboard/sync.php';
     const apiKey = getSettingValue('live_sync_key') || 'fivestar_pos_2026';
 

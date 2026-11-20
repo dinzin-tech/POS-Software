@@ -96,14 +96,37 @@ $pendingOrdersFile = $dataDir . '/pending_orders.json';
 $completedOrdersFile = $dataDir . '/completed_orders.json';
 $heartbeatFile = $dataDir . '/pos_heartbeat.json';
 
+/** Candidate data directories across root, dashboard, and sharedhost-mobile deployments */
+function getCandidateDataDirs(string $dataDir): array {
+    $parent = dirname($dataDir);
+    $root = dirname($parent);
+    return array_unique(array_filter([
+        $dataDir,
+        $parent . '/data',
+        $parent . '/dashboard/data',
+        $parent . '/sharedhost-mobile/data',
+        $root . '/data',
+        $root . '/dashboard/data',
+        $root . '/sharedhost-mobile/data',
+    ]));
+}
+
+$candidateDirs = getCandidateDataDirs($dataDir);
+
 // Record live POS heartbeat whenever authenticated request reaches sync endpoint
 $nowTime = time();
-@file_put_contents($heartbeatFile, json_encode([
+$hbPayload = json_encode([
     'last_seen' => $nowTime,
     'last_seen_iso' => date('c', $nowTime),
     'action' => $action ?: 'push_sync',
     'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
-], JSON_UNESCAPED_SLASHES), LOCK_EX);
+], JSON_UNESCAPED_SLASHES);
+
+foreach ($candidateDirs as $cDir) {
+    if (is_dir($cDir)) {
+        @file_put_contents($cDir . '/pos_heartbeat.json', $hbPayload, LOCK_EX);
+    }
+}
 
 // Action: SET STORE STATUS (POS explicitly toggles open/closed or notifies shutdown)
 if ($action === 'set_store_status') {
@@ -114,7 +137,6 @@ if ($action === 'set_store_status') {
     $statusText = $payload['status_text'] ?? ($isOpen ? 'Open Now' : 'Currently Closed');
     $message = $payload['message'] ?? ($isOpen ? 'Kitchen Active & Accepting Orders' : 'Restaurant POS is closed.');
 
-    $statusFile = $dataDir . '/store_status.json';
     $storeStatus = [
         'synced_at' => date('c'),
         'last_heartbeat' => $isOpen ? time() : 0,
@@ -123,10 +145,15 @@ if ($action === 'set_store_status') {
         'message' => $message,
         'opening_hours' => $payload['opening_hours'] ?? null,
     ];
-    @file_put_contents($statusFile, json_encode($storeStatus, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
 
-    if (!$isOpen) {
-        @file_put_contents($heartbeatFile, json_encode(['last_seen' => 0, 'last_seen_iso' => null, 'action' => 'closed'], JSON_UNESCAPED_SLASHES), LOCK_EX);
+    foreach ($candidateDirs as $cDir) {
+        if (!is_dir($cDir)) {
+            @mkdir($cDir, 0755, true);
+        }
+        @file_put_contents($cDir . '/store_status.json', json_encode($storeStatus, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        if (!$isOpen) {
+            @file_put_contents($cDir . '/pos_heartbeat.json', json_encode(['last_seen' => 0, 'last_seen_iso' => null, 'action' => 'closed'], JSON_UNESCAPED_SLASHES), LOCK_EX);
+        }
     }
 
     echo json_encode([
@@ -141,11 +168,11 @@ if ($action === 'set_store_status') {
 // Action: GET ORDERS (Local POS polls for new online orders)
 if ($action === 'get_orders') {
     $orders = [];
-    $candidateFiles = array_unique([
-        $pendingOrdersFile,
-        dirname(__DIR__) . '/dashboard/data/pending_orders.json',
-        dirname(__DIR__) . '/sharedhost-mobile/data/pending_orders.json',
-    ]);
+    $candidateFiles = [];
+    foreach ($candidateDirs as $cDir) {
+        $candidateFiles[] = $cDir . '/pending_orders.json';
+    }
+    $candidateFiles = array_unique($candidateFiles);
 
     $seen = [];
     foreach ($candidateFiles as $filePath) {
@@ -190,11 +217,11 @@ if ($action === 'ack_orders') {
     $ackMap = array_flip($ackIds);
     $acknowledged = [];
 
-    $candidateFiles = array_unique([
-        $pendingOrdersFile,
-        dirname(__DIR__) . '/dashboard/data/pending_orders.json',
-        dirname(__DIR__) . '/sharedhost-mobile/data/pending_orders.json',
-    ]);
+    $candidateFiles = [];
+    foreach ($candidateDirs as $cDir) {
+        $candidateFiles[] = $cDir . '/pending_orders.json';
+    }
+    $candidateFiles = array_unique($candidateFiles);
 
     foreach ($candidateFiles as $filePath) {
         if (!file_exists($filePath)) continue;
@@ -224,26 +251,29 @@ if ($action === 'ack_orders') {
         }
     }
 
-    // Append to completed orders log
+    // Append to completed orders log across candidate directories
     if (!empty($acknowledged)) {
-        $fpC = fopen($completedOrdersFile, 'c+');
-        if ($fpC && flock($fpC, LOCK_EX)) {
-            $rawC = stream_get_contents($fpC);
-            $history = json_decode($rawC ?: '[]', true);
-            if (!is_array($history)) $history = [];
-            foreach ($acknowledged as $a) {
-                $history[] = $a;
+        foreach ($candidateDirs as $cDir) {
+            $cFile = $cDir . '/completed_orders.json';
+            $fpC = fopen($cFile, 'c+');
+            if ($fpC && flock($fpC, LOCK_EX)) {
+                $rawC = stream_get_contents($fpC);
+                $history = json_decode($rawC ?: '[]', true);
+                if (!is_array($history)) $history = [];
+                foreach ($acknowledged as $a) {
+                    $history[] = $a;
+                }
+                // Keep last 500 completed orders
+                if (count($history) > 500) {
+                    $history = array_slice($history, -500);
+                }
+                ftruncate($fpC, 0);
+                rewind($fpC);
+                fwrite($fpC, json_encode($history, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                fflush($fpC);
+                flock($fpC, LOCK_UN);
+                fclose($fpC);
             }
-            // Keep last 500 completed orders
-            if (count($history) > 500) {
-                $history = array_slice($history, -500);
-            }
-            ftruncate($fpC, 0);
-            rewind($fpC);
-            fwrite($fpC, json_encode($history, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-            fflush($fpC);
-            flock($fpC, LOCK_UN);
-            fclose($fpC);
         }
     }
 
@@ -266,39 +296,25 @@ if ($action === 'publish_receipt') {
         $receiptId = 'REC-' . date('ymd-His') . '-' . mt_rand(100, 999);
     }
 
-    $receiptsDir = $dataDir . '/receipts';
-    if (!is_dir($receiptsDir)) {
-        @mkdir($receiptsDir, 0755, true);
-    }
-
-    // Auto-clean expired receipts older than 4 days (345,600s)
-    $retentionSeconds = 4 * 86400;
-    $files = glob($receiptsDir . '/*.json');
-    if ($files) {
-        $cutoff = time() - $retentionSeconds;
-        foreach ($files as $f) {
-            if (filemtime($f) < $cutoff) @unlink($f);
-        }
-    }
-
     $payload['receipt_id'] = $receiptId;
+    $retentionSeconds = 4 * 86400;
     $payload['stored_at'] = time();
     $payload['expires_at'] = time() + $retentionSeconds;
 
-    $filePath = $receiptsDir . '/' . $receiptId . '.json';
-    @file_put_contents($filePath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    $aliasNum = !empty($payload['order_number']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['order_number']) : '';
+    $aliasBill = !empty($payload['bill_number']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['bill_number']) : '';
 
-    // Also alias by order_number and bill_number
-    if (!empty($payload['order_number'])) {
-        $aliasNum = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['order_number']);
-        if ($aliasNum !== '' && $aliasNum !== $receiptId) {
-            @file_put_contents($receiptsDir . '/' . $aliasNum . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    foreach ($candidateDirs as $cDir) {
+        $rDir = $cDir . '/receipts';
+        if (!is_dir($rDir)) {
+            @mkdir($rDir, 0755, true);
         }
-    }
-    if (!empty($payload['bill_number'])) {
-        $aliasBill = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['bill_number']);
+        @file_put_contents($rDir . '/' . $receiptId . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        if ($aliasNum !== '' && $aliasNum !== $receiptId) {
+            @file_put_contents($rDir . '/' . $aliasNum . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
         if ($aliasBill !== '' && $aliasBill !== $receiptId) {
-            @file_put_contents($receiptsDir . '/' . $aliasBill . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            @file_put_contents($rDir . '/' . $aliasBill . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
     }
 

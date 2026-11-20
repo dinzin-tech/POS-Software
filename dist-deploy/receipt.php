@@ -161,8 +161,8 @@ if ($id !== '') {
                                 'payment_method' => strtoupper((string)($ord['payment_method'] ?? 'CASH')),
                                 'payment_id' => $ord['payment_id'] ?? '',
                                 'store_name' => 'Five Star',
-                                'store_address' => 'Lohith Nagara, Nelmangala.',
-                                'store_phone' => '+918151021943',
+                                'store_address' => 'BH Rd, Binnamangala, Nelmangala.',
+                                'store_phone' => '+919886426278',
                             ];
                             break 2;
                         }
@@ -178,8 +178,8 @@ if ($id !== '') {
 
 // Variables for display
 $storeName = $receiptData['store_name'] ?? 'Five Star';
-$storeAddress = $receiptData['store_address'] ?? 'Lohith Nagara, Nelmangala.';
-$storePhone = $receiptData['store_phone'] ?? '+918151021943';
+$storeAddress = $receiptData['store_address'] ?? 'BH Rd, Binnamangala, Nelmangala.';
+$storePhone = $receiptData['store_phone'] ?? '+919886426278';
 $orderNumber = $receiptData['order_number'] ?? ($id ?: 'ONLINE');
 $billNumber = $receiptData['bill_number'] ?? ('INV-' . substr(md5($id ?: '1'), 0, 4));
 $onlineOrderId = $receiptData['online_order_id'] ?? ($receiptData['receipt_id'] ?? $id);
@@ -729,7 +729,7 @@ $isPaidInFull = ($paymentStatus === 'PAID') || ($paidAmount >= $total && $total 
         🖨️ Print / Save Receipt (PDF)
       </button>
 
-      <a href="https://wa.me/918151021943?text=<?php echo urlencode('Hi Five Star Chicken, regarding order #' . $orderNumber . ' (' . $billNumber . ')'); ?>" 
+      <a href="https://wa.me/919886426278?text=<?php echo urlencode('Hi Five Star Chicken, regarding order #' . $orderNumber . ' (' . $billNumber . ')'); ?>" 
          target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
         💬 Message Restaurant on WhatsApp
       </a>

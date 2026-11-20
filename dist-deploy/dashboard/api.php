@@ -37,46 +37,66 @@ header('Expires: 0');
 $action = $_GET['action'] ?? ($_POST['action'] ?? 'data');
 $dataDir = __DIR__ . '/data';
 
+/** Candidate data directories across root, dashboard, and sharedhost-mobile deployments */
+function getCandidateDataDirs(string $dataDir): array {
+    $parent = dirname($dataDir);
+    $root = dirname($parent);
+    return array_unique(array_filter([
+        $dataDir,
+        $parent . '/data',
+        $parent . '/dashboard/data',
+        $parent . '/sharedhost-mobile/data',
+        $root . '/data',
+        $root . '/dashboard/data',
+        $root . '/sharedhost-mobile/data',
+    ]));
+}
+
 /**
  * Evaluates live restaurant open/closed status based on active POS heartbeat.
  * FloCafe POS polls sync.php every 4 seconds when online.
- * If no heartbeat is detected for > 90 seconds, the POS/restaurant is considered OFFLINE/CLOSED.
+ * Uses a safe 180s (3-minute) window to handle network jitter without false closures.
  */
 function resolveDynamicStoreStatus(string $dataDir, array $config): array {
-    $statusFile = $dataDir . '/store_status.json';
-    $heartbeatFile = $dataDir . '/pos_heartbeat.json';
-
+    $candidateDirs = getCandidateDataDirs($dataDir);
     $lastHeartbeat = 0;
-    if (file_exists($heartbeatFile)) {
-        $hbRaw = @file_get_contents($heartbeatFile);
-        $hbData = json_decode($hbRaw ?: '[]', true);
-        if (is_array($hbData) && !empty($hbData['last_seen'])) {
-            $lastHeartbeat = (int)$hbData['last_seen'];
-        }
-    }
-
     $manualOpen = true;
     $statusMessage = '';
     $openingHours = null;
 
-    if (file_exists($statusFile)) {
-        $statusRaw = @file_get_contents($statusFile);
-        $statusData = json_decode($statusRaw ?: '[]', true);
-        if (is_array($statusData)) {
-            if (isset($statusData['is_open'])) {
-                $manualOpen = !empty($statusData['is_open']);
+    foreach ($candidateDirs as $dir) {
+        $hbFile = $dir . '/pos_heartbeat.json';
+        if (file_exists($hbFile)) {
+            $hbRaw = @file_get_contents($hbFile);
+            $hbData = json_decode($hbRaw ?: '[]', true);
+            if (is_array($hbData) && !empty($hbData['last_seen'])) {
+                $lastHeartbeat = max($lastHeartbeat, (int)$hbData['last_seen']);
             }
-            if ($lastHeartbeat === 0 && !empty($statusData['last_heartbeat'])) {
-                $lastHeartbeat = (int)$statusData['last_heartbeat'];
+        }
+        $stFile = $dir . '/store_status.json';
+        if (file_exists($stFile)) {
+            $stRaw = @file_get_contents($stFile);
+            $stData = json_decode($stRaw ?: '[]', true);
+            if (is_array($stData)) {
+                if (isset($stData['is_open'])) {
+                    $manualOpen = !empty($stData['is_open']);
+                }
+                if (!empty($stData['last_heartbeat'])) {
+                    $lastHeartbeat = max($lastHeartbeat, (int)$stData['last_heartbeat']);
+                }
+                if (!empty($stData['message'])) {
+                    $statusMessage = $stData['message'];
+                }
+                if (!empty($stData['opening_hours'])) {
+                    $openingHours = $stData['opening_hours'];
+                }
             }
-            $statusMessage = $statusData['message'] ?? '';
-            $openingHours = $statusData['opening_hours'] ?? null;
         }
     }
 
     // POS heartbeat freshness: the local POS polls `get_orders` every 4 seconds when running.
-    // If we haven't seen a poll in 90 seconds, the POS system is OFF / restaurant is closed!
-    $heartbeatMaxAgeSeconds = 90;
+    // 180 seconds window accommodates minor network jitter while closing cleanly within 3 minutes of power off.
+    $heartbeatMaxAgeSeconds = 180;
     $isPosOnline = ($lastHeartbeat > 0) && ((time() - $lastHeartbeat) <= $heartbeatMaxAgeSeconds);
 
     // Dynamic Store Open condition:
@@ -87,7 +107,7 @@ function resolveDynamicStoreStatus(string $dataDir, array $config): array {
 
     if (!$isPosOnline) {
         $statusText = 'Currently Closed';
-        $statusMessage = 'Restaurant POS is offline. Online ordering is available only while the restaurant is open.';
+        $statusMessage = 'Restaurant POS is offline. Online ordering will resume when kitchen opens.';
     } elseif (!$manualOpen) {
         $statusText = 'Temporarily Paused';
         $statusMessage = $statusMessage ?: 'Online ordering paused temporarily by the restaurant.';
@@ -205,69 +225,74 @@ if ($action === 'order_status') {
             }
         }
 
-        // Check completed orders history
-        $completedFile = $dataDir . '/completed_orders.json';
-        if (file_exists($completedFile)) {
-            $cRaw = @file_get_contents($completedFile);
-            $cList = json_decode($cRaw ?: '[]', true);
-            if (is_array($cList)) {
-                foreach ($cList as $co) {
-                    if (($co['order_id'] ?? '') === $reqId || ($co['order_number'] ?? '') === $reqId) {
-                        echo json_encode([
-                            'ok' => true,
-                            'status' => 'confirmed',
-                            'order_id' => $co['order_id'] ?? $reqId,
-                            'order_number' => $co['order_number'] ?? $reqId,
-                            'bill_number' => $co['bill_number'] ?? null,
-                            'customer_name' => $co['customer']['name'] ?? ($co['customer_name'] ?? ''),
-                            'customer_phone' => $co['customer']['phone'] ?? ($co['customer_phone'] ?? ''),
-                            'order_type' => $co['order_type'] ?? 'Takeaway',
-                            'table_number' => $co['table_number'] ?? '',
-                            'items' => $co['items'] ?? [],
-                            'subtotal' => $co['subtotal'] ?? 0,
-                            'tax_amount' => $co['tax_amount'] ?? 0,
-                            'total' => $co['total'] ?? 0,
-                            'paid_amount' => $co['paid_amount'] ?? ($co['total'] ?? 0),
-                            'payment_status' => strtoupper((string)($co['payment_status'] ?? 'PAID')),
-                            'payment_method' => strtoupper((string)($co['payment_method'] ?? 'ONLINE')),
-                            'created_at' => $co['created_at'] ?? date('c'),
-                            'bill_url' => '/bill.php?id=' . urlencode($co['order_number'] ?? $reqId),
-                        ]);
-                        exit;
+        // Check completed orders history across all candidate data dirs
+        $candidateDirs = getCandidateDataDirs($dataDir);
+        foreach ($candidateDirs as $cDir) {
+            $completedFile = $cDir . '/completed_orders.json';
+            if (file_exists($completedFile)) {
+                $cRaw = @file_get_contents($completedFile);
+                $cList = json_decode($cRaw ?: '[]', true);
+                if (is_array($cList)) {
+                    foreach ($cList as $co) {
+                        if (($co['order_id'] ?? '') === $reqId || ($co['order_number'] ?? '') === $reqId) {
+                            echo json_encode([
+                                'ok' => true,
+                                'status' => 'confirmed',
+                                'order_id' => $co['order_id'] ?? $reqId,
+                                'order_number' => $co['order_number'] ?? $reqId,
+                                'bill_number' => $co['bill_number'] ?? null,
+                                'customer_name' => $co['customer']['name'] ?? ($co['customer_name'] ?? ''),
+                                'customer_phone' => $co['customer']['phone'] ?? ($co['customer_phone'] ?? ''),
+                                'order_type' => $co['order_type'] ?? 'Takeaway',
+                                'table_number' => $co['table_number'] ?? '',
+                                'items' => $co['items'] ?? [],
+                                'subtotal' => $co['subtotal'] ?? 0,
+                                'tax_amount' => $co['tax_amount'] ?? 0,
+                                'total' => $co['total'] ?? 0,
+                                'paid_amount' => $co['paid_amount'] ?? ($co['total'] ?? 0),
+                                'payment_status' => strtoupper((string)($co['payment_status'] ?? 'PAID')),
+                                'payment_method' => strtoupper((string)($co['payment_method'] ?? 'ONLINE')),
+                                'created_at' => $co['created_at'] ?? date('c'),
+                                'bill_url' => '/bill.php?id=' . urlencode($co['order_number'] ?? $reqId),
+                            ]);
+                            exit;
+                        }
                     }
                 }
             }
         }
 
-        // Check pending orders
-        $pendingFile = $dataDir . '/pending_orders.json';
-        if (file_exists($pendingFile)) {
-            $pRaw = @file_get_contents($pendingFile);
-            $pList = json_decode($pRaw ?: '[]', true);
-            if (is_array($pList)) {
-                foreach ($pList as $po) {
-                    if (($po['order_id'] ?? '') === $reqId || ($po['order_number'] ?? '') === $reqId) {
-                        echo json_encode([
-                            'ok' => true,
-                            'status' => 'pending',
-                            'order_id' => $po['order_id'] ?? $reqId,
-                            'order_number' => $po['order_number'] ?? $reqId,
-                            'bill_number' => null,
-                            'customer_name' => $po['customer']['name'] ?? ($po['customer_name'] ?? ''),
-                            'customer_phone' => $po['customer']['phone'] ?? ($po['customer_phone'] ?? ''),
-                            'order_type' => $po['order_type'] ?? 'Takeaway',
-                            'table_number' => $po['table_number'] ?? '',
-                            'items' => $po['items'] ?? [],
-                            'subtotal' => $po['subtotal'] ?? 0,
-                            'tax_amount' => $po['tax_amount'] ?? 0,
-                            'total' => $po['total'] ?? 0,
-                            'paid_amount' => $po['paid_amount'] ?? 0,
-                            'payment_status' => strtoupper((string)($po['payment_status'] ?? 'UNPAID')),
-                            'payment_method' => strtoupper((string)($po['payment_method'] ?? 'CASH')),
-                            'created_at' => $po['created_at'] ?? date('c'),
-                            'bill_url' => '/bill.php?id=' . urlencode($po['order_number'] ?? $reqId),
-                        ]);
-                        exit;
+        // Check pending orders across all candidate data dirs
+        foreach ($candidateDirs as $cDir) {
+            $pendingFile = $cDir . '/pending_orders.json';
+            if (file_exists($pendingFile)) {
+                $pRaw = @file_get_contents($pendingFile);
+                $pList = json_decode($pRaw ?: '[]', true);
+                if (is_array($pList)) {
+                    foreach ($pList as $po) {
+                        if (($po['order_id'] ?? '') === $reqId || ($po['order_number'] ?? '') === $reqId) {
+                            echo json_encode([
+                                'ok' => true,
+                                'status' => 'pending',
+                                'order_id' => $po['order_id'] ?? $reqId,
+                                'order_number' => $po['order_number'] ?? $reqId,
+                                'bill_number' => null,
+                                'customer_name' => $po['customer']['name'] ?? ($po['customer_name'] ?? ''),
+                                'customer_phone' => $po['customer']['phone'] ?? ($po['customer_phone'] ?? ''),
+                                'order_type' => $po['order_type'] ?? 'Takeaway',
+                                'table_number' => $po['table_number'] ?? '',
+                                'items' => $po['items'] ?? [],
+                                'subtotal' => $po['subtotal'] ?? 0,
+                                'tax_amount' => $po['tax_amount'] ?? 0,
+                                'total' => $po['total'] ?? 0,
+                                'paid_amount' => $po['paid_amount'] ?? 0,
+                                'payment_status' => strtoupper((string)($po['payment_status'] ?? 'UNPAID')),
+                                'payment_method' => strtoupper((string)($po['payment_method'] ?? 'CASH')),
+                                'created_at' => $po['created_at'] ?? date('c'),
+                                'bill_url' => '/bill.php?id=' . urlencode($po['order_number'] ?? $reqId),
+                            ]);
+                            exit;
+                        }
                     }
                 }
             }
@@ -641,35 +666,38 @@ if ($action === 'submit_order' || $action === 'order') {
         'razorpay_signature' => $razorpaySignature,
     ];
 
-    // Atomically append into data/pending_orders.json
-    if (!is_dir($dataDir)) {
-        @mkdir($dataDir, 0755, true);
-    }
-    $pendingOrdersFile = $dataDir . '/pending_orders.json';
-    $fp = fopen($pendingOrdersFile, 'c+');
-    if (!$fp || !flock($fp, LOCK_EX)) {
-        http_response_code(500);
-        echo json_encode(['ok' => false, 'error' => 'Order queue is temporarily busy. Please try again.']);
-        exit;
+    // Atomically append into data/pending_orders.json across all candidate directories
+    $candidateDirs = getCandidateDataDirs($dataDir);
+    foreach ($candidateDirs as $cDir) {
+        if (!is_dir($cDir)) {
+            @mkdir($cDir, 0755, true);
+        }
+        $pendingOrdersFile = $cDir . '/pending_orders.json';
+        $fp = fopen($pendingOrdersFile, 'c+');
+        if ($fp && flock($fp, LOCK_EX)) {
+            $rawExisting = stream_get_contents($fp);
+            $existing = json_decode($rawExisting ?: '[]', true);
+            if (!is_array($existing)) $existing = [];
+            $alreadyPresent = false;
+            foreach ($existing as $ex) {
+                if (($ex['order_id'] ?? '') === $orderId) {
+                    $alreadyPresent = true;
+                    break;
+                }
+            }
+            if (!$alreadyPresent) {
+                $existing[] = $newOrder;
+            }
+            ftruncate($fp, 0);
+            rewind($fp);
+            fwrite($fp, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            fflush($fp);
+            flock($fp, LOCK_UN);
+            fclose($fp);
+        }
     }
 
-    $rawExisting = stream_get_contents($fp);
-    $existing = json_decode($rawExisting ?: '[]', true);
-    if (!is_array($existing)) $existing = [];
-    $existing[] = $newOrder;
-
-    ftruncate($fp, 0);
-    rewind($fp);
-    fwrite($fp, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-    fflush($fp);
-    flock($fp, LOCK_UN);
-    fclose($fp);
-
-    // Auto-save digital receipt so link works immediately
-    $receiptsDir = $dataDir . '/receipts';
-    if (!is_dir($receiptsDir)) {
-        @mkdir($receiptsDir, 0755, true);
-    }
+    // Auto-save digital receipt so link works immediately across all candidate dirs
     $retentionSeconds = 4 * 86400;
     $initialReceipt = [
         'receipt_id' => $orderId,
@@ -692,12 +720,18 @@ if ($action === 'submit_order' || $action === 'order') {
         'payment_method' => strtoupper($paymentMethod),
         'payment_id' => $paymentId,
         'store_name' => 'Five Star',
-        'store_address' => 'Lohith Nagara, Nelmangala.',
-        'store_phone' => '+918151021943',
+        'store_address' => 'BH Rd, Binnamangala, Nelmangala.',
+        'store_phone' => '+919886426278',
         'stored_at' => time(),
         'expires_at' => time() + $retentionSeconds,
     ];
-    @file_put_contents($receiptsDir . '/' . $orderId . '.json', json_encode($initialReceipt, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    foreach ($candidateDirs as $cDir) {
+        $rDir = $cDir . '/receipts';
+        if (!is_dir($rDir)) {
+            @mkdir($rDir, 0755, true);
+        }
+        @file_put_contents($rDir . '/' . $orderId . '.json', json_encode($initialReceipt, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
     $host = $_SERVER['HTTP_HOST'] ?? 'fivestarnelamangala.in';

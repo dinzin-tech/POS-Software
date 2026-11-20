@@ -4,7 +4,7 @@
     "bill_number": "INVOICE-0041",
     "online_order_id": "WEB-261029-132502-489",
     "customer_name": "Charan",
-    "customer_phone": "+918151021943",
+    "customer_phone": "+919886426278",
     "order_type": "Takeaway",
     "created_date_formatted": "29\/10\/2026 1:25:03 pm",
     "items": [
@@ -30,6 +30,6 @@
     "payment_method": "ONLINE (RAZORPAY)",
     "payment_id": "pay_rzp_live_test_778899",
     "store_name": "Five Star",
-    "store_address": "Lohith Nagara, Nelmangala.",
-    "store_phone": "+918151021943"
+    "store_address": "BH Rd, Binnamangala, Nelmangala.",
+    "store_phone": "+919886426278"
 }
