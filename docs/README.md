@@ -99,6 +99,8 @@ metadata. Do not move them without a coordinated change to those references.
 | --- | --- |
 | [printers.md](printers.md) | Merchants and support: connecting a printer and diagnosing the queue. |
 | [linux.md](linux.md) | Merchants and support: Linux packages, printing permissions, and the tray. |
+| [windows-device-setup.md](windows-device-setup.md) | Merchants and support: Windows multi-device setup (KDS, tablets, firewall). |
+| [windows-end-user-guide.md](windows-end-user-guide.md) | End-user guide for operating DinZin POS on Windows. |
 | [google-drive-setup.md](google-drive-setup.md) | Maintainers: provisioning the optional Drive backup OAuth client. |
 
 ## Other repository assets

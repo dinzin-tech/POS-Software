@@ -1,7 +1,7 @@
 # Mac App Store publishing
 
 The Mac App Store build is a separate manual workflow,
-[`.github/workflows/publish-mas.yml`](../../.github/workflows/publish-mas.yml). It builds the MAS
+`.github/workflows/publish-mas.yml`. It builds the MAS
 package and submits it through fastlane and Transporter. The release workflow produces the MAS
 package as a build target but does not submit it, and the MAS path is not consumed by
 `electron-updater`, so it is invisible to in-app updates.

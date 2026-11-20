@@ -417,26 +417,29 @@ if ($action === 'publish_receipt') {
  * Allocate sequential Token / Order Number matching FloCafe POS sequence (e.g. TOK-0001, TOK-0002)
  */
 function getNextOrderNumber(string $dataDir): string {
-    $seqFile = $dataDir . '/order_sequence.json';
+    $candidateDirs = getCandidateDataDirs($dataDir);
     $today = date('Y-m-d');
     $prefix = 'TOK';
     $nextSeq = 1;
 
-    $fp = fopen($seqFile, 'c+');
-    if ($fp && flock($fp, LOCK_EX)) {
-        $raw = stream_get_contents($fp);
-        $data = json_decode($raw ?: '[]', true);
-        if (is_array($data)) {
-            if (($data['date'] ?? '') === $today) {
-                $nextSeq = max(1, (int)($data['last_seq'] ?? 0) + 1);
-            }
-            if (!empty($data['prefix'])) {
-                $prefix = $data['prefix'];
+    // 1. Cross-check all candidate dirs for the latest sequence record
+    foreach ($candidateDirs as $cDir) {
+        $sFile = $cDir . '/order_sequence.json';
+        if (file_exists($sFile)) {
+            $raw = @file_get_contents($sFile);
+            $data = json_decode($raw ?: '[]', true);
+            if (is_array($data) && ($data['date'] ?? '') === $today) {
+                $nextSeq = max($nextSeq, (int)($data['last_seq'] ?? 0) + 1);
+                if (!empty($data['prefix'])) {
+                    $prefix = $data['prefix'];
+                }
             }
         }
+    }
 
-        // Cross-check with live_data.json to ensure sequence is never below POS active/recent orders
-        $liveFile = $dataDir . '/live_data.json';
+    // 2. Cross-check with live_data.json across all candidate dirs to ensure sequence is never below POS active/recent orders
+    foreach ($candidateDirs as $cDir) {
+        $liveFile = $cDir . '/live_data.json';
         if (file_exists($liveFile)) {
             $liveRaw = @file_get_contents($liveFile);
             $liveData = json_decode($liveRaw ?: '[]', true);
@@ -457,9 +460,11 @@ function getNextOrderNumber(string $dataDir): string {
                 }
             }
         }
+    }
 
-        // Cross-check with pending orders
-        $pendingFile = $dataDir . '/pending_orders.json';
+    // 3. Cross-check with pending orders across all candidate dirs
+    foreach ($candidateDirs as $cDir) {
+        $pendingFile = $cDir . '/pending_orders.json';
         if (file_exists($pendingFile)) {
             $penRaw = @file_get_contents($pendingFile);
             $penData = json_decode($penRaw ?: '[]', true);
@@ -472,25 +477,26 @@ function getNextOrderNumber(string $dataDir): string {
                 }
             }
         }
-
-        $orderNumber = $prefix . '-' . str_pad((string)$nextSeq, 4, '0', STR_PAD_LEFT);
-
-        ftruncate($fp, 0);
-        rewind($fp);
-        fwrite($fp, json_encode([
-            'date' => $today,
-            'last_seq' => $nextSeq,
-            'prefix' => $prefix,
-            'updated_at' => date('c'),
-        ], JSON_PRETTY_PRINT));
-        fflush($fp);
-        flock($fp, LOCK_UN);
-        fclose($fp);
-
-        return $orderNumber;
     }
 
-    return 'TOK-' . str_pad((string)mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+    $orderNumber = $prefix . '-' . str_pad((string)$nextSeq, 4, '0', STR_PAD_LEFT);
+
+    // Save updated sequence across all candidate directories
+    $seqData = json_encode([
+        'date' => $today,
+        'last_seq' => $nextSeq,
+        'prefix' => $prefix,
+        'updated_at' => date('c'),
+    ], JSON_PRETTY_PRINT);
+
+    foreach ($candidateDirs as $cDir) {
+        if (!is_dir($cDir)) {
+            @mkdir($cDir, 0755, true);
+        }
+        @file_put_contents($cDir . '/order_sequence.json', $seqData, LOCK_EX);
+    }
+
+    return $orderNumber;
 }
 
 // ==========================================
@@ -610,7 +616,9 @@ if ($action === 'submit_order' || $action === 'order') {
 
     // 4. Generate sequential Token / Order Number matching FloCafe POS format (e.g. TOK-0009)
     $orderNumber = getNextOrderNumber($dataDir);
-    $orderId = $orderNumber;
+    // Globally unique order ID for idempotency and backend tracking (e.g. WEB-261120-110509-0009)
+    $cleanNum = preg_replace('/\D/', '', $orderNumber);
+    $orderId = 'WEB-' . date('ymd-His') . '-' . str_pad($cleanNum, 4, '0', STR_PAD_LEFT);
 
     // Calculate totals
     $subtotal = 0;
@@ -731,15 +739,19 @@ if ($action === 'submit_order' || $action === 'order') {
             @mkdir($rDir, 0755, true);
         }
         @file_put_contents($rDir . '/' . $orderId . '.json', json_encode($initialReceipt, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        if ($orderNumber !== $orderId) {
+            @file_put_contents($rDir . '/' . $orderNumber . '.json', json_encode($initialReceipt, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
     }
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
     $host = $_SERVER['HTTP_HOST'] ?? 'fivestarnelamangala.in';
-    $billUrl = $protocol . $host . '/bill.php?id=' . urlencode($orderId);
+    $billUrl = $protocol . $host . '/bill.php?id=' . urlencode($orderNumber);
 
     echo json_encode([
         'ok' => true,
         'order_id' => $orderId,
+        'order_number' => $orderNumber,
         'bill_url' => $billUrl,
         'message' => 'Order submitted successfully! Sent to kitchen for KOT generation and bill dispatch.',
         'order' => $newOrder,

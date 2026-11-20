@@ -74,28 +74,33 @@ if ($action === 'publish_receipt' || ($requestMethod === 'POST' && isset($_GET['
     $payload['stored_at'] = time();
     $payload['expires_at'] = time() + $retentionSeconds;
 
-    $filePath = $receiptsDir . '/' . $receiptId . '.json';
-    @file_put_contents($filePath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-
-    // Also alias by order_number if provided (e.g. TOK-0005)
-    if (!empty($payload['order_number'])) {
-        $aliasId = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['order_number']);
-        if ($aliasId !== '' && $aliasId !== $receiptId) {
-            @file_put_contents($receiptsDir . '/' . $aliasId . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    foreach ($candidateDirs as $cDir) {
+        if (!is_dir($cDir)) {
+            @mkdir($cDir, 0755, true);
         }
-    }
+        $filePath = $cDir . '/' . $receiptId . '.json';
+        @file_put_contents($filePath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
-    // Also alias by bill_number if provided (e.g. INVOICE-0041)
-    if (!empty($payload['bill_number'])) {
-        $aliasBill = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['bill_number']);
-        if ($aliasBill !== '' && $aliasBill !== $receiptId) {
-            @file_put_contents($receiptsDir . '/' . $aliasBill . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        // Also alias by order_number if provided (e.g. TOK-0005)
+        if (!empty($payload['order_number'])) {
+            $aliasId = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['order_number']);
+            if ($aliasId !== '' && $aliasId !== $receiptId) {
+                @file_put_contents($cDir . '/' . $aliasId . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            }
+        }
+
+        // Also alias by bill_number if provided (e.g. INVOICE-0041)
+        if (!empty($payload['bill_number'])) {
+            $aliasBill = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['bill_number']);
+            if ($aliasBill !== '' && $aliasBill !== $receiptId) {
+                @file_put_contents($cDir . '/' . $aliasBill . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            }
         }
     }
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
     $host = $_SERVER['HTTP_HOST'] ?? 'fivestarnelamangala.in';
-    $billUrl = $protocol . $host . '/bill.php?id=' . urlencode($receiptId);
+    $billUrl = $protocol . $host . '/bill.php?id=' . urlencode(!empty($payload['order_number']) ? $payload['order_number'] : $receiptId);
 
     echo json_encode([
         'ok' => true,
@@ -114,20 +119,25 @@ $receiptData = null;
 $isExpired = false;
 
 if ($id !== '') {
-    $receiptFile = $receiptsDir . '/' . $id . '.json';
-    if (file_exists($receiptFile)) {
-        $mtime = @filemtime($receiptFile);
-        if ($mtime && $mtime < $cutoffTime) {
-            @unlink($receiptFile);
-            $isExpired = true;
-        } else {
-            $rawContent = @file_get_contents($receiptFile);
-            $decoded = json_decode($rawContent ?: '[]', true);
-            if (is_array($decoded) && !empty($decoded)) {
-                $receiptData = $decoded;
+    foreach ($candidateDirs as $cDir) {
+        $receiptFile = $cDir . '/' . $id . '.json';
+        if (file_exists($receiptFile)) {
+            $mtime = @filemtime($receiptFile);
+            if ($mtime && $mtime < $cutoffTime) {
+                @unlink($receiptFile);
+                $isExpired = true;
+            } else {
+                $rawContent = @file_get_contents($receiptFile);
+                $decoded = json_decode($rawContent ?: '[]', true);
+                if (is_array($decoded) && !empty($decoded)) {
+                    $receiptData = $decoded;
+                    break;
+                }
             }
         }
-    } else {
+    }
+
+    if (!$receiptData) {
         // Also check if id is in pending_orders or completed_orders
         $dataParent = dirname($receiptsDir);
         $orderFiles = [$dataParent . '/pending_orders.json', $dataParent . '/completed_orders.json'];

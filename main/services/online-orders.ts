@@ -241,9 +241,20 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
   const db = getDatabase();
 
   // 1. Idempotency check: Don't process the same order twice
+  // A unique external_order_id (e.g. WEB-261120-110509-0002) is matched directly.
+  // If external_order_id is a short token (e.g. TOK-0002) or when checking special_instructions,
+  // restrict the check to today / last 24h to avoid collisions with historical orders that reused daily token numbers.
+  const isShortToken = (raw.order_id || '').startsWith('TOK-');
   const existingOrder = db.prepare(`
     SELECT id, order_number FROM orders
-    WHERE external_order_id = ? OR special_instructions LIKE ?
+    WHERE (
+      external_order_id = ?
+      ${isShortToken ? "AND created_at >= date('now', 'start of day', 'localtime')" : ''}
+    )
+    OR (
+      special_instructions LIKE ?
+      AND created_at >= date('now', 'start of day', 'localtime')
+    )
     LIMIT 1
   `).get(raw.order_id, `%[Online: ${raw.order_id}]%`) as { id: number; order_number: string } | undefined;
 
@@ -313,10 +324,16 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
 
       // 4. Insert Order - Align order number with website token number if provided (e.g. TOK-0009)
       let orderNumber: string;
-      const candidateNumber = (raw.order_number || raw.order_id || '').trim();
+      const candidateNumber = (raw.order_number || (raw.order_id && raw.order_id.startsWith('TOK-') ? raw.order_id : '')).trim();
       if (candidateNumber.startsWith('TOK-')) {
-        const existingWithNumber = db.prepare('SELECT id FROM orders WHERE order_number = ? LIMIT 1').get(candidateNumber);
-        if (!existingWithNumber) {
+        const existingWithNumberToday = db.prepare(`
+          SELECT id FROM orders
+          WHERE order_number = ?
+            AND created_at >= date('now', 'start of day', 'localtime')
+          LIMIT 1
+        `).get(candidateNumber);
+
+        if (!existingWithNumberToday) {
           orderNumber = candidateNumber;
           // Synchronize POS sequences table so subsequent counter orders won't collide
           try {
@@ -341,7 +358,8 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
       }
       const typeLabel = posType === 'dine_in' ? `Dine-In (${raw.table_number || 'No Table'})` : (posType === 'delivery' ? 'Delivery' : 'Takeaway');
       const payTag = isPrepaid ? ` [PAID: ${raw.payment_method || 'Online'} - Ref: ${raw.payment_id || 'Razorpay'}]` : ' [PAYMENT DUE: Cash/Counter]';
-      const notes = `[Online: ${raw.order_id}] ${typeLabel}${payTag}${raw.special_instructions ? ' | ' + raw.special_instructions : ''}`.trim();
+      const tokenTag = raw.order_number ? ` [Token: ${raw.order_number}]` : '';
+      const notes = `[Online: ${raw.order_id}]${tokenTag} ${typeLabel}${payTag}${raw.special_instructions ? ' | ' + raw.special_instructions : ''}`.trim();
 
       const defaultUser = db.prepare("SELECT id FROM users ORDER BY created_at ASC LIMIT 1").get() as { id: string } | undefined;
       const userId = defaultUser?.id || null;
@@ -560,7 +578,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
     }
 
     const receiptId = raw.order_id || `REC-${createdOrderNumber}`;
-    const receiptUrl = `${baseDomain}/bill.php?id=${encodeURIComponent(receiptId)}`;
+    const receiptUrl = `${baseDomain}/bill.php?id=${encodeURIComponent(createdOrderNumber || receiptId)}`;
 
     // Publish official thermal bill snapshot to web server for 4-day retention
     const receiptPayload = {
@@ -750,7 +768,8 @@ export async function pollOnlineOrders(syncUrl: string, apiKey: string): Promise
       if (!ord || !ord.order_id) continue;
       const result = await ingestOnlineOrder(ord);
       if (result.ok) {
-        ackIds.push(ord.order_id);
+        if (ord.order_id) ackIds.push(ord.order_id);
+        if (ord.order_number && ord.order_number !== ord.order_id) ackIds.push(ord.order_number);
       } else {
         console.error(`[OnlineOrders] Failed to ingest order ${ord.order_id}:`, result.error);
       }

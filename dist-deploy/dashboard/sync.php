@@ -233,7 +233,8 @@ if ($action === 'ack_orders') {
             if (is_array($current)) {
                 foreach ($current as $ord) {
                     $id = $ord['order_id'] ?? ($ord['id'] ?? '');
-                    if (isset($ackMap[$id])) {
+                    $num = $ord['order_number'] ?? '';
+                    if (isset($ackMap[$id]) || (!empty($num) && isset($ackMap[$num]))) {
                         $ord['acknowledged_at'] = date('c');
                         $ord['status'] = 'synced';
                         $acknowledged[] = $ord;
@@ -407,25 +408,23 @@ if (!empty($data['recent_bills']) && is_array($data['recent_bills'])) {
     }
 }
 if ($posMaxSeq > 0) {
-    $seqFile = $dataDir . '/order_sequence.json';
     $today = date('Y-m-d');
-    $fpS = fopen($seqFile, 'c+');
-    if ($fpS && flock($fpS, LOCK_EX)) {
-        $sRaw = stream_get_contents($fpS);
-        $sData = json_decode($sRaw ?: '[]', true);
-        $currLast = (($sData['date'] ?? '') === $today) ? (int)($sData['last_seq'] ?? 0) : 0;
+    foreach ($candidateDirs as $cDir) {
+        if (!is_dir($cDir)) continue;
+        $seqFile = $cDir . '/order_sequence.json';
+        $currLast = 0;
+        if (file_exists($seqFile)) {
+            $sRaw = @file_get_contents($seqFile);
+            $sData = json_decode($sRaw ?: '[]', true);
+            $currLast = (($sData['date'] ?? '') === $today) ? (int)($sData['last_seq'] ?? 0) : 0;
+        }
         $newLast = max($currLast, $posMaxSeq);
-        ftruncate($fpS, 0);
-        rewind($fpS);
-        fwrite($fpS, json_encode([
+        @file_put_contents($seqFile, json_encode([
             'date' => $today,
             'last_seq' => $newLast,
             'prefix' => 'TOK',
             'updated_at' => date('c'),
-        ], JSON_PRETTY_PRINT));
-        fflush($fpS);
-        flock($fpS, LOCK_UN);
-        fclose($fpS);
+        ], JSON_PRETTY_PRINT), LOCK_EX);
     }
 }
 

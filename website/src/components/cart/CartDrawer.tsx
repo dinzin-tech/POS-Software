@@ -188,7 +188,7 @@ export default function CartDrawer() {
         throw new Error(lastError);
       }
 
-      const generatedId = submittedData.order_id || submittedData.order_number || `TOK-${Date.now().toString().slice(-4)}`;
+      const generatedId = submittedData.order_number || submittedData.order_id || `TOK-${Date.now().toString().slice(-4)}`;
       setConfirmedOrderId(generatedId);
       if (submittedData.bill_number) {
         setConfirmedBillNumber(submittedData.bill_number);
