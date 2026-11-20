@@ -826,6 +826,6 @@ export function stopLiveSync(): void {
     clearTimeout(debounceTimer);
     debounceTimer = null;
   }
-  void notifyStoreClosingOnShutdown();
+  void notifyStoreClosingOnShutdown().catch(() => {});
   console.log('[LiveSync] Service stopped');
 }

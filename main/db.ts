@@ -335,8 +335,13 @@ function sha256Hex(value: string): string {
 }
 
 export function getSettingValue(key: string): string | null {
-  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string | null } | undefined;
-  return row?.value ?? null;
+  if (!db || !db.open) return null;
+  try {
+    const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string | null } | undefined;
+    return row?.value ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** Resolves the tenant's configured business day start time, holding it to the
