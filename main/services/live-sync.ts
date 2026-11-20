@@ -1,4 +1,5 @@
 import {
+  dateStampInTimezone,
   dayBoundsInTimezone,
   getDatabase,
   getSettingValue,
@@ -530,6 +531,23 @@ export function buildLiveSyncPayload(): Record<string, unknown> {
     hourly_sales: hourlySales,
     menu_catalog: buildMenuCatalog(db),
     store_status: getStoreStatus(db),
+    order_sequence: (() => {
+      try {
+        const todayBucket = dateStampInTimezone(timezone);
+        const seqRow = db.prepare(`
+          SELECT current_value FROM sequences WHERE name = 'orders' AND date = ?
+        `).get(todayBucket) as { current_value: number } | undefined;
+        const maxOrderRow = db.prepare(`
+          SELECT MAX(CAST(SUBSTR(order_number, 5) AS INTEGER)) as max_num
+          FROM orders
+          WHERE order_number LIKE 'TOK-%'
+            AND created_at >= date('now', 'start of day', 'localtime')
+        `).get() as { max_num: number | null } | undefined;
+        return Math.max(Number(seqRow?.current_value || 0), Number(maxOrderRow?.max_num || 0));
+      } catch {
+        return 0;
+      }
+    })(),
   };
 }
 

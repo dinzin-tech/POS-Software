@@ -238,6 +238,9 @@ export default function CartDrawer() {
           const res = await fetch(statusUrl);
           if (res.ok) {
             const data = await res.json().catch(() => ({}));
+            if (data?.order_number && typeof data.order_number === 'string' && data.order_number !== confirmedOrderId) {
+              setConfirmedOrderId(data.order_number);
+            }
             if (data?.bill_number && typeof data.bill_number === 'string') {
               setConfirmedBillNumber(data.bill_number);
               clearInterval(interval);

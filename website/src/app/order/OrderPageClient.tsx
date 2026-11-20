@@ -288,6 +288,8 @@ export default function OrderPageClient() {
                 if (!prev) return null;
                 const updated = {
                   ...prev,
+                  order_number: data.order_number || prev.order_number,
+                  bill_url: data.bill_url || prev.bill_url,
                   bill_number: data.bill_number,
                   status: 'confirmed' as const,
                 };

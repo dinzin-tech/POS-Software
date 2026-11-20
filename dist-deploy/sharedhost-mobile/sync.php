@@ -304,6 +304,7 @@ if ($action === 'publish_receipt') {
 
     $aliasNum = !empty($payload['order_number']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['order_number']) : '';
     $aliasBill = !empty($payload['bill_number']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['bill_number']) : '';
+    $aliasOriginal = !empty($payload['original_token']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['original_token']) : '';
 
     foreach ($candidateDirs as $cDir) {
         $rDir = $cDir . '/receipts';
@@ -316,6 +317,9 @@ if ($action === 'publish_receipt') {
         }
         if ($aliasBill !== '' && $aliasBill !== $receiptId) {
             @file_put_contents($rDir . '/' . $aliasBill . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
+        if ($aliasOriginal !== '' && $aliasOriginal !== $receiptId && $aliasOriginal !== $aliasNum) {
+            @file_put_contents($rDir . '/' . $aliasOriginal . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
     }
 
@@ -393,6 +397,9 @@ if (isset($data['store_status']) && is_array($data['store_status'])) {
 
 // Synchronize order sequence counter from POS orders
 $posMaxSeq = 0;
+if (isset($data['order_sequence']) && (int)$data['order_sequence'] > 0) {
+    $posMaxSeq = max($posMaxSeq, (int)$data['order_sequence']);
+}
 if (!empty($data['active_orders']) && is_array($data['active_orders'])) {
     foreach ($data['active_orders'] as $ao) {
         if (!empty($ao['order_number']) && preg_match('/^TOK-(\d+)$/i', (string)$ao['order_number'], $m)) {

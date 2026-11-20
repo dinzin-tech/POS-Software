@@ -96,6 +96,15 @@ if ($action === 'publish_receipt' || ($requestMethod === 'POST' && isset($_GET['
                 @file_put_contents($cDir . '/' . $aliasBill . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
             }
         }
+
+        // Also alias by original_token if token was reassigned by POS
+        if (!empty($payload['original_token'])) {
+            $aliasOriginal = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['original_token']);
+            $currAliasId = !empty($payload['order_number']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['order_number']) : '';
+            if ($aliasOriginal !== '' && $aliasOriginal !== $receiptId && $aliasOriginal !== $currAliasId) {
+                @file_put_contents($cDir . '/' . $aliasOriginal . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            }
+        }
     }
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';

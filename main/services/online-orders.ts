@@ -584,6 +584,7 @@ export async function ingestOnlineOrder(raw: RawOnlineOrder): Promise<{ ok: bool
     const receiptPayload = {
       receipt_id: receiptId,
       order_number: createdOrderNumber,
+      original_token: raw.order_number || '',
       bill_number: billNumber,
       online_order_id: raw.order_id,
       customer_name: raw.customer.name,

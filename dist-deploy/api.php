@@ -194,34 +194,37 @@ if ($action === 'order_status') {
 
     // 1. If lookup by exact Token or Order ID
     if ($reqId !== '') {
-        $rFile = $receiptsDir . '/' . $reqId . '.json';
-        if (file_exists($rFile)) {
-            $rData = json_decode(@file_get_contents($rFile) ?: '[]', true);
-            if (is_array($rData)) {
-                $bNum = $rData['bill_number'] ?? '';
-                $isProcessed = !empty($bNum) && stripos($bNum, 'Processing') === false;
-                echo json_encode([
-                    'ok' => true,
-                    'status' => $isProcessed ? 'confirmed' : 'pending',
-                    'order_id' => $rData['online_order_id'] ?? ($rData['receipt_id'] ?? $reqId),
-                    'order_number' => $rData['order_number'] ?? $reqId,
-                    'bill_number' => $isProcessed ? $bNum : null,
-                    'customer_name' => $rData['customer_name'] ?? '',
-                    'customer_phone' => $rData['customer_phone'] ?? '',
-                    'order_type' => $rData['order_type'] ?? 'Takeaway',
-                    'table_number' => $rData['table_number'] ?? '',
-                    'items' => $rData['items'] ?? [],
-                    'subtotal' => $rData['subtotal'] ?? 0,
-                    'tax_amount' => $rData['tax_amount'] ?? 0,
-                    'total' => $rData['total'] ?? 0,
-                    'paid_amount' => $rData['paid_amount'] ?? 0,
-                    'balance' => $rData['balance'] ?? 0,
-                    'payment_status' => $rData['payment_status'] ?? 'PAID',
-                    'payment_method' => $rData['payment_method'] ?? 'ONLINE',
-                    'created_at' => $rData['created_date_formatted'] ?? date('d/m/Y g:i:s a', (int)($rData['stored_at'] ?? time())),
-                    'bill_url' => '/bill.php?id=' . urlencode($rData['order_number'] ?? $reqId),
-                ]);
-                exit;
+        $candidateDirs = getCandidateDataDirs($dataDir);
+        foreach ($candidateDirs as $cDir) {
+            $rFile = $cDir . '/receipts/' . $reqId . '.json';
+            if (file_exists($rFile)) {
+                $rData = json_decode(@file_get_contents($rFile) ?: '[]', true);
+                if (is_array($rData)) {
+                    $bNum = $rData['bill_number'] ?? '';
+                    $isProcessed = !empty($bNum) && stripos($bNum, 'Processing') === false;
+                    echo json_encode([
+                        'ok' => true,
+                        'status' => $isProcessed ? 'confirmed' : 'pending',
+                        'order_id' => $rData['online_order_id'] ?? ($rData['receipt_id'] ?? $reqId),
+                        'order_number' => $rData['order_number'] ?? $reqId,
+                        'bill_number' => $isProcessed ? $bNum : null,
+                        'customer_name' => $rData['customer_name'] ?? '',
+                        'customer_phone' => $rData['customer_phone'] ?? '',
+                        'order_type' => $rData['order_type'] ?? 'Takeaway',
+                        'table_number' => $rData['table_number'] ?? '',
+                        'items' => $rData['items'] ?? [],
+                        'subtotal' => $rData['subtotal'] ?? 0,
+                        'tax_amount' => $rData['tax_amount'] ?? 0,
+                        'total' => $rData['total'] ?? 0,
+                        'paid_amount' => $rData['paid_amount'] ?? 0,
+                        'balance' => $rData['balance'] ?? 0,
+                        'payment_status' => $rData['payment_status'] ?? 'PAID',
+                        'payment_method' => $rData['payment_method'] ?? 'ONLINE',
+                        'created_at' => $rData['created_date_formatted'] ?? date('d/m/Y g:i:s a', (int)($rData['stored_at'] ?? time())),
+                        'bill_url' => '/bill.php?id=' . urlencode($rData['order_number'] ?? $reqId),
+                    ]);
+                    exit;
+                }
             }
         }
 
@@ -387,16 +390,25 @@ if ($action === 'publish_receipt') {
     $filePath = $receiptsDir . '/' . $receiptId . '.json';
     @file_put_contents($filePath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
-    if (!empty($payload['order_number'])) {
-        $aliasNum = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['order_number']);
-        if ($aliasNum !== '' && $aliasNum !== $receiptId) {
-            @file_put_contents($receiptsDir . '/' . $aliasNum . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    $aliasNum = !empty($payload['order_number']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['order_number']) : '';
+    $aliasBill = !empty($payload['bill_number']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['bill_number']) : '';
+    $aliasOriginal = !empty($payload['original_token']) ? preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['original_token']) : '';
+
+    $candidateDirs = getCandidateDataDirs($dataDir);
+    foreach ($candidateDirs as $cDir) {
+        $rDir = $cDir . '/receipts';
+        if (!is_dir($rDir)) {
+            @mkdir($rDir, 0755, true);
         }
-    }
-    if (!empty($payload['bill_number'])) {
-        $aliasBill = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$payload['bill_number']);
+        @file_put_contents($rDir . '/' . $receiptId . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        if ($aliasNum !== '' && $aliasNum !== $receiptId) {
+            @file_put_contents($rDir . '/' . $aliasNum . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
         if ($aliasBill !== '' && $aliasBill !== $receiptId) {
-            @file_put_contents($receiptsDir . '/' . $aliasBill . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            @file_put_contents($rDir . '/' . $aliasBill . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
+        if ($aliasOriginal !== '' && $aliasOriginal !== $receiptId && $aliasOriginal !== $aliasNum) {
+            @file_put_contents($rDir . '/' . $aliasOriginal . '.json', json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
     }
 
