@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
-import { Plus, Search, X, Edit, Trash2, ArrowDownCircle, ArrowUpCircle, PackageMinus, ClipboardList, Scale } from 'lucide-react';
+import { Plus, Search, X, Edit, Trash2, ArrowDownCircle, ArrowUpCircle, PackageMinus, ClipboardList, Scale, FileSpreadsheet, Download, Upload, CheckCircle } from 'lucide-react';
 import { useTranslations } from 'use-intl';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useFormatNumber } from '@/hooks/useFormatNumber';
@@ -104,6 +104,10 @@ export default function InventoryPage() {
 
   const [deletingSupply, setDeletingSupply] = useState<Supply | null>(null);
   const [deletingRecipe, setDeletingRecipe] = useState<Recipe | null>(null);
+  const [showCsvModal, setShowCsvModal] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [csvUploading, setCsvUploading] = useState(false);
+  const [csvResult, setCsvResult] = useState<Record<string, unknown> | null>(null);
 
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
@@ -303,6 +307,39 @@ export default function InventoryPage() {
     }
   };
 
+  const downloadSupplyCsv = async (path: string, filename: string) => {
+    try {
+      const res = await api.get(path, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data as Blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error(tCommon('downloadFailed'));
+    }
+  };
+
+  const handleSupplyCsvUpload = async () => {
+    if (!csvFile) return;
+    setCsvUploading(true);
+    setCsvResult(null);
+    try {
+      const text = await csvFile.text();
+      const res = await api.post('/supplies/import-csv', { csv: text });
+      setCsvResult(res.data);
+      refresh();
+    } catch (err: unknown) {
+      const message = err instanceof Error && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+        : undefined;
+      toast.error(message || tCommon('importFailed'));
+    } finally {
+      setCsvUploading(false);
+    }
+  };
+
   if (!canManage) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -317,7 +354,16 @@ export default function InventoryPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-foreground">{tNav('inventory')}</h1>
         {tab === 'supplies' && (
-          <Button onClick={openAddSupply}><Plus size={16} className="me-1" /> {t('addSupply')}</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => {
+              setCsvFile(null);
+              setCsvResult(null);
+              setShowCsvModal(true);
+            }}>
+              <FileSpreadsheet size={16} className="me-1" /> CSV
+            </Button>
+            <Button onClick={openAddSupply}><Plus size={16} className="me-1" /> {t('addSupply')}</Button>
+          </div>
         )}
         {tab === 'recipes' && (
           <Button onClick={openAddRecipe}><Plus size={16} className="me-1" /> {t('addRecipe')}</Button>
@@ -639,6 +685,86 @@ export default function InventoryPage() {
               </div>
               <Button type="submit" className="w-full" disabled={recipeForm.items.length === 0}>{tCommon('save')}</Button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showCsvModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card rounded-2xl p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold">Bulk inventory CSV</h2>
+              <button onClick={() => setShowCsvModal(false)}><X size={20} className="text-gray-400" /></button>
+            </div>
+            <div className="space-y-5">
+              <div className="bg-muted rounded-xl p-4 space-y-3">
+                <p className="text-sm font-medium text-foreground">Download</p>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => downloadSupplyCsv('/supplies/template-csv', 'supplies-template.csv')}
+                    className="flex items-center gap-2 px-4 py-2 text-sm border border-border rounded-lg bg-card hover:bg-muted font-medium"
+                  >
+                    <Download size={14} /> Blank template
+                  </button>
+                  <button
+                    onClick={() => downloadSupplyCsv('/supplies/export-csv', 'supplies-export.csv')}
+                    className="flex items-center gap-2 px-4 py-2 text-sm border border-border rounded-lg bg-card hover:bg-muted font-medium"
+                  >
+                    <Download size={14} /> Current data
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Columns: name, base_unit (each/g/kg/ml/l), stock_quantity, low_stock_threshold, is_active (yes/no).
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-foreground">Upload CSV</p>
+                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted transition-colors">
+                  <Upload size={20} className="text-gray-400 mb-1" />
+                  <span className="text-sm text-muted-foreground">{csvFile ? csvFile.name : 'Click to choose a CSV file'}</span>
+                  <input
+                    type="file"
+                    accept=".csv,text/csv"
+                    className="hidden"
+                    onChange={(e) => {
+                      setCsvFile(e.target.files?.[0] ?? null);
+                      setCsvResult(null);
+                    }}
+                  />
+                </label>
+                {csvFile && (
+                  <Button onClick={handleSupplyCsvUpload} disabled={csvUploading} className="w-full">
+                    {csvUploading ? 'Importing...' : tCommon('import')}
+                  </Button>
+                )}
+              </div>
+
+              {csvResult && (
+                <div className="rounded-xl border border-border overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-green-50 border-b border-border">
+                    <CheckCircle size={15} className="text-green-600" />
+                    <span className="text-sm font-medium text-green-800">Import complete</span>
+                  </div>
+                  <div className="px-4 py-3 text-sm text-foreground space-y-1">
+                    <p>{tCommon('created')} <span className="font-medium">{String(csvResult.created ?? 0)}</span></p>
+                    <p>Updated <span className="font-medium">{String(csvResult.updated ?? 0)}</span></p>
+                    <p>Reactivated <span className="font-medium">{String(csvResult.reactivated ?? 0)}</span></p>
+                    <p>{tCommon('skipped')} <span className="font-medium">{String(csvResult.skipped ?? 0)}</span></p>
+                    <p>Failed <span className="font-medium">{String(csvResult.failed ?? 0)}</span></p>
+                  </div>
+                  {Array.isArray(csvResult.errors) && (csvResult.errors as string[]).length > 0 && (
+                    <div className="px-4 py-3 border-t border-border bg-amber-50">
+                      <ul className="space-y-1">
+                        {(csvResult.errors as string[]).map((error, index) => (
+                          <li key={index} className="text-xs text-amber-800">{error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
