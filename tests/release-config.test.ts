@@ -259,6 +259,10 @@ function run() {
   if (workflow) {
     const jobs = workflow.jobs;
     const triggers = workflow.on || workflow['true'];
+    const legacyBuildWorkflow = loadWorkflow('build-release.yml');
+    const legacyBuildTriggers = legacyBuildWorkflow.on || legacyBuildWorkflow['true'];
+    assert.deepEqual(triggers.push.tags, ['[0-9]*'], 'canonical Release workflow must own numeric version tags');
+    assert.deepEqual(legacyBuildTriggers.push.tags, ['v*'], 'legacy build workflow must not overlap numeric version tags');
     const createRelease = jobs['create-release'];
     for (const jobName of ['create-release', 'release-linux', 'release-mac', 'release-windows', 'verify-release', 'publish-release']) {
       if (jobs[jobName]) {
