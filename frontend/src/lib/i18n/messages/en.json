@@ -1281,8 +1281,8 @@
     "tables": "Tables"
   },
   "settings": {
-    "aboutDescription": "FloPOS is a free forever, open-source restaurant POS for cafes, restaurants, bakeries, food trucks, cloud kitchens, and bars. It includes ordering, tables, menus, kitchen display, receipt printing, staff access, and local data storage. Download it, run service, keep your data, and own your POS.",
-    "aboutFloCafe": "About DinZin",
+    "aboutDescription": "DinZin POS helps restaurants and cafes manage daily operations in one place. Handle orders, tables, menus, kitchen workflows, receipts, staff access, and store data with tools designed for day-to-day service.",
+    "aboutFloCafe": "About DinZin POS",
     "aboutGithub": "GitHub Repository",
     "aboutWebsite": "App Website",
     "account": "Account",
