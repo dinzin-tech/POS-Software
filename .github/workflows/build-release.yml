@@ -5,13 +5,52 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 3.12.29). If empty, defaults to tag or package.json version.'
+        required: false
+        type: string
 
 permissions:
   contents: write
 
 jobs:
+  prepare-release:
+    name: Prepare Release Metadata
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Resolve dynamic version and tag
+        id: meta
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            RAW_VER="${{ inputs.version }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            RAW_VER="${GITHUB_REF_NAME}"
+          else
+            RAW_VER=$(node -p "require('./package.json').version")
+          fi
+          CLEAN_VER="${RAW_VER#v}"
+          TAG="v${CLEAN_VER}"
+          echo "Dynamic version: ${CLEAN_VER}"
+          echo "Release tag: ${TAG}"
+          echo "version=${CLEAN_VER}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
   build-linux:
     name: Build Linux AppImage
+    needs: prepare-release
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -24,6 +63,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Set dynamic version
+        shell: bash
+        run: |
+          npm version "${{ needs.prepare-release.outputs.version }}" --no-git-tag-version --allow-same-version
 
       - name: Build frontend & backend
         run: |
@@ -44,6 +88,7 @@ jobs:
 
   build-windows:
     name: Build Windows Executable
+    needs: prepare-release
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -56,6 +101,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Set dynamic version
+        shell: bash
+        run: |
+          npm version "${{ needs.prepare-release.outputs.version }}" --no-git-tag-version --allow-same-version
 
       - name: Build frontend & backend
         run: |
@@ -78,11 +128,18 @@ jobs:
 
   publish-release:
     name: Publish GitHub Release
-    needs: [build-linux, build-windows]
+    needs: [prepare-release, build-linux, build-windows]
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Download Linux AppImage
         uses: actions/download-artifact@v4
@@ -99,6 +156,28 @@ jobs:
       - name: Release on GitHub
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ needs.prepare-release.outputs.tag }}
+          name: ${{ needs.prepare-release.outputs.tag }}
           files: dist-release/*
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit version bump to repository
+        shell: bash
+        run: |
+          TARGET_VER="${{ needs.prepare-release.outputs.version }}"
+          git fetch origin main
+          git checkout -B main origin/main
+          CURRENT_VER=$(node -p "require('./package.json').version")
+          if [ "$CURRENT_VER" != "$TARGET_VER" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            npm version "$TARGET_VER" --no-git-tag-version
+            git add package.json package-lock.json
+            git commit -m "chore(release): bump version to ${TARGET_VER} [skip ci]"
+            git push origin main
+            echo "Successfully updated package.json to ${TARGET_VER} on main"
+          else
+            echo "package.json on main is already at version ${TARGET_VER}"
+          fi
